@@ -18,23 +18,26 @@
 /************************************************/
 /*                  Libraries                   */
 /************************************************/
-#include "../include/definitions.hpp"
-
-
+#include "../include/ClientConfig.hpp"
 /************************************************/
 /*                   Main                       */
 /************************************************/
 int main(int argc, char *argv[]) 
 {
 try {
+    ReturnCodes retVal = ERROR;
+    std::string current_val;
+    ImapClientConfig app_config(argc, argv);
     /* Start of The Program Section... */
-    (void)argc;
-    (void)argv;
-    printf("Alles Gute!\n");
+    retVal = (ReturnCodes)app_config.GetClientMode();
+    if (SECURE == retVal)
+    {
+        printf("Alles Gute!\n");
+    }
 
     /* End of The Program Section */
 
-    return 0;
+    return retVal;
 }
 catch (const std::exception &e)
 {

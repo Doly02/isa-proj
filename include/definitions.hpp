@@ -39,6 +39,11 @@
  */
 #define NON_SECURE                  (false)
 
+#define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
+#define DEFAULT_MAILBOX_DIR         "INBOX"
+
+#define EMPTY_STR                   ""
+
 #define DEBUG_ENABLED               (true)
 
 /**
@@ -50,5 +55,41 @@ typedef enum
     ERROR       = 1u      /**< Error */
 
 } ReturnCodes;
+
+/**
+ * @brief Structure For The Email Message.
+ */
+typedef struct 
+{
+    std::vector<std::string> from;          //<! Sender Address.
+    
+    std::vector<std::string> to;            //<! Receiver Address.
+    std::vector<std::string> cc;            //<! Carbon Copy.
+    std::vector<std::string> bcc;           //<! Blind Carbon Copy.
+
+    std::string subject;                    //<! Subject of The Email.
+    std::string date;                       //<! Date
+    std::string message_id;                 //<! Message-ID
+    std::vector<std::string> content_type;  //<! Content-Type
+
+} MailHeader_t;
+
+/**
+ * @brief Structure of The Email Body.
+ */
+typedef struct 
+{
+    std::vector<std::string> content;           //<! Mail Content.
+
+} MailBody_t;
+
+/**
+ * @brief Structure of The Email.
+ */
+typedef struct
+{
+    MailHeader_t    header;
+    MailBody_t      body;                   //<! Header of The Mail.
+} Mail_t;
 
 #endif /* DEFINITIONS_HPP */
