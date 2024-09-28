@@ -26,7 +26,7 @@
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
-BaseImapClient::BaseImapClient() : mCurrentTagValue(0) {}
+BaseImapClient::BaseImapClient() : mCurrentTagValue(0), curr_state(LOGIN) {}
 
 std::string BaseImapClient::generateTag(void)
 {
@@ -37,7 +37,15 @@ std::string BaseImapClient::generateTag(void)
     // Add Incremented Hexadecimal Value
     tag_stream << std::setw(10) << std::setfill('0') << std::hex << ++mCurrentTagValue;
     return tag_stream.str();
-}   
+}  
+
+std::string BaseImapClient::getTag()
+{
+    std::stringstream tag_stream;
+    tag_stream << 'A';
+    tag_stream << std::setw(10) << std::setfill('0') << std::hex << mCurrentTagValue;
+    return tag_stream.str();
+}
 
 /**
  * @brief Resolves the hostname of the IMAP server to an IP address.
@@ -90,15 +98,23 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
     return "";
 }
 
-int BaseImapClient::EvaluateServerResponse(Response_t type, std::string response)
+int BaseImapClient::FindEndOfResponse(std::string buff)
 {
-    switch (type)
+    std::current_tag = getTag();
+    switch(type)
     {
         case LOGIN:
-            return response.find("OK LOGIN Authentication succeeded");
-        case CONNECT:
-            return response.find("OK");
+            /* login completed, now in authenticated state */
+            if (std::string::npos != buff.find(current_tag + " OK LOGIN completed"))
+                return SUCCESS;
+            /* login failure: user name or password rejected */
+            else if (std::string::npos != buff.find(current_tag + " NO LOGIN completed"))
+                return TRANSMIT_DATA_FAILED; /*TODO: Update Return Value */
+            /* command unknown or arguments invalid */
+            else if (std::string::npos != buff.find(current_tag + " BAD LOGIN completed"))
+                return TRANSMIT_DATA_FAILED; /*TODO: Update Return Value */
         default:
-            return SERVER_UNKNOWN_RESPONSE;
+            return RESPONSE_NOT_FOUND;
+            
     }
 }

@@ -36,6 +36,7 @@ class NonSecureImapClient : public BaseImapClient
         std::string outputDir;      //!< Directory to store the emails
         
         int sockfd;                 //!< Socket File Descriptor for IMAP Connection.
+        std::string rx_data;        //<! Buffer For Server Response
 
     public:
 
@@ -56,6 +57,8 @@ class NonSecureImapClient : public BaseImapClient
         bool ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password);
 
         int SendData(const std::string& data);
+
+        int ReceiveData(void);
 
         int LoginClient(std::string username, std::string password);
 

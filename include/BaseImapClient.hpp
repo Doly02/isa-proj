@@ -29,8 +29,8 @@
 class BaseImapClient {
 
     private:
-        unsigned long long mCurrentTagValue;
-
+        unsigned long long  mCurrentTagValue;
+        State_t             curr_state;
     public:
 
         /**
@@ -60,7 +60,11 @@ class BaseImapClient {
         */
         std::string generateTag(void);
 
-        int EvaluateServerResponse(Response_t type, std::string response);
+        std::string getTag(void);
+
+        std::string FindEndOfResponse(State_t type);
+
+        int FindEndOfResponse(std::string buff);
 
 };
 

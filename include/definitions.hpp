@@ -36,6 +36,11 @@
 /************************************************/
 /*             Macro Definitions                */
 /************************************************/
+/**
+ * @brief   Rx Buffer Size For Receiving Data From IMAP Server.
+ * @details 1024 Bytes Should Be Enough.
+ */
+static constexpr int RX_BUFFER_SIZE 1024 /* RX Buffer = 1024B */
 
 /**
  * @brief Definitions of Return Codes.
@@ -45,6 +50,8 @@
 #define PARSE_CREDENTIALS_FAILED    (2u)
 #define SERVER_UNKNOWN_RESPONSE     (3u)
 #define TRANSMIT_DATA_FAILED        (4u)
+#define RECEIVE_DATA_FAILED         (5u)
+#define RESPONSE_NOT_FOUND          (6u)
 #define NOT_IMPLEMENTED             throw std::runtime_error("Not Implemented Yet!")
 /**
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
@@ -111,8 +118,11 @@ typedef struct
 
 typedef enum
 {
-    LOGIN = 0u,
-    CONNECT = 1u
-} Response_t;
+    /* Responses To Login Command */
+    LOGIN = 0u,                  //<! login completed, now in authenticated state
+    CONNECT,
+    LOGOUT,          
+
+} State_t;
 
 #endif /* DEFINITIONS_HPP */

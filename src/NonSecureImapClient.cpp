@@ -30,6 +30,9 @@ NonSecureImapClient::NonSecureImapClient(const std::string& mailBox, const std::
 
 bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
 {
+    /* Set Current State of The Communication With IMAP Server */
+    curr_state = LOGIN;
+
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
     bool is_ipv6_addr = isIPv6Address(serverAddress);
@@ -104,6 +107,11 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
 
     /* Send Login Command To IMAP Server */
     LoginClient(username, password);
+    if (SUCCESS != ReceiveData())
+    {
+        return false;
+    }
+    // TODO: Print To The User That Login Was Successful.
 
     return true; 
 
@@ -130,6 +138,32 @@ int NonSecureImapClient::SendData(const std::string& data)
 
 }
 
+int NonSecureImapClient::ReceiveData()
+{
+    char        rx_buffer[RX_BUFFER_SIZE];
+    ssize_t     bytes_rx;            //<! Num. of Received Bytes
+
+    while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE-1, 0)))
+    {
+        rx_buffer[bytes_rx] = '\0';
+        rx_data += rx_buffer;
+        if (SUCCESS == BaseImapClient::FindEndOfResponse(std::string(rx_buffer)))
+        {
+            break;
+        }
+
+    }
+
+    /* Handle Error If Occured During Transmission */
+    if (0 > bytes_rx)
+    {
+        std::cerr << "ERR: Failed to Receive Data.\n";
+        return RECEIVE_DATA_FAILED;
+    }
+    return SUCCESS;
+
+}
+
 int NonSecureImapClient::LoginClient(std::string username, std::string password)
 {
     std::string tag = generateTag();
@@ -138,6 +172,8 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
     {
         return TRANSMIT_DATA_FAILED;
     }
+    // TODO: Receive Response From The Server & Eval.
+
     return SUCCESS;
 }
 
