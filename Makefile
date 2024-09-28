@@ -18,13 +18,13 @@ CFLAGS = -std=c++17 -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -pedantic 
 DEBUG_CFLAGS = -fsanitize=address -g -std=c++17 -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -pedantic
 
 # Header Files
-HEADERS = include/definitions.hpp include/utilities.hpp include/ClientConfig.hpp
+HEADERS = include/definitions.hpp include/utilities.hpp include/ClientConfig.hpp include/BaseImapClient.hpp include/NonSecureImapClient.hpp
 # include/definitions.hpp include/utilities.hpp include/ClientConfig.hpp include/BaseImapClient.hpp
 # Libraries
 LIBS = #-lpcap
 
 # Source Files
-SOURCES = src/utilities.cpp src/ClientConfig.cpp src/main.cpp
+SOURCES = src/utilities.cpp src/ClientConfig.cpp src/BaseImapClient.cpp src/NonSecureImapClient.cpp src/main.cpp
 # src/utilities.cpp src/ClientConfig.cpp  src/BaseImapClient.cpp
 # Object Files 
 OBJECTS = $(SOURCES:.cpp=.o)

@@ -23,6 +23,8 @@
 /************************************************/
 #include <string>
 #include <cstring>
+#include <unistd.h>             /*!< Hostname Relevant, close() */
+#include "definitions.hpp"
 
 class BaseImapClient {
 
@@ -37,12 +39,17 @@ class BaseImapClient {
         BaseImapClient();
 
         /**
-        * @brief       Resolves The Hostname of the IMAP Server to an IPv4 Address.
-        * @details     Correctness of This Method Can Be Tested By Command 'nslookup'.
-        * @param[in]   hostname The IMAP Server Hostname to Resolve.
-        * @retval      A String Containing the IPv4 Address or an Empty String in Case of Failure.
+        * @brief       Resolves the Hostname of The Server to an IP Address (tries IPv4 First, Then IPv6).
+        * @details     The Function Uses getaddrinfo() To Resolve The Hostname To An IP Address. 
+        *              It First Attempts To Resolve The Address To an IPv4 Address. 
+        *              If No IPv4 Address is Found, Method Tries To Resolve an IPv6 Address.
+        *              The Correctness of This Method Can Be Tested Using The Command 'nslookup' or 'dig'.
+        *              The Method Supports Both - IPv4 and IPv6 Addresses.
+        * @param[in]   hostname The Server Hostname to Resolve.
+        * @param[in]   port The Port Number as a String (e.g., "143" for IMAP).
+        * @retval      A String Containing the Resolved IP Address (Either IPv4 or IPv6), or An Empty String in Case of Failure.
         */
-        std::string resolveHostnameToIPv4(const std::string& hostname);
+        std::string ResolveHostnameToIP(const std::string& hostname, const std::string& port);
 
         /**
         * @brief       Generates Tags For Client Requests.
@@ -52,6 +59,9 @@ class BaseImapClient {
         * @retval      11-Byte Long String.
         */
         std::string generateTag(void);
+
+        int EvaluateServerResponse(Response_t type, std::string response);
+
 };
 
 #endif /* BASE_IMAP_CLIENT_H */

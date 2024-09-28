@@ -44,7 +44,7 @@ bool fileExists(const std::string& filename);
 * @retval       True If The String Is IPv4 Address.
 * @retval       False Otherwise.
 */
-bool IsIp4Address(std::string& str);
+bool IsIPv4Address(const std::string& str);
 
 /**
 * @brief        Checks Whether The String Is IPv6 Address.
@@ -54,7 +54,7 @@ bool IsIp4Address(std::string& str);
 * @retval       True If The String Is IPv6 Address.
 * @retval       False Otherwise.
 */
-bool isIpv6Address(const std::string& str);
+bool isIPv6Address(const std::string& str);
 
 
 #endif /* UTILITIES_HPP */

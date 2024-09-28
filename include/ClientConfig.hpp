@@ -72,10 +72,10 @@ class ImapClientConfig
         bool ProcessArguments(int argc, char* argv[]);
 
         /**
-        * @brief Extracts Username and Password From an Authentication File.
+        * @brief        Extracts Username and Password From an Authentication File.
         * 
-        * @details This Function Attempts to Extract The Credentials (Username and Password)
-        * From The Specified Auth. file. It Uses Regular Expressions To Search For The Format:
+        * @details      This Function Attempts to Extract The Credentials (Username and Password)
+        *               From The Specified Auth. file. It Uses Regular Expressions To Search For The Format:
         * 
         * @code
         * username = <username>
@@ -83,9 +83,9 @@ class ImapClientConfig
         * @endcode
         * 
         * User Has to Provide Full Path to The File With Credentials By Parameter '-p'.
-        *
-        * @throw std::runtime_error If The Auth. File Cannot Be Opened or 
-        * If Valid Credentials (Username and Password) Are Not Found in The Expected Format. TODO: Update Comment!
+        * @throw        std::runtime_error If The Auth. File Cannot Be Opened or 
+        *               If Valid Credentials (Username and Password) Are Not Found in 
+        *               The Expected Format. TODO: Update Comment!
         */
         int ExtractAuthData(void);
 };

@@ -22,16 +22,17 @@
 /*                  Libraries                   */
 /************************************************/
 #include <string>
+#include <cstring>          /*<! For memset() */
 #include <vector>
 #include <cstdio>
-#include <iostream>
-#include <fstream>          /*!@ For std::ifstream */
+#include <iostream>         /*<! For 'cerr' Output.*/
+#include <fstream>          /*<! For std::ifstream */
 #include <regex>
 
-#include <sys/socket.h>
+#include <sys/socket.h>     /*<!  Hostname Relevant. */
 #include <netinet/in.h>
-#include <arpa/inet.h>
-
+#include <arpa/inet.h>      /*<!  Hostname Relevant. */
+#include <netdb.h>          /*<! For getaddrinfo() + Hostname Relevant.*/
 /************************************************/
 /*             Macro Definitions                */
 /************************************************/
@@ -42,7 +43,9 @@
 #define SUCCESS                     (0u)
 #define NO_IP_ADDR_FOUND            (1u)
 #define PARSE_CREDENTIALS_FAILED    (2u)
-
+#define SERVER_UNKNOWN_RESPONSE     (3u)
+#define TRANSMIT_DATA_FAILED        (4u)
+#define NOT_IMPLEMENTED             throw std::runtime_error("Not Implemented Yet!")
 /**
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
  */
@@ -53,7 +56,7 @@
  * @brief Non-Secure IMAP Client Mode. Communicate Just Thru TCP/IP.
  */
 #define NON_SECURE                  (false)
-#define PORT_NON_SECURE             (143)
+#define PORT_SECURE                 (143)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
@@ -104,5 +107,12 @@ typedef struct
     std::vector<std::string> password;           
 
 } Credentials_t;
+
+
+typedef enum
+{
+    LOGIN = 0u,
+    CONNECT = 1u
+} Response_t;
 
 #endif /* DEFINITIONS_HPP */

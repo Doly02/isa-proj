@@ -55,6 +55,11 @@ class NonSecureImapClient : public BaseImapClient
         */
         bool ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password);
 
+        int SendData(const std::string& data);
+
+        int LoginClient(std::string username, std::string password);
+
+        int LogoutClient(void);
         /**
         * @brief    Fetches Emails From The Connected Mailbox.
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.
@@ -67,7 +72,7 @@ class NonSecureImapClient : public BaseImapClient
         * @retval   True on Successful Disconnection, False Otherwise.
         */
         bool DisconnectImapServer(void);
-}
+};
 
 
 #endif /* NON_SECURE_IMAP_CLIENT_H */

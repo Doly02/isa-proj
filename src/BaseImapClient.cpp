@@ -21,12 +21,8 @@
 #include "../include/BaseImapClient.hpp"
 #include <sstream>      //!< For Tag Creation.
 #include <iomanip>      //!< For Tag Creation.
-#include <iostream>     //!< For 'cerr' Output.
 
 #include <unistd.h>     //!< Hostname Relevant.
-#include <arpa/inet.h>  //!< Hostname Relevant.
-#include <netdb.h>      //!< Hostname Relevant.
-#include <sys/socket.h> //!< Hostname Relevant.
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
@@ -39,46 +35,70 @@ std::string BaseImapClient::generateTag(void)
     tag_stream << 'A';
 
     // Add Incremented Hexadecimal Value
-    tag_stream << std::setw(10) << std::setfill('0') << std::hex << mCurrentTagValue++;
+    tag_stream << std::setw(10) << std::setfill('0') << std::hex << ++mCurrentTagValue;
     return tag_stream.str();
 }   
 
 /**
- * @brief Resolves the hostname of the IMAP server to an IPv4 address.
+ * @brief Resolves the hostname of the IMAP server to an IP address.
  */
-std::string BaseImapClient::resolveHostnameToIPv4(const std::string& hostname) {
-    
-    struct addrinfo hints, *pResults, *pCurrent;
-    char ipstr[INET_ADDRSTRLEN];
+std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, const std::string& port) {
+    struct addrinfo hints, *res, *p;
     int status;
+    char ip_str[INET6_ADDRSTRLEN]; // Enough to store either IPv4 or IPv6 address
 
-    // Set hints For IPv4 Addresses.
+    // Set hints to try both IPv4 and IPv6
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET;          // To Work Just Only With IPv4 Addresses (TODO: Maybe I Would Like To Work With IPv6 Addresses Too :D )
-    hints.ai_socktype = SOCK_STREAM;    // Decision That TCP Connection Will Be Used
+    hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
 
-    // Get Address With The Help of getaddrinfo
-    if ((status = getaddrinfo(hostname.c_str(), nullptr, &hints, &pResults)) != 0) 
-    {
-        std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
+    // Get address info
+    if ((status = getaddrinfo(hostname.c_str(), port.c_str(), &hints, &res)) != 0) {
+        std::cerr << "ERR: Unable to resolve hostname to IP address: " << gai_strerror(status) << "\n";
         return "";
     }
 
-    /**
-     * It's Importatnt To Go Thru The Results Because One Hostname Can Be Associated With More Than One IP Address.
-     */
-    for (pCurrent = pResults; pCurrent != nullptr; pCurrent = pCurrent->ai_next) {
-        
-        /* Convert Binary IP Address To Readeable String */
-        struct sockaddr_in *ipv4 = (struct sockaddr_in *)pCurrent->ai_addr;
-        void *addr = &(ipv4->sin_addr);
-        inet_ntop(pCurrent->ai_family, addr, ipstr, sizeof ipstr);
+    // Loop through the results and process the first valid address (prefer IPv4)
+    for (p = res; p != nullptr; p = p->ai_next) {
+        void *addr;
+        std::string ipVersion;
 
-        freeaddrinfo(pResults);  
-        return std::string(ipstr);
+        // Check if it's IPv4 or IPv6
+        if (p->ai_family == AF_INET) { // IPv4
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+            addr = &(ipv4->sin_addr);
+            ipVersion = "IPv4";
+        } else if (p->ai_family == AF_INET6) { // IPv6
+            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+            addr = &(ipv6->sin6_addr);
+            ipVersion = "IPv6";
+        } else {
+            continue;
+        }
+
+        // Convert the IP to a readable string
+        inet_ntop(p->ai_family, addr, ip_str, sizeof ip_str);
+        std::cout << "INFO: Resolved " << hostname << " to " << ipVersion << " address: " << ip_str << "\n";
+
+        // Clean up and return the first resolved IP
+        freeaddrinfo(res);
+        return std::string(ip_str);
     }
 
-    /* None Address Found */
-    freeaddrinfo(pResults);
+    // No address found
+    freeaddrinfo(res);
     return "";
+}
+
+int BaseImapClient::EvaluateServerResponse(Response_t type, std::string response)
+{
+    switch (type)
+    {
+        case LOGIN:
+            return response.find("OK LOGIN Authentication succeeded");
+        case CONNECT:
+            return response.find("OK");
+        default:
+            return SERVER_UNKNOWN_RESPONSE;
+    }
 }
