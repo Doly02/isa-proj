@@ -17,15 +17,24 @@
 
 #ifndef DEFINITIONS_HPP
 #define DEFINITIONS_HPP
+
 /************************************************/
-/*             Macro Definitions                */
+/*                  Libraries                   */
 /************************************************/
 #include <string>
 #include <vector>
 #include <cstdio>
 #include <iostream>
-#include <fstream>      /*!@ For std::ifstream */
+#include <fstream>          /*!@ For std::ifstream */
 #include <regex>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+/************************************************/
+/*             Macro Definitions                */
+/************************************************/
 
 /**
  * @brief Definitions of Return Codes.
@@ -38,10 +47,13 @@
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
  */
 #define SECURE                      (true)
+#define PORT_NON_SECURE             (993)
+
 /**
  * @brief Non-Secure IMAP Client Mode. Communicate Just Thru TCP/IP.
  */
 #define NON_SECURE                  (false)
+#define PORT_NON_SECURE             (143)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
