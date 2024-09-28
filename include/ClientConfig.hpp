@@ -20,12 +20,10 @@
 /************************************************/
 /*                  Libraries                   */
 /************************************************/
-#include <iostream>
 #include <getopt.h>
 #include <string>
 #include "definitions.hpp"
 #include "utilities.hpp"
-#include <vector>  
 /************************************************/
 /*                  Class Definition            */
 /************************************************/
@@ -42,6 +40,8 @@ class ImapClientConfig
         std::string     mailboxD;       //<! Specifies Mailbox Directory.
         bool            justNew;        //<! Only New Emails Will Be Read.
         bool            justHeaders;    //<! Just Header Will Be Downloaded.
+
+        Credentials_t   authData;
 
     public:
         /*TODO Add Public Properieties. */
@@ -70,6 +70,24 @@ class ImapClientConfig
 
 
         bool ProcessArguments(int argc, char* argv[]);
+
+        /**
+        * @brief Extracts Username and Password From an Authentication File.
+        * 
+        * @details This Function Attempts to Extract The Credentials (Username and Password)
+        * From The Specified Auth. file. It Uses Regular Expressions To Search For The Format:
+        * 
+        * @code
+        * username = <username>
+        * password = <password>
+        * @endcode
+        * 
+        * User Has to Provide Full Path to The File With Credentials By Parameter '-p'.
+        *
+        * @throw std::runtime_error If The Auth. File Cannot Be Opened or 
+        * If Valid Credentials (Username and Password) Are Not Found in The Expected Format. TODO: Update Comment!
+        */
+        int ExtractAuthData(void);
 };
 
 #endif /* CLIENTCONFIG_HPP */

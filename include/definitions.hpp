@@ -24,11 +24,15 @@
 #include <vector>
 #include <cstdio>
 #include <iostream>
+#include <fstream>      /*!@ For std::ifstream */
+#include <regex>
 
 /**
  * @brief Definitions of Return Codes.
  */
-#define NO_IP_ADDR_FOUND
+#define SUCCESS                     (0u)
+#define NO_IP_ADDR_FOUND            (1u)
+#define PARSE_CREDENTIALS_FAILED    (2u)
 
 /**
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
@@ -45,16 +49,6 @@
 #define EMPTY_STR                   ""
 
 #define DEBUG_ENABLED               (true)
-
-/**
- * @brief Return Codes For The Program.
- */
-typedef enum 
-{
-    SUCCESS     = 0u,    /**< Success */
-    ERROR       = 1u      /**< Error */
-
-} ReturnCodes;
 
 /**
  * @brief Structure For The Email Message.
@@ -91,5 +85,12 @@ typedef struct
     MailHeader_t    header;
     MailBody_t      body;                   //<! Header of The Mail.
 } Mail_t;
+
+typedef struct 
+{
+    std::vector<std::string> username;          
+    std::vector<std::string> password;           
+
+} Credentials_t;
 
 #endif /* DEFINITIONS_HPP */

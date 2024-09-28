@@ -20,7 +20,6 @@
 /************************************************/
 #include "../include/ClientConfig.hpp"
 
-
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
@@ -32,18 +31,23 @@ ImapClientConfig::ImapClientConfig()
     certD(DEFAULT_SSL_CERT_LOC),
     mailboxD(DEFAULT_MAILBOX_DIR),
     justNew(false),
-    justHeaders(false) {}
+    justHeaders(false),
+    authData{ {EMPTY_STR}, {EMPTY_STR} } {}
 
 ImapClientConfig::ImapClientConfig(int argc, char* argv[])   
 {
-    this->ParseArguments(argc, argv);
+    bool retVal = false;
+    retVal = this->ProcessArguments(argc, argv);
+    if(SUCCESS == retVal)
+    {
+        printf("Success!\n");
+    }
 }
 
 bool ImapClientConfig::GetClientMode()
 {
     return mode;
 }
-
 
 bool ImapClientConfig::ParseArguments(int argc, char* argv[])
 {
@@ -54,8 +58,6 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
     {
         return false;  
     }
-    
-    mode = SECURE;
     server = argv[1];
 
     while (-1 != (c = getopt(argc, argv, "p:c:C:a:b:o:Tnh")))
@@ -101,6 +103,68 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
     return true;
 }
 
+int ImapClientConfig::ExtractAuthData(void)  
+{
+    // Check The Auth. File Path
+    std::ifstream in(authF);
+
+#if (DEBUG_ENABLED == 1)
+    if (!fileExists(authF)) {
+        std::cerr << "ERR: The file does not exist at path: " << authF << std::endl;
+        return PARSE_CREDENTIALS_FAILED;
+    }
+#endif /* (DEBUG_ENABLED == 1) */
 
 
+    if (false == in.is_open()) 
+    {
+        /* TODO: Maybe Return Some Err. Code? */
+        printf("ERR: Unable To Open The Authentication File.\n");
+        return PARSE_CREDENTIALS_FAILED;
+    }
 
+    std::string contents((std::istreambuf_iterator<char>(in)),
+                         std::istreambuf_iterator<char>()); /* Read The Context of The Auth. File */
+
+    std::regex auth_file_template(R"(username\s*=\s*(\S+)\s*\npassword\s*=\s*(\S+))");
+    std::smatch match;
+
+    if (std::regex_search(contents, match, auth_file_template) && (3 == match.size())) 
+    {
+        authData.username.push_back(match.str(1));
+        authData.password.push_back(match.str(2));
+    } 
+    else 
+    {   /* TODO: Maybe Return Some Err. Code? */
+        printf("ERR: Unable To Find Valid Credentials in The File.\n");
+        return PARSE_CREDENTIALS_FAILED;
+    }
+
+#if (DEBUG_ENABLED == 1)
+
+    if (!authData.username.empty()) {
+        std::string username_dbg = authData.username[0];  
+        std::cout << "Username: " << username_dbg << std::endl;
+    }
+
+    if (!authData.password.empty()) {
+        std::string password_dbg = authData.password[0]; 
+        std::cout << "Password: " << password_dbg << std::endl;
+    }
+
+#endif /* (DEBUG_ENABLED == 1) */
+
+    return SUCCESS;
+}
+
+bool ImapClientConfig::ProcessArguments(int argc, char* argv[])
+{
+    /* Parse The Arguments */
+    ParseArguments(argc, argv);
+
+    /* Checkout The Credentials & Parse Them */
+    if (SUCCESS != ExtractAuthData())
+        return (bool)PARSE_CREDENTIALS_FAILED;
+
+    return (bool)SUCCESS;
+}

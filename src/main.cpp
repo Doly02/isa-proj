@@ -24,12 +24,14 @@
 /************************************************/
 int main(int argc, char *argv[]) 
 {
-try {
-    ReturnCodes retVal = ERROR;
+try 
+{
+    int retVal = 1;
     std::string current_val;
     ImapClientConfig app_config(argc, argv);
     /* Start of The Program Section... */
-    retVal = (ReturnCodes)app_config.GetClientMode();
+
+    retVal = app_config.GetClientMode();
     if (SECURE == retVal)
     {
         printf("Alles Gute!\n");

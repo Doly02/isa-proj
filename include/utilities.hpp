@@ -24,11 +24,18 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include "definitions.hpp"
+
+#if (DEBUG_ENABLED == 1)
+    #include <fstream>
+    #include <sys/stat.h>
+#endif /* (DEBUG_ENABLED == 1) */
+
 /************************************************/
 /*            Definition of Functions           */
 /************************************************/
 void PrintHelp(void);
 
+bool fileExists(const std::string& filename);
 /**
 * @brief        Checks Whether The String Is IPv4 Address.
 * @param str    String With Potential IPv4 Address

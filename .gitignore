@@ -2,7 +2,11 @@
 # Prerequisites
 *.d
 
+# Personal 
 imapcl
+misc/
+
+
 # Compiled Object files
 *.slo
 *.lo
