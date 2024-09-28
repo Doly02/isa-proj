@@ -30,14 +30,21 @@ class BaseImapClient {
 
     private:
         unsigned long long  mCurrentTagValue;
-        State_t             curr_state;
+    
     public:
+        State_t             curr_state;
+        int                 sockfd;             //!< Socket File Descriptor for IMAP Connection.
 
         /**
         * @brief Class Constructor.
         */
         BaseImapClient();
-
+        
+        /**
+        * @brief Class Destructor.
+        */
+        ~BaseImapClient();
+        
         /**
         * @brief       Resolves the Hostname of The Server to an IP Address (tries IPv4 First, Then IPv6).
         * @details     The Function Uses getaddrinfo() To Resolve The Hostname To An IP Address. 

@@ -28,6 +28,16 @@
 /************************************************/
 BaseImapClient::BaseImapClient() : mCurrentTagValue(0), curr_state(LOGIN) {}
 
+BaseImapClient::~BaseImapClient(){
+    if (sockfd >= 0) {
+        if (close(sockfd) < 0) {
+            std::cerr << "ERR: Failed to Close Socket in Destructor.\n";
+        }
+        sockfd = -1;  // Nastav deskriptor na neplatnou hodnotu
+    }
+}
+
+
 std::string BaseImapClient::generateTag(void)
 {
     std::stringstream tag_stream;
@@ -100,21 +110,31 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
 int BaseImapClient::FindEndOfResponse(std::string buff)
 {
-    std::current_tag = getTag();
-    switch(type)
-    {
+    std::string current_tag = getTag();
+    switch(curr_state)
+    {   /*TODO: Update Return Value For All TRANSMIT_DATA_FAILED */
         case LOGIN:
             /* login completed, now in authenticated state */
             if (std::string::npos != buff.find(current_tag + " OK LOGIN completed"))
                 return SUCCESS;
             /* login failure: user name or password rejected */
             else if (std::string::npos != buff.find(current_tag + " NO LOGIN completed"))
-                return TRANSMIT_DATA_FAILED; /*TODO: Update Return Value */
+                return TRANSMIT_DATA_FAILED; 
             /* command unknown or arguments invalid */
             else if (std::string::npos != buff.find(current_tag + " BAD LOGIN completed"))
-                return TRANSMIT_DATA_FAILED; /*TODO: Update Return Value */
+                return TRANSMIT_DATA_FAILED; 
+            break;
+        case LOGOUT:
+            if (std::string::npos != buff.find(current_tag + " OK LOGOUT completed"))
+                return SUCCESS;
+            else if (std::string::npos != buff.find(current_tag + " BAD LOGOUT completed"))
+                return TRANSMIT_DATA_FAILED; 
+            break;
         default:
             return RESPONSE_NOT_FOUND;
             
     }
+    return RESPONSE_NOT_FOUND;
 }
+
+/* TODO: BYE Command! */

@@ -68,12 +68,14 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
         {
             std::cerr << "ERR: Invalid IPv4 Address Format.\n";
             close(sockfd);
+            sockfd = -1;
             return false;
         }
         if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
         {
             std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
             close(sockfd);
+            sockfd = -1;
             return false;
         }
     }
@@ -94,6 +96,7 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
         {
             std::cerr << "ERR: Invalid IPv6 Address Format.\n";
             close(sockfd);
+            sockfd = -1;
             return false;
         }
 
@@ -101,6 +104,7 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
         {
             std::cerr << "ERR: Unable to connect to the IMAP server (IPv6).\n";
             close(sockfd);
+            sockfd = -1;
             return false;
         }
     }
@@ -125,13 +129,11 @@ int NonSecureImapClient::SendData(const std::string& data)
     bytes_tx = send(sockfd, message.c_str(), message.length(), 0);
     if (0 > bytes_tx)
     {
-        std::cerr << "ERR: Failed to Send Data to IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
     }
     /* Check If All Data Was Transmitted */
     if (static_cast<size_t>(bytes_tx) != message.length())
     {
-        std::cerr << "ERR: Some of The Data Were Not Transmitted!\n";
         return TRANSMIT_DATA_FAILED;
     }
     return SUCCESS;
@@ -151,13 +153,10 @@ int NonSecureImapClient::ReceiveData()
         {
             break;
         }
-
     }
 
     /* Handle Error If Occured During Transmission */
-    if (0 > bytes_rx)
-    {
-        std::cerr << "ERR: Failed to Receive Data.\n";
+    if (0 > bytes_rx){
         return RECEIVE_DATA_FAILED;
     }
     return SUCCESS;
@@ -170,6 +169,7 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
     std::string log_cmd = tag + " LOGIN " + username + " " + password;
     if (SUCCESS != SendData(log_cmd))
     {
+        std::cerr << "ERR: Failed to Login to IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
     }
     // TODO: Receive Response From The Server & Eval.
@@ -179,5 +179,18 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
 
 int NonSecureImapClient::LogoutClient()
 {
-    return -1;
+    std::string tag = generateTag();  
+    std::string logout_cmd = tag + " LOGOUT"; 
+    if (SUCCESS != SendData(logout_cmd)) 
+    {
+        std::cerr << "ERR: Failed to Send LOGOUT Command to IMAP Server.\n";
+        return TRANSMIT_DATA_FAILED;
+    }
+
+    if (SUCCESS != ReceiveData()) {
+        std::cerr << "ERR: Failed to Receive LOGOUT Response from IMAP Server.\n";
+        return RECEIVE_DATA_FAILED;
+    }
+
+    return SUCCESS;
 }

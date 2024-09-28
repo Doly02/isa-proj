@@ -35,7 +35,6 @@ class NonSecureImapClient : public BaseImapClient
         std::string mailbox;        //!< Mailbox to fetch emails from
         std::string outputDir;      //!< Directory to store the emails
         
-        int sockfd;                 //!< Socket File Descriptor for IMAP Connection.
         std::string rx_data;        //<! Buffer For Server Response
 
     public:
