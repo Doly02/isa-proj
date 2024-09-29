@@ -393,3 +393,28 @@ int NonSecureImapClient::SetMailBox()
     }
     return SUCCESS;
 }
+
+int NonSecureImapClient::DisconnectImapServer(void)
+{
+    if (0 < sockfd)
+    {
+        curr_state = LOGOUT;
+        std::string tag = GenerateTag();
+        std::string logout_cmd = tag + " LOGOUT";
+        std::string recv_data = EMPTY_STR;
+        
+        if (SUCCESS != SendData(logout_cmd))
+        {
+            std::cerr << "ERR: Failed to Login to IMAP Server.\n";
+            return TRANSMIT_DATA_FAILED;
+        }
+        recv_data = ReceiveData();
+        if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+        {
+            std::cerr << "ERR: Failed to Receive LOGOUT Response.\n";
+            return false;
+        }
+        return SUCCESS;
+    }
+    return SUCCESS; /* TODO: Already Closed */
+}
