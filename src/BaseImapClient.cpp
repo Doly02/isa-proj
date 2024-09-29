@@ -74,7 +74,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
     // Get address info
     if ((status = getaddrinfo(hostname.c_str(), port.c_str(), &hints, &res)) != 0) {
         std::cerr << "ERR: Unable to resolve hostname to IP address: " << gai_strerror(status) << "\n";
-        return "";
+        return EMPTY_STR;
     }
 
     // Loop through the results and process the first valid address (prefer IPv4)
@@ -106,7 +106,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
     // No address found
     freeaddrinfo(res);
-    return "";
+    return EMPTY_STR;
 }
 
 int BaseImapClient::FindEndOfResponse(std::string buff)
@@ -124,12 +124,16 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             /* command unknown or arguments invalid */
             else if (std::string::npos != buff.find(current_tag + " BAD LOGIN completed"))
                 return TRANSMIT_DATA_FAILED; 
+            else
+                return CONTINUE_IN_RECEIVING;
             break;
         case LOGOUT:
             if (std::string::npos != buff.find(current_tag + " OK LOGOUT completed"))
                 return SUCCESS;
             else if (std::string::npos != buff.find(current_tag + " BAD LOGOUT completed"))
                 return TRANSMIT_DATA_FAILED; 
+            else
+                return CONTINUE_IN_RECEIVING;
             break;
         case SEARCH:
             /* OK - search completed */
@@ -141,12 +145,27 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             /* BAD - command unknown or arguments invalid */
             else if (std::string::npos != buff.find(current_tag + " BAD SEARCH completed"))
                 return TRANSMIT_DATA_FAILED;
+            else
+                return CONTINUE_IN_RECEIVING;
+            break;
+        case FETCH:
+            /* OK - fetch completed */
+            if (std::string::npos != buff.find(current_tag + " OK FETCH completed"))
+                return SUCCESS;
+            /* NO - fetch error: can't fetch that data */
+            else if (std::string::npos != buff.find(current_tag + " NO FETCH completed"))
+                return TRANSMIT_DATA_FAILED;
+            /* BAD - command unknown or arguments invalid */
+            else if (std::string::npos != buff.find(current_tag + " BAD FETCH completed"))
+                return TRANSMIT_DATA_FAILED;
+            else
+                return CONTINUE_IN_RECEIVING;
             break;
         default:
-            return RESPONSE_NOT_FOUND;
+            return UNDEFINED_STATE;
             
     }
-    return RESPONSE_NOT_FOUND;
+    return UNDEFINED_STATE;
 }
 
 /* TODO: BYE Command! */

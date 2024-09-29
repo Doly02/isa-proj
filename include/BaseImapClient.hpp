@@ -33,9 +33,8 @@ class BaseImapClient {
     
     public:
         State_t             curr_state;
-        int                 sockfd;             //!< Socket File Descriptor for IMAP Connection.
-        std::vector<int>         vec_uids;
-
+        int                 sockfd;         //!< Socket File Descriptor for IMAP Connection.
+        std::vector<int>    vec_uids;
         /**
         * @brief Class Constructor.
         */
@@ -74,6 +73,11 @@ class BaseImapClient {
 
         int FindEndOfResponse(std::string buff);
 
-};
+        /**
+         * @brief       Parses an IMAP Server Response Containing an Email.
+         * @details     None Yet :D 
+         */
+        std::string ParseEmail(void);
+};  
 
 #endif /* BASE_IMAP_CLIENT_H */

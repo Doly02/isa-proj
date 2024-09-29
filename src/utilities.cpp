@@ -30,9 +30,10 @@ void PrintHelp(void)
     printf("TODO\n");
 }
 
-bool fileExists(const std::string& filename) {
+bool FileExists(const std::string& filename) 
+{
     struct stat buffer;
-    return (stat(filename.c_str(), &buffer) == 0);
+    return (0 == stat(filename.c_str(), &buffer));
 }
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)

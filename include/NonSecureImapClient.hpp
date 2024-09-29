@@ -35,8 +35,6 @@ class NonSecureImapClient : public BaseImapClient
         std::string mailbox;        //!< Mailbox to fetch emails from
         std::string outputDir;      //!< Directory to store the emails
         
-        std::string rx_data;        //<! Buffer For Server Response
-
     public:
 
         /**
@@ -57,13 +55,13 @@ class NonSecureImapClient : public BaseImapClient
 
         int SendData(const std::string& data);
 
-        int ReceiveData(void);
+        std::string ReceiveData(void);
 
         int LoginClient(std::string username, std::string password);
 
         int LogoutClient(void);
         
-        int ParseUIDs(void);
+        int ParseUIDs(std::string response);
 
         int FetchUIDs(void);
         /**
@@ -71,7 +69,10 @@ class NonSecureImapClient : public BaseImapClient
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.
         * @retval   True If Emails Were Successfully Fetched, False Otherwise.
         */
-        bool FetchEmails(void);
+        int FetchEmails(void);
+
+ 
+        std::string FetchEmailByUID(int uid);
 
         int SetMailBox(void);
 

@@ -25,18 +25,18 @@
 /************************************************/
 NonSecureImapClient::NonSecureImapClient(const std::string& mailBox, const std::string& outDirectory)
     : mailbox(mailBox), 
-    outputDir(outDirectory),
-    rx_data(EMPTY_STR) {}
+    outputDir(outDirectory){}
 
 
 bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
 {
-    /* Set Current State of The Communication With IMAP Server */
-    curr_state = LOGIN;
-
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
     bool is_ipv6_addr = isIPv6Address(serverAddress);
+    std::string recv_data = EMPTY_STR;
+
+    /* Set Current State of The Communication With IMAP Server */
+    curr_state = LOGIN;
 
     if (false == is_ipv4_addr && false == is_ipv6_addr)
     {
@@ -112,7 +112,8 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
 
     /* Send Login Command To IMAP Server */
     LoginClient(username, password);
-    if (SUCCESS != ReceiveData())
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data)
     {
         return false;
     }
@@ -141,26 +142,33 @@ int NonSecureImapClient::SendData(const std::string& data)
 
 }
 
-int NonSecureImapClient::ReceiveData()
+std::string NonSecureImapClient::ReceiveData()
 {
-    char        rx_buffer[RX_BUFFER_SIZE];
-    ssize_t     bytes_rx;            //<! Num. of Received Bytes
+    char            rx_buffer[RX_BUFFER_SIZE] = { 0 };  //<! Buffer That Interacts With recv()
+    ssize_t         bytes_rx = 0;                       //<! Num. of Received Bytes
+    std::string     rx_data = EMPTY_STR;                //<! Buffer For Server Response
+    int             ret_val = -1;
 
     while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE-1, 0)))
     {
         rx_buffer[bytes_rx] = '\0';
         rx_data += rx_buffer;
-        if (SUCCESS == BaseImapClient::FindEndOfResponse(std::string(rx_buffer)))
+        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
+        if (SUCCESS == ret_val)
         {
             break;
+        }
+        else if (TRANSMIT_DATA_FAILED == ret_val)
+        {
+            return BAD_RESPONSE;
         }
     }
 
     /* Handle Error If Occured During Transmission */
     if (0 > bytes_rx){
-        return RECEIVE_DATA_FAILED;
+        return EMPTY_STR;
     }
-    return SUCCESS;
+    return rx_data;
 
 }
 
@@ -180,7 +188,8 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
 
 int NonSecureImapClient::LogoutClient()
 {
-    curr_state = LOGOUT;
+    curr_state              = LOGOUT;
+    std::string recv_data   = EMPTY_STR;
 
     std::string tag = GenerateTag();  
     std::string logout_cmd = tag + " LOGOUT"; 
@@ -190,17 +199,21 @@ int NonSecureImapClient::LogoutClient()
         return TRANSMIT_DATA_FAILED;
     }
 
-    if (SUCCESS != ReceiveData()) {
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
         std::cerr << "ERR: Failed to Receive LOGOUT Response from IMAP Server.\n";
         return RECEIVE_DATA_FAILED;
     }
+    
+    /* Check Server's Response */
+
 
     return SUCCESS;
 }
 
-int NonSecureImapClient::ParseUIDs()
+int NonSecureImapClient::ParseUIDs(std::string response)
 {
-    std::string uid_response = rx_data;
     std::string deleted_part;
     int uid = 0;
     std::string::size_type found;
@@ -209,7 +222,7 @@ int NonSecureImapClient::ParseUIDs()
     {
         std::regex reg_expression("(\\r\\n.*(?=OK SEARCH completed)[.|\\s\\S]*)");
         std::smatch match;
-        if (std::regex_search(uid_response, match, reg_expression) && (1 < match.size()))
+        if (std::regex_search(response, match, reg_expression) && (1 < match.size()))
         {
             deleted_part = match.str(1);
         }
@@ -223,22 +236,22 @@ int NonSecureImapClient::ParseUIDs()
         /* ERR: Regex Error While Parsing UIDs */
         return PARSE_REGEX_FAILED;
     }
-    uid_response = uid_response.substr(0, uid_response.size() - deleted_part.size());
+    response = response.substr(0, response.size() - deleted_part.size());
     deleted_part = "* SEARCH ";
     
-    found = uid_response.find(deleted_part);
+    found = response.find(deleted_part);
     if (std::string::npos != found)
     {
-        uid_response.erase(found, deleted_part.length()); /* Erase The Prefix "* SEARCH" */
+        response.erase(found, deleted_part.length()); /* Erase The Prefix "* SEARCH" */
     }
 
-    if (uid_response.empty())
+    if (response.empty())
     {
         /* ERR: No UIDs Found in Response */
         return NON_UIDS_RECEIVED;
     }
 
-    std::istringstream parse_uids(uid_response);
+    std::istringstream parse_uids(response);
     for (std::string tok; std::getline(parse_uids, tok, ' '); )
     {
         uid = std::atoi(tok.c_str());
@@ -251,6 +264,7 @@ int NonSecureImapClient::ParseUIDs()
 
 int NonSecureImapClient::FetchUIDs()
 {
+    std::string recv_data = EMPTY_STR;
     curr_state = SEARCH;
 
     std::string tag = GenerateTag();
@@ -259,18 +273,72 @@ int NonSecureImapClient::FetchUIDs()
     {
         std::cerr << "ERR: Failed to Fetch UIDs From IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
-    } 
-    if (SUCCESS != ReceiveData()) {
+    }
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
         std::cerr << "ERR: Failed to Receive UIDs From IMAP Server.\n";
         return RECEIVE_DATA_FAILED;
     }
-
+    if (SUCCESS != ParseUIDs(recv_data)) 
+    {
+        std::cerr << "ERR: Failed to Parse UIDs.\n";
+        return NON_UIDS_RECEIVED;                       /* TODO: Update Logic of RetVal! */
+    }
     return SUCCESS;    
 }
 
+int NonSecureImapClient::FetchEmails()
+{
+    int ret_val = NON_UIDS_RECEIVED;
+    std::string email = EMPTY_STR;
+
+    ret_val = FetchUIDs();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+    for (int id : this->vec_uids)
+    {
+        email = EMPTY_STR;
+        email = FetchEmailByUID(id);
+        if (EMPTY_STR == email)
+        {
+            return PARSE_EMAIL_FAILED;   
+        }
+    }
+
+    return SUCCESS;
+}
+
+std::string NonSecureImapClient::FetchEmailByUID(int uid)
+{
+    curr_state = FETCH;
+    std::string recv_data = EMPTY_STR;
+
+    std::string tag = GenerateTag();
+    std::string fetch_cmd = tag + " UID FETCH " + std::to_string(uid) + " BODY[HEADER]";
+
+    if (SUCCESS != SendData(fetch_cmd))
+    {
+        std::cerr << "ERR: Failed to Send FETCH Command for UID: " << uid << "\n";
+        return EMPTY_STR;
+    }
+
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
+        std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
+        return recv_data;
+    }
+    /* rx_data Now Contains Email */
+    curr_state = DEFAULT;
+    return recv_data;
+}
 
 int NonSecureImapClient::SetMailBox()
 {
+    std::string recv_data = EMPTY_STR;
     curr_state = SEARCH;
 
     std::string tag = GenerateTag();  
@@ -279,8 +347,10 @@ int NonSecureImapClient::SetMailBox()
     {
         std::cerr << "ERR: Failed to Set Mailbox on IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
-    }    
-    if (SUCCESS != ReceiveData()) {
+    }
+
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) {
         std::cerr << "ERR: Failed to Receive Response For Setup of Mailbox on IMAP Server.\n";
         return RECEIVE_DATA_FAILED;
     }

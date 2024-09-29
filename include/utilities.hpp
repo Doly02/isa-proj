@@ -35,7 +35,7 @@
 /************************************************/
 void PrintHelp(void);
 
-bool fileExists(const std::string& filename);
+bool FileExists(const std::string& filename);
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name);
 /**

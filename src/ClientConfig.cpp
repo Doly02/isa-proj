@@ -109,7 +109,7 @@ int ImapClientConfig::ExtractAuthData(void)
     std::ifstream in(authF);
 
 #if (DEBUG_ENABLED == 1)
-    if (!fileExists(authF)) {
+    if (!FileExists(authF)) {
         std::cerr << "ERR: The file does not exist at path: " << authF << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
