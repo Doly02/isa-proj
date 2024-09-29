@@ -69,6 +69,8 @@ class NonSecureImapClient : public BaseImapClient
         */
         bool FetchEmails(void);
 
+        int SetMailBox(std::string box);
+
         /**
         * @brief    Disconnects From The IMAP Server.
         * @retval   True on Successful Disconnection, False Otherwise.

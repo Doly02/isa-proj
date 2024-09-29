@@ -119,9 +119,10 @@ typedef struct
 typedef enum
 {
     /* Responses To Login Command */
-    LOGIN = 0u,                  //<! login completed, now in authenticated state
+    LOGIN = 0u,                     //<! login completed, now in authenticated state
     CONNECT,
-    LOGOUT,          
+    LOGOUT,  
+    SEARCH,                         //<! search cmd for fetch of the UIDs.        
 
 } State_t;
 

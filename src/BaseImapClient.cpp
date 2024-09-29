@@ -130,6 +130,16 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             else if (std::string::npos != buff.find(current_tag + " BAD LOGOUT completed"))
                 return TRANSMIT_DATA_FAILED; 
             break;
+        case SEARCH:
+            /* OK - search completed */
+            if (std::string::npos != buff.find(current_tag + " OK SEARCH completed"))
+                return SUCCESS;
+            /* NO - search error: can't search that [CHARSET] or criteria*/
+            else if (std::string::npos != buff.find(current_tag + " NO SEARCH completed"))
+                return TRANSMIT_DATA_FAILED;
+            /* BAD - command unknown or arguments invalid */
+            else if (std::string::npos != buff.find(current_tag + " BAD SEARCH completed"))
+                return TRANSMIT_DATA_FAILED;
         default:
             return RESPONSE_NOT_FOUND;
             
@@ -138,3 +148,6 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
 }
 
 /* TODO: BYE Command! */
+/**
+ * Zpravy jsou poznaceny UID (unikatni pro kazdou zpravu) -> Tak poznas ze zpravu jsi jiz stahoval.
+ */

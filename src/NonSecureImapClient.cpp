@@ -179,6 +179,8 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
 
 int NonSecureImapClient::LogoutClient()
 {
+    curr_state = LOGOUT;
+
     std::string tag = generateTag();  
     std::string logout_cmd = tag + " LOGOUT"; 
     if (SUCCESS != SendData(logout_cmd)) 
@@ -192,5 +194,23 @@ int NonSecureImapClient::LogoutClient()
         return RECEIVE_DATA_FAILED;
     }
 
+    return SUCCESS;
+}
+
+int NonSecureImapClient::SetMailBox()
+{
+    curr_state = SEARCH;
+
+    std::string tag = generateTag();  
+    std::string set_mailbox_cmd = tag + " SELECT " + mailbox;
+    if (SUCCESS != SendData(set_mailbox_cmd)) 
+    {
+        std::cerr << "ERR: Failed to Set Mailbox on IMAP Server.\n";
+        return TRANSMIT_DATA_FAILED;
+    }    
+    if (SUCCESS != ReceiveData()) {
+        std::cerr << "ERR: Failed to Receive Response For Setup of Mailboc on IMAP Server.\n";
+        return RECEIVE_DATA_FAILED;
+    }
     return SUCCESS;
 }
