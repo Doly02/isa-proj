@@ -34,6 +34,7 @@ class BaseImapClient {
     public:
         State_t             curr_state;
         int                 sockfd;             //!< Socket File Descriptor for IMAP Connection.
+        std::vector<int>         vec_uids;
 
         /**
         * @brief Class Constructor.
@@ -65,9 +66,9 @@ class BaseImapClient {
         *              Incrementing With Each Client's Request.
         * @retval      11-Byte Long String.
         */
-        std::string generateTag(void);
+        std::string GenerateTag(void);
 
-        std::string getTag(void);
+        std::string GetTag(void);
 
         std::string FindEndOfResponse(State_t type);
 

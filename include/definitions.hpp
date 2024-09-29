@@ -52,6 +52,9 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define TRANSMIT_DATA_FAILED        (4u)
 #define RECEIVE_DATA_FAILED         (5u)
 #define RESPONSE_NOT_FOUND          (6u)
+#define PARSE_REGEX_FAILED          (7u)
+#define NON_UIDS_RECEIVED           (8u)
+
 #define NOT_IMPLEMENTED             throw std::runtime_error("Not Implemented Yet!")
 /**
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.

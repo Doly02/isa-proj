@@ -62,6 +62,10 @@ class NonSecureImapClient : public BaseImapClient
         int LoginClient(std::string username, std::string password);
 
         int LogoutClient(void);
+        
+        int ParseUIDs(void);
+
+        int FetchUIDs(void);
         /**
         * @brief    Fetches Emails From The Connected Mailbox.
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.
@@ -69,7 +73,7 @@ class NonSecureImapClient : public BaseImapClient
         */
         bool FetchEmails(void);
 
-        int SetMailBox(std::string box);
+        int SetMailBox(void);
 
         /**
         * @brief    Disconnects From The IMAP Server.

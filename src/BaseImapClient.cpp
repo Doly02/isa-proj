@@ -26,7 +26,8 @@
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
-BaseImapClient::BaseImapClient() : mCurrentTagValue(0), curr_state(LOGIN) {}
+BaseImapClient::BaseImapClient() : mCurrentTagValue(0), 
+                                    curr_state(LOGIN){}
 
 BaseImapClient::~BaseImapClient(){
     if (sockfd >= 0) {
@@ -38,7 +39,7 @@ BaseImapClient::~BaseImapClient(){
 }
 
 
-std::string BaseImapClient::generateTag(void)
+std::string BaseImapClient::GenerateTag(void)
 {
     std::stringstream tag_stream;
 
@@ -49,7 +50,7 @@ std::string BaseImapClient::generateTag(void)
     return tag_stream.str();
 }  
 
-std::string BaseImapClient::getTag()
+std::string BaseImapClient::GetTag()
 {
     std::stringstream tag_stream;
     tag_stream << 'A';
@@ -110,7 +111,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
 int BaseImapClient::FindEndOfResponse(std::string buff)
 {
-    std::string current_tag = getTag();
+    std::string current_tag = GetTag();
     switch(curr_state)
     {   /*TODO: Update Return Value For All TRANSMIT_DATA_FAILED */
         case LOGIN:
@@ -140,6 +141,7 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             /* BAD - command unknown or arguments invalid */
             else if (std::string::npos != buff.find(current_tag + " BAD SEARCH completed"))
                 return TRANSMIT_DATA_FAILED;
+            break;
         default:
             return RESPONSE_NOT_FOUND;
             
