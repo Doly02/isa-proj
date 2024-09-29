@@ -36,6 +36,19 @@
 void PrintHelp(void);
 
 bool fileExists(const std::string& filename);
+
+std::string GeneratePathToFile(std::string output_dir, std::string f_name);
+/**
+    * @brief       Creates The File And Stores The Specified Content in It.
+    * @details     None Yet :D
+    *
+    * @param[in]   content File Content.
+    * @param[in]   file_path Path To The File.
+    *
+    * @retval      SUCCESS If Everything Went Well.
+    */
+int StoreEmail(std::string content, std::string file_path);
+
 /**
 * @brief        Checks Whether The String Is IPv4 Address.
 * @param str    String With Potential IPv4 Address

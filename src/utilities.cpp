@@ -35,6 +35,20 @@ bool fileExists(const std::string& filename) {
     return (stat(filename.c_str(), &buffer) == 0);
 }
 
+std::string GeneratePathToFile(std::string output_dir, std::string f_name)
+{
+    return (output_dir + "/" + f_name);
+}
+
+
+int StoreEmail(std::string content, std::string file_path)
+{
+    std::ofstream file(file_path);
+    file << content;
+    return SUCCESS;
+}
+
+
 bool IsIPv4Address(const std::string& str)
 {
     struct sockaddr_in sa;
