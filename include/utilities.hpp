@@ -49,6 +49,10 @@ std::string GeneratePathToFile(std::string output_dir, std::string f_name);
     */
 int StoreEmail(std::string content, std::string file_path);
 
+std::string ParseEmailHeader(std::string header);
+
+std::string ParseEmailBody(std::string body);
+
 /**
 * @brief        Checks Whether The String Is IPv4 Address.
 * @param str    String With Potential IPv4 Address
