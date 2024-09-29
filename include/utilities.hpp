@@ -37,6 +37,8 @@ void PrintHelp(void);
 
 bool FileExists(const std::string& filename);
 
+std::string GenerateFilename(int uid);
+
 std::string GeneratePathToFile(std::string output_dir, std::string f_name);
 /**
     * @brief       Creates The File And Stores The Specified Content in It.
@@ -45,9 +47,9 @@ std::string GeneratePathToFile(std::string output_dir, std::string f_name);
     * @param[in]   content File Content.
     * @param[in]   file_path Path To The File.
     *
-    * @retval      SUCCESS If Everything Went Well.
+    * @retval      void
     */
-int StoreEmail(std::string content, std::string file_path);
+void StoreEmail(std::string content, std::string file_path);
 
 std::string ParseEmailHeader(std::string header);
 

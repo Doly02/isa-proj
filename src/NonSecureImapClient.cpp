@@ -292,32 +292,49 @@ int NonSecureImapClient::FetchEmails()
 {
     int ret_val = NON_UIDS_RECEIVED;
     std::string email = EMPTY_STR;
+    std::string path = EMPTY_STR;
+    int num_of_uids = int(vec_uids.size());
 
     ret_val = FetchUIDs();
     if (SUCCESS != ret_val)
     {
         return ret_val;
     }
+
+
     for (int id : this->vec_uids)
     {
         email = EMPTY_STR;
-        email = FetchEmailByUID(id);
+        email = FetchEmailByUID(id, WHOLE_MESSAGE);
         if (EMPTY_STR == email)
         {
             return PARSE_EMAIL_FAILED;   
         }
+        /* Assembly Path To File */
+        path = GenerateFilename(id);
+        path = GeneratePathToFile(outputDir, path);
+        StoreEmail(email, path);
+
     }
 
-    return SUCCESS;
+    return num_of_uids;
 }
 
-std::string NonSecureImapClient::FetchEmailByUID(int uid)
+std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
 {
     curr_state = FETCH;
     std::string recv_data = EMPTY_STR;
-
+    std::string fetch_cmd = EMPTY_STR;
     std::string tag = GenerateTag();
-    std::string fetch_cmd = tag + " UID FETCH " + std::to_string(uid) + " BODY[HEADER]";
+
+    if (WHOLE_MESSAGE == mode)
+    {
+        fetch_cmd = tag + " UID FETCH " + std::to_string(uid) + " BODY[HEADER]";
+    }
+    else if (JUST_HEADER == mode)
+    {
+        fetch_cmd = tag + " UID FETCH " + std::to_string(uid) + " BODY[TEXT]"; 
+    }
 
     if (SUCCESS != SendData(fetch_cmd))
     {
@@ -332,8 +349,28 @@ std::string NonSecureImapClient::FetchEmailByUID(int uid)
         return recv_data;
     }
     /* rx_data Now Contains Email */
+
     curr_state = DEFAULT;
     return recv_data;
+}
+
+std::string NonSecureImapClient::ParseEmail(int uid, std::string email, bool just_headers)
+{
+    std::string email_content;
+    std::string email_body;
+
+    if (false == just_headers)
+    {
+        email_body = FetchEmailByUID(uid, JUST_HEADER);
+        email_body = ParseEmailBody(email_body);
+    }
+    email_content = ParseEmailHeader(email);
+
+    if (false == just_headers)
+    {
+        email_content = email_content.append(email_body);
+    }
+    return email_content;
 }
 
 int NonSecureImapClient::SetMailBox()

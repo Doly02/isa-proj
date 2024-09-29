@@ -45,6 +45,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 /**
  * @brief Definitions of Return Codes.
  */
+#define PARSE_EMAIL_FAILED          (-2)
 #define SUCCESS                     (0u)
 #define NO_IP_ADDR_FOUND            (1u)
 #define PARSE_CREDENTIALS_FAILED    (2u)
@@ -54,9 +55,8 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define RESPONSE_NOT_FOUND          (6u)
 #define PARSE_REGEX_FAILED          (7u)
 #define NON_UIDS_RECEIVED           (8u)
-#define PARSE_EMAIL_FAILED          (9u)
-#define CONTINUE_IN_RECEIVING       (10u)
-#define UNDEFINED_STATE             (11u)
+#define CONTINUE_IN_RECEIVING       (9u)
+#define UNDEFINED_STATE             (10u)
 
 #define BAD_RESPONSE                "Bad Response :("
 #define NO_RESPONSE                 "No Response :|"
@@ -79,8 +79,12 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 
 #define EMPTY_STR                   ""
 
+#define WHOLE_MESSAGE               (true)
+#define JUST_HEADER                 (false)
+
 #define DEBUG_ENABLED               (true)
 
+#define OUTPUT_FILE_FORMAT          ".log"
 /**
  * @brief Structure For The Email Message.
  */

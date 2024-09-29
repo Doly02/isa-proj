@@ -36,32 +36,39 @@ bool FileExists(const std::string& filename)
     return (0 == stat(filename.c_str(), &buffer));
 }
 
+std::string GenerateFilename(int uid)
+{
+    return ("MSG_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
+}
+
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)
 {
     return (output_dir + "/" + f_name);
 }
 
 
-int StoreEmail(std::string content, std::string file_path)
+void StoreEmail(std::string content, std::string file_path)
 {
     std::ofstream file(file_path);
     file << content;
-    return SUCCESS;
 }
 
 std::string ParseEmailHeader(std::string header)
 {
     std::string delete_part = EMPTY_STR;
     try {
-        regex reg_expression("(\\r\\n\\)[.|\\s\\S]*)");
-        smatch match;
-        if(regex_search(message, match, reg_expression) && (1 < match.size())) {
+        std::regex reg_expression("(\\r\\n\\)[.|\\s\\S]*)");
+        std::smatch match;
+        if(regex_search(header, match, reg_expression) && (1 < match.size())) {
             delete_part = match.str(1);
         } 
     } 
-    catch(regex_error& e) {
-        new BAD_RESPONSE;
+    catch(std::regex_error& e) {
+        return BAD_RESPONSE;
     }
+    header = header.substr(0, header.size() - delete_part.size());
+    header.erase(0, header.find("\r\n") + 1);
+    return header.erase(0, header.find("\n") + 1);
 }
 
 std::string ParseEmailBody(std::string body)
@@ -69,8 +76,8 @@ std::string ParseEmailBody(std::string body)
     std::string delete_part = EMPTY_STR;
     try
     {
-        regex reg_expression("(.*(?=OK FETCH completed)[.|\\s\\S]*)");
-        smatch match;
+        std::regex reg_expression("(.*(?=OK FETCH completed)[.|\\s\\S]*)");
+        std::smatch match;
         if (regex_search(body, match, reg_expression) && (1 < match.size()))
         {
             delete_part = match.str(1);
@@ -79,13 +86,13 @@ std::string ParseEmailBody(std::string body)
         body.erase(0, body.find("\r\n") + 1);
         return body.erase(0, body.find("\n") + 1);
     }
-    catch(regex_error& e) {
+    catch(std::regex_error& e) {
         return BAD_RESPONSE;
     }
 
     body = body.substr(0, body.size() - delete_part.size());
-    body.erase(0, body.find("\r\n")+1);
-    body = body.substr(0, body.size()-5);
+    body.erase(0, body.find("\r\n") + 1);
+    body = body.substr(0, body.size() - 5);
     return body;
 }
 

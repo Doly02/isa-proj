@@ -72,15 +72,19 @@ class NonSecureImapClient : public BaseImapClient
         int FetchEmails(void);
 
  
-        std::string FetchEmailByUID(int uid);
+        std::string FetchEmailByUID(int uid, bool mode);
+
+        std::string ParseEmail(int uid, std::string email, bool just_headers);
 
         int SetMailBox(void);
 
         /**
         * @brief    Disconnects From The IMAP Server.
-        * @retval   True on Successful Disconnection, False Otherwise.
+        * @retval   SUCCESS If Client Was Safely Dissconnected.
         */
-        bool DisconnectImapServer(void);
+        int DisconnectImapServer(void);
+
+        int Launch(void);
 };
 
 
