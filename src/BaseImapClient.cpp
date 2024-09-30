@@ -46,7 +46,7 @@ std::string BaseImapClient::GenerateTag(void)
     tag_stream << 'A';
 
     // Add Incremented Hexadecimal Value
-    tag_stream << std::setw(5) << std::setfill('0') << std::hex << ++mCurrentTagValue;
+    tag_stream << std::setw(10) << std::setfill('0') << std::hex << ++mCurrentTagValue;
     return tag_stream.str();
 }  
 
@@ -117,6 +117,13 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
         case LOGIN:
             /* login completed, now in authenticated state */
             if (std::string::npos != buff.find(current_tag + " OK LOGIN completed"))
+                return SUCCESS; 
+            /* Greeting from IMAP Server FIXME */
+            else if (std::string::npos != buff.find(current_tag + "* OK "))
+                return TRANSMIT_DATA_FAILED; 
+            /* It's Also Possible That Server Will Respond With CAPABILITY... */
+            else if (std::string::npos != buff.find(current_tag + " OK [CAPABILITY") &&
+             std::string::npos != buff.find("Logged in"))
                 return SUCCESS;
             /* login failure: user name or password rejected */
             else if (std::string::npos != buff.find(current_tag + " NO LOGIN completed"))
@@ -161,6 +168,23 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             else
                 return CONTINUE_IN_RECEIVING;
             break;
+        case SELECT:
+            /* OK - select completed, now in selected state -> Client is Able To Modify Mailbox */
+            if (std::string::npos != buff.find(current_tag + " OK [READ-WRITE] SELECT completed"))
+                return SUCCESS;
+
+            /* The Client is Not Permitted To Modify The Mailbox But is Permitted Read Access, 
+               The Mailbox is Selected as Read-Only*/
+            if (std::string::npos != buff.find(current_tag + " OK [READ-ONLY] SELECT completed"))
+                return SUCCESS;
+            /* NO - select failure, now in authenticated state: no such mailbox, can't access mailbox */
+            else if (std::string::npos != buff.find(current_tag + " NO FETCH completed"))
+                return TRANSMIT_DATA_FAILED;
+            /* BAD - command unknown or arguments invalid */
+            else if (std::string::npos != buff.find(current_tag + " BAD FETCH completed"))
+                return TRANSMIT_DATA_FAILED;
+            else
+                return CONTINUE_IN_RECEIVING;
         default:
             return UNDEFINED_STATE;
             

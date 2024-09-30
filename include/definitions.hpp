@@ -138,7 +138,8 @@ typedef enum
     CONNECT,
     LOGOUT,  
     SEARCH,                         //<! search cmd for fetch of the UIDs.
-    FETCH,        
+    FETCH,
+    SELECT,
     DEFAULT,
 } State_t;
 

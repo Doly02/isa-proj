@@ -32,7 +32,6 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
     bool is_ipv6_addr = isIPv6Address(serverAddress);
-    std::string recv_data = EMPTY_STR;
 
     /* Set Current State of The Communication With IMAP Server */
     curr_state = LOGIN;
@@ -117,11 +116,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
     curr_state = LOGIN;
     /* Send Login Command To IMAP Server */
     LoginClient(username, password);
-    recv_data = ReceiveData();
-    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data)
-    {
-        return -3;
-    }
+
     // TODO: Print To The User That Login Was Successful.
     curr_state = DEFAULT;
     return SUCCESS; 
@@ -149,6 +144,7 @@ int NonSecureImapClient::SendData(const std::string& data)
 
 std::string NonSecureImapClient::ReceiveData()
 {
+    int i = 0;
     char            rx_buffer[RX_BUFFER_SIZE] = { 0 };  //<! Buffer That Interacts With recv()
     ssize_t         bytes_rx = 0;                       //<! Num. of Received Bytes
     std::string     rx_data = EMPTY_STR;                //<! Buffer For Server Response
@@ -156,8 +152,9 @@ std::string NonSecureImapClient::ReceiveData()
 
     while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE - 1, 0)))
     {
+        i++;
         rx_buffer[bytes_rx] = '\0';
-        printf("DEBUG: rx_buffer contains: %s\n", rx_buffer);
+        printf("DEBUG: rx_buffer[%d,%d] contains: %s\n", curr_state, i, rx_buffer);
         rx_data += rx_buffer;
         ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
         if (SUCCESS == ret_val)
@@ -169,7 +166,7 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-    printf("DEBUG: Received: %s, bytes_rx=%d\n", rx_data.c_str(), u_int(bytes_rx));
+    printf("DEBUG: bytes_rx=%d\n", u_int(bytes_rx));
     /* Handle Error If Occured During Transmission */
     if (0 > bytes_rx){
         return EMPTY_STR;
@@ -196,8 +193,6 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
         std::cerr << "ERR: Failed to Receive LOGIN Response from IMAP Server.\n";
         return RECEIVE_DATA_FAILED;
     }
-
-    printf("DEBUG: Address Resolved.\n");
     return SUCCESS;
 }
 
@@ -398,7 +393,7 @@ std::string NonSecureImapClient::ParseEmail(int uid, std::string email, bool jus
 int NonSecureImapClient::SetMailBox()
 {
     std::string recv_data = EMPTY_STR;
-    curr_state = SEARCH;
+    curr_state = SELECT;
 
     std::string tag = GenerateTag();  
     std::string set_mailbox_cmd = tag + " SELECT " + mailbox;
@@ -449,6 +444,7 @@ int NonSecureImapClient::Launch(const std::string& serverAddress, const std::str
     int ret_val = -4;
 
     ret_val = ConnectImapServer(serverAddress, username, password);
+    printf("DEBUG: Connect ret_val=%d\n", ret_val);
     if (SUCCESS != ret_val)
     {
         return ret_val;
