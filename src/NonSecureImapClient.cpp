@@ -117,7 +117,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
             return -3;
         }
     }
-
+    curr_state = LOGIN;
     /* Send Login Command To IMAP Server */
     LoginClient(username, password);
     recv_data = ReceiveData();
@@ -126,7 +126,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         return -3;
     }
     // TODO: Print To The User That Login Was Successful.
-
+    curr_state = DEFAULT;
     return SUCCESS; 
 
 }
@@ -307,6 +307,9 @@ int NonSecureImapClient::FetchUIDs()
         std::cerr << "ERR: Failed to Parse UIDs.\n";
         return NON_UIDS_RECEIVED;                       /* TODO: Update Logic of RetVal! */
     }
+
+    curr_state = DEFAULT;
+
     return SUCCESS;    
 }
 
@@ -412,6 +415,9 @@ int NonSecureImapClient::SetMailBox()
         std::cerr << "ERR: Failed to Receive Response For Setup of Mailbox on IMAP Server.\n";
         return RECEIVE_DATA_FAILED;
     }
+
+    curr_state = DEFAULT;
+
     return SUCCESS;
 }
 

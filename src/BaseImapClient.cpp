@@ -46,7 +46,7 @@ std::string BaseImapClient::GenerateTag(void)
     tag_stream << 'A';
 
     // Add Incremented Hexadecimal Value
-    tag_stream << std::setw(10) << std::setfill('0') << std::hex << ++mCurrentTagValue;
+    tag_stream << std::setw(5) << std::setfill('0') << std::hex << ++mCurrentTagValue;
     return tag_stream.str();
 }  
 
@@ -68,7 +68,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
     // Set hints to try both IPv4 and IPv6
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
+    hints.ai_family = AF_INET;    // Allow IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM; // TCP stream sockets
 
     // Get address info
@@ -87,7 +87,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
             struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
             addr = &(ipv4->sin_addr);
             ipVersion = "IPv4";
-        } else if (p->ai_family == AF_INET6) { // IPv6
+        } else if (p->ai_family == AF_INET6 && 0) { // IPv6
             struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
             addr = &(ipv6->sin6_addr);
             ipVersion = "IPv6";
