@@ -57,10 +57,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
     /* Create a Socket For Either IPv4 or IPv6 */
     if (true == is_ipv4_addr)
     {
-#if (DEBUG_ENABLE == true)
-        printf("IPv4 Choosen For Connection.\n");
-#endif /* (DEBUG_ENABLE == true) */
-
+        printf("DEBUG: IPv4 Choosen For Connection.\n");
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (0 > sockfd)
         {
@@ -157,9 +154,10 @@ std::string NonSecureImapClient::ReceiveData()
     std::string     rx_data = EMPTY_STR;                //<! Buffer For Server Response
     int             ret_val = -1;
 
-    while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE-1, 0)))
+    while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE - 1, 0)))
     {
         rx_buffer[bytes_rx] = '\0';
+        printf("DEBUG: rx_buffer contains: %s\n", rx_buffer);
         rx_data += rx_buffer;
         ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
         if (SUCCESS == ret_val)
@@ -171,7 +169,7 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-    printf("DEBUG: Received: %s\n", rx_data.c_str());
+    printf("DEBUG: Received: %s, bytes_rx=%d\n", rx_data.c_str(), u_int(bytes_rx));
     /* Handle Error If Occured During Transmission */
     if (0 > bytes_rx){
         return EMPTY_STR;

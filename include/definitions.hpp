@@ -68,13 +68,13 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
  */
 #define SECURE                      (true)
-#define PORT_NON_SECURE             (993)
+#define PORT_NON_SECURE             (143)
 
 /**
  * @brief Non-Secure IMAP Client Mode. Communicate Just Thru TCP/IP.
  */
 #define NON_SECURE                  (false)
-#define PORT_SECURE                 (143)
+#define PORT_SECURE                 (993)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
