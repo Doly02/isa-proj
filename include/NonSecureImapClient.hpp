@@ -34,7 +34,7 @@ class NonSecureImapClient : public BaseImapClient
         /* IMAP Server Informations */
         std::string mailbox;        //!< Mailbox to fetch emails from
         std::string outputDir;      //!< Directory to store the emails
-        
+        bool        headersOnly;
     public:
 
         /**
@@ -42,16 +42,16 @@ class NonSecureImapClient : public BaseImapClient
         * @param[in]    mailbox The Name of The Mailbox To Fetch Emails From.
         * @param[in]    outputDir The Directory To Save The Downloaded Emails.
         */
-        NonSecureImapClient(const std::string& mailbox, const std::string& outputDir);
+        NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly);
         
         /**
         * @brief    Connects to the IMAP server.
         * @param[in] serverAddress IMAP server address.
         * @param[in] username IMAP account username.
         * @param[in] password IMAP account password.
-        * @retval   True on successful connection, False otherwise.
+        * @retval   SUCCESS If Client Has Connected Successfully To IMAP Server.
         */
-        bool ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password);
+        int ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password);
 
         int SendData(const std::string& data);
 
@@ -84,9 +84,8 @@ class NonSecureImapClient : public BaseImapClient
         */
         int DisconnectImapServer(void);
 
-        int Launch(void);
+        int Launch(const std::string& serverAddress, const std::string& username, const std::string& password);
 };
 
 
 #endif /* NON_SECURE_IMAP_CLIENT_H */
-

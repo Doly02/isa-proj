@@ -29,10 +29,12 @@
 #include <fstream>          /*<! For std::ifstream */
 #include <regex>
 
-#include <sys/socket.h>     /*<!  Hostname Relevant. */
+#include <sys/socket.h>     /*<! Hostname Relevant. */
+#include <sys/stat.h>       /*<! For FileExists()   */
 #include <netinet/in.h>
 #include <arpa/inet.h>      /*<!  Hostname Relevant. */
 #include <netdb.h>          /*<! For getaddrinfo() + Hostname Relevant.*/
+
 /************************************************/
 /*             Macro Definitions                */
 /************************************************/
@@ -123,8 +125,8 @@ typedef struct
 
 typedef struct 
 {
-    std::vector<std::string> username;          
-    std::vector<std::string> password;           
+    std::string username;          
+    std::string password;           
 
 } Credentials_t;
 

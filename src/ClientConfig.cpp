@@ -30,6 +30,7 @@ ImapClientConfig::ImapClientConfig()
     certF(EMPTY_STR), 
     certD(DEFAULT_SSL_CERT_LOC),
     mailboxD(DEFAULT_MAILBOX_DIR),
+    outputD(EMPTY_STR),
     justNew(false),
     justHeaders(false),
     authData{ {EMPTY_STR}, {EMPTY_STR} } {}
@@ -37,6 +38,7 @@ ImapClientConfig::ImapClientConfig()
 ImapClientConfig::ImapClientConfig(int argc, char* argv[])   
 {
     bool retVal = false;
+    mode        = NON_SECURE;
     retVal = this->ProcessArguments(argc, argv);
     if(SUCCESS == retVal)
     {
@@ -48,6 +50,28 @@ bool ImapClientConfig::GetClientMode()
 {
     return mode;
 }
+
+
+std::string ImapClientConfig::GetServerAddress()
+{
+    return server;
+}
+
+std::string ImapClientConfig::GetOutputDirectory()
+{
+    return outputD;
+}
+
+std::string ImapClientConfig::GetMailbox()
+{
+    return mailboxD;
+}
+
+bool ImapClientConfig::GetHeadersOnly()
+{
+    return justHeaders;
+}
+
 
 bool ImapClientConfig::ParseArguments(int argc, char* argv[])
 {
@@ -88,17 +112,20 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
             case 'h':   /* Just Email Headers Will Be Downloaded */
                 justHeaders = true;
                 break;
+            case 'o':
+                outputD = optarg;
+                break;
             case '?':
             default:
                 return false;
         }
     }
 
-#if (DEBUG_ENABLED == 1)
+#if (DEBUG_ENABLED == true)
 
     printf("Choosen Sever: %s, Port: %d\n",server.c_str(), port);
 
-#endif /* (DEBUG_ENABLED == 1) */
+#endif /* (DEBUG_ENABLED == true) */
 
     return true;
 }
@@ -108,12 +135,13 @@ int ImapClientConfig::ExtractAuthData(void)
     // Check The Auth. File Path
     std::ifstream in(authF);
 
-#if (DEBUG_ENABLED == 1)
+#if (DEBUG_ENABLED == true)
+
     if (!FileExists(authF)) {
         std::cerr << "ERR: The file does not exist at path: " << authF << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
-#endif /* (DEBUG_ENABLED == 1) */
+#endif /* (DEBUG_ENABLED == true) */
 
 
     if (false == in.is_open()) 
@@ -131,8 +159,8 @@ int ImapClientConfig::ExtractAuthData(void)
 
     if (std::regex_search(contents, match, auth_file_template) && (3 == match.size())) 
     {
-        authData.username.push_back(match.str(1));
-        authData.password.push_back(match.str(2));
+        authData.username = match.str(1); 
+        authData.password = match.str(2);  
     } 
     else 
     {   /* TODO: Maybe Return Some Err. Code? */
@@ -140,16 +168,14 @@ int ImapClientConfig::ExtractAuthData(void)
         return PARSE_CREDENTIALS_FAILED;
     }
 
-#if (DEBUG_ENABLED == 1)
+#if(DEBUG_ENABLED == true)
 
-    if (!authData.username.empty()) {
-        std::string username_dbg = authData.username[0];  
-        std::cout << "Username: " << username_dbg << std::endl;
+    if (!authData.username.empty()) {  
+        std::cerr << "Username: " << authData.username.c_str() << std::endl;
     }
 
-    if (!authData.password.empty()) {
-        std::string password_dbg = authData.password[0]; 
-        std::cout << "Password: " << password_dbg << std::endl;
+    if (!authData.password.empty()) { 
+        std::cerr << "Password: " << authData.password.c_str() << std::endl;
     }
 
 #endif /* (DEBUG_ENABLED == 1) */

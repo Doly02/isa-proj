@@ -38,13 +38,14 @@ class ImapClientConfig
         std::string     certD;          //<! Specifies Dir In Which Cert. is Stored.
         std::string     authF;          //<! Defines Authentication File.
         std::string     mailboxD;       //<! Specifies Mailbox Directory.
+        std::string     outputD;
         bool            justNew;        //<! Only New Emails Will Be Read.
         bool            justHeaders;    //<! Just Header Will Be Downloaded.
 
-        Credentials_t   authData;
 
     public:
         /*TODO Add Public Properieties. */
+        Credentials_t   authData;
 
         ImapClientConfig();
         /**
@@ -58,6 +59,14 @@ class ImapClientConfig
 
         bool GetClientMode(void);
 
+        std::string GetServerAddress(void);
+
+        std::string GetOutputDirectory(void);
+
+        std::string GetMailbox(void);
+
+        bool GetHeadersOnly(void);
+
         /**
          * @brief       Parses Command Line Arguments.
          * @param[in]   argc Number of Arguments
@@ -67,7 +76,6 @@ class ImapClientConfig
          * @return      Arguments Are Not Valid, Exits With Error Code 1, Otherwise Returns 0.
         */         
         bool ParseArguments(int argc, char* argv[]);   
-
 
         bool ProcessArguments(int argc, char* argv[]);
 

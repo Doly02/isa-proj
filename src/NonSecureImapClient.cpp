@@ -19,16 +19,15 @@
 /************************************************/
 #include "../include/NonSecureImapClient.hpp"
 
-
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
-NonSecureImapClient::NonSecureImapClient(const std::string& mailBox, const std::string& outDirectory)
-    : mailbox(mailBox), 
-    outputDir(outDirectory){}
+NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly)
+    : mailbox(MailBox), 
+    outputDir(OutDirectory),
+    headersOnly(HeadersOnly){}
 
-
-bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
+int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
 {
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
@@ -45,19 +44,28 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
         {
             std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
         }
+        printf("DEBUG: Address Resolved.\n");
     }
 
     is_ipv4_addr = IsIPv4Address(server_ip);
     is_ipv6_addr = isIPv6Address(server_ip);
 
+
+    printf("DEBUG: IPv4=%d, IPv6=%d.\n",is_ipv4_addr,is_ipv6_addr);
+
+
     /* Create a Socket For Either IPv4 or IPv6 */
     if (true == is_ipv4_addr)
     {
+#if (DEBUG_ENABLE == true)
+        printf("IPv4 Choosen For Connection.\n");
+#endif /* (DEBUG_ENABLE == true) */
+
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (0 > sockfd)
         {
             std::cerr << "ERR: Unable To Create IPv4 Socket.\n";
-            return false;
+            return -3;
         }
 
         /* Preparation of IPv4 Server Addr. Struct */
@@ -70,14 +78,14 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
             std::cerr << "ERR: Invalid IPv4 Address Format.\n";
             close(sockfd);
             sockfd = -1;
-            return false;
+            return -3;
         }
         if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
         {
             std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
             close(sockfd);
             sockfd = -1;
-            return false;
+            return -3;
         }
     }
     else if (true == is_ipv6_addr)
@@ -86,7 +94,7 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
         if (0 > sockfd) 
         {
             std::cerr << "ERR: Unable To Create IPv6 Socket.\n";
-            return false;
+            return -3;
         }
 
         struct sockaddr_in6 server_addr;
@@ -98,7 +106,7 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
             std::cerr << "ERR: Invalid IPv6 Address Format.\n";
             close(sockfd);
             sockfd = -1;
-            return false;
+            return -3;
         }
 
         if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
@@ -106,7 +114,7 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
             std::cerr << "ERR: Unable to connect to the IMAP server (IPv6).\n";
             close(sockfd);
             sockfd = -1;
-            return false;
+            return -3;
         }
     }
 
@@ -115,11 +123,11 @@ bool NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, co
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data)
     {
-        return false;
+        return -3;
     }
     // TODO: Print To The User That Login Was Successful.
 
-    return true; 
+    return SUCCESS; 
 
 }
 
@@ -127,7 +135,7 @@ int NonSecureImapClient::SendData(const std::string& data)
 {
     ssize_t bytes_tx = 0;
     std::string message = data + "\r\n";
-
+    printf("DEBUG: Send Data: %s", message.c_str());
     bytes_tx = send(sockfd, message.c_str(), message.length(), 0);
     if (0 > bytes_tx)
     {
@@ -163,7 +171,7 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-
+    printf("DEBUG: Received: %s\n", rx_data.c_str());
     /* Handle Error If Occured During Transmission */
     if (0 > bytes_rx){
         return EMPTY_STR;
@@ -176,13 +184,22 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
 {
     std::string tag = GenerateTag();
     std::string log_cmd = tag + " LOGIN " + username + " " + password;
+    std::string recv_data   = EMPTY_STR;
+
     if (SUCCESS != SendData(log_cmd))
     {
         std::cerr << "ERR: Failed to Login to IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
     }
     // TODO: Receive Response From The Server & Eval.
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
+        std::cerr << "ERR: Failed to Receive LOGIN Response from IMAP Server.\n";
+        return RECEIVE_DATA_FAILED;
+    }
 
+    printf("DEBUG: Address Resolved.\n");
     return SUCCESS;
 }
 
@@ -255,7 +272,11 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     for (std::string tok; std::getline(parse_uids, tok, ' '); )
     {
         uid = std::atoi(tok.c_str());
+#if (DEBUG_ENABLED == true)
+        if (1 <= uid && uid <= 5)
+#else
         if (0  < uid)
+#endif /* (DEBUG_ENABLED == true) */
             vec_uids.push_back(uid);
     }
 
@@ -269,6 +290,7 @@ int NonSecureImapClient::FetchUIDs()
 
     std::string tag = GenerateTag();
     std::string fetch_uids_cmd = tag + " UID SEARCH ALL"; /* TODO: Here Will Be Update (Right Now -n Is not Avalaible)*/
+    
     if (SUCCESS != SendData(fetch_uids_cmd)) 
     {
         std::cerr << "ERR: Failed to Fetch UIDs From IMAP Server.\n";
@@ -348,7 +370,6 @@ std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
         std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
         return recv_data;
     }
-    /* rx_data Now Contains Email */
 
     curr_state = DEFAULT;
     return recv_data;
@@ -417,4 +438,33 @@ int NonSecureImapClient::DisconnectImapServer(void)
         return SUCCESS;
     }
     return SUCCESS; /* TODO: Already Closed */
+}
+
+int NonSecureImapClient::Launch(const std::string& serverAddress, const std::string& username, const std::string& password)
+{
+    int ret_val = -4;
+
+    ret_val = ConnectImapServer(serverAddress, username, password);
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
+    // Set MailBox
+    ret_val = SetMailBox();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
+    ret_val = FetchEmails();
+    
+    printf("Fetched New: %d Emails!", ret_val);
+
+    ret_val = LogoutClient();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }    
+    return SUCCESS;
 }
