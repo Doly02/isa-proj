@@ -144,38 +144,38 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             break;
         case SEARCH:
             /* OK - search completed */
-            if (std::string::npos != buff.find(current_tag + " OK SEARCH completed"))
+            if (std::string::npos != buff.find(current_tag + " OK Search completed"))
                 return SUCCESS;
             /* NO - search error: can't search that [CHARSET] or criteria*/
-            else if (std::string::npos != buff.find(current_tag + " NO SEARCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO Search completed"))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD SEARCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD Search completed"))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case FETCH:
             /* OK - fetch completed */
-            if (std::string::npos != buff.find(current_tag + " OK FETCH completed"))
+            if (std::string::npos != buff.find(current_tag + " OK Fetch completed"))
                 return SUCCESS;
             /* NO - fetch error: can't fetch that data */
-            else if (std::string::npos != buff.find(current_tag + " NO FETCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO Fetch completed"))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD FETCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD Fetch completed"))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case SELECT:
             /* OK - select completed, now in selected state -> Client is Able To Modify Mailbox */
-            if (std::string::npos != buff.find(current_tag + " OK [READ-WRITE] SELECT completed"))
+            if (std::string::npos != buff.find(current_tag + " OK [READ-WRITE] Select completed"))
                 return SUCCESS;
 
             /* The Client is Not Permitted To Modify The Mailbox But is Permitted Read Access, 
                The Mailbox is Selected as Read-Only*/
-            if (std::string::npos != buff.find(current_tag + " OK [READ-ONLY] SELECT completed"))
+            if (std::string::npos != buff.find(current_tag + " OK [READ-ONLY] Select completed"))
                 return SUCCESS;
             /* NO - select failure, now in authenticated state: no such mailbox, can't access mailbox */
             else if (std::string::npos != buff.find(current_tag + " NO FETCH completed"))
@@ -195,4 +195,11 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
 /* TODO: BYE Command! */
 /**
  * Zpravy jsou poznaceny UID (unikatni pro kazdou zpravu) -> Tak poznas ze zpravu jsi jiz stahoval.
+ *
+ *
+ * SELECT Command: 
+ * 1) RFC:              A142 OK [READ-WRITE] SELECT completed
+ * 2) Real Server:      A0000000002 OK [READ-WRITE] Select completed
+ *
+ * TODO: Ask If Is Valid To Put Server's Response Automatically to Lowercase.
  */

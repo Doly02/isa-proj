@@ -43,20 +43,14 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         {
             std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
         }
-        printf("DEBUG: Address Resolved.\n");
     }
 
     is_ipv4_addr = IsIPv4Address(server_ip);
     is_ipv6_addr = isIPv6Address(server_ip);
 
-
-    printf("DEBUG: IPv4=%d, IPv6=%d.\n",is_ipv4_addr,is_ipv6_addr);
-
-
     /* Create a Socket For Either IPv4 or IPv6 */
     if (true == is_ipv4_addr)
     {
-        printf("DEBUG: IPv4 Choosen For Connection.\n");
         sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (0 > sockfd)
         {
@@ -127,7 +121,6 @@ int NonSecureImapClient::SendData(const std::string& data)
 {
     ssize_t bytes_tx = 0;
     std::string message = data + "\r\n";
-    printf("DEBUG: Send Data: %s", message.c_str());
     bytes_tx = send(sockfd, message.c_str(), message.length(), 0);
     if (0 > bytes_tx)
     {
@@ -154,7 +147,6 @@ std::string NonSecureImapClient::ReceiveData()
     {
         i++;
         rx_buffer[bytes_rx] = '\0';
-        printf("DEBUG: rx_buffer[%d,%d] contains: %s\n", curr_state, i, rx_buffer);
         rx_data += rx_buffer;
         ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
         if (SUCCESS == ret_val)
@@ -166,7 +158,6 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-    printf("DEBUG: bytes_rx=%d\n", u_int(bytes_rx));
     /* Handle Error If Occured During Transmission */
     if (0 > bytes_rx){
         return EMPTY_STR;
@@ -444,7 +435,6 @@ int NonSecureImapClient::Launch(const std::string& serverAddress, const std::str
     int ret_val = -4;
 
     ret_val = ConnectImapServer(serverAddress, username, password);
-    printf("DEBUG: Connect ret_val=%d\n", ret_val);
     if (SUCCESS != ret_val)
     {
         return ret_val;
