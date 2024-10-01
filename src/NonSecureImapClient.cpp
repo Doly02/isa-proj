@@ -22,10 +22,11 @@
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
-NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly)
+NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly, bool NewOnly)
     : mailbox(MailBox), 
     outputDir(OutDirectory),
-    headersOnly(HeadersOnly){}
+    headersOnly(HeadersOnly),
+    newOnly(NewOnly){}
 
 int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
 {
@@ -269,7 +270,14 @@ int NonSecureImapClient::FetchUIDs()
     curr_state = SEARCH;
 
     std::string tag = GenerateTag();
-    std::string fetch_uids_cmd = tag + " UID SEARCH ALL"; /* TODO: Here Will Be Update (Right Now -n Is not Avalaible)*/
+    std::string fetch_uids_cmd = tag + " UID SEARCH"; /* TODO: Here Will Be Update (Right Now -n Is not Avalaible)*/
+    
+    printf("value_true: %s\n", newOnly ? "true" : "false");
+    if (false == newOnly)
+        fetch_uids_cmd += " ALL";
+    else
+        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfide */
+
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
     {
@@ -309,7 +317,7 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /*if (id >= 27 && id <= 31)
+        /*if (id >= 36 && id <= 40)
         {*/
         email = EMPTY_STR;
         email = FetchEmailByUID(id, WHOLE_MESSAGE);

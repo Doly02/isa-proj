@@ -40,6 +40,7 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
     bool retVal = false;
     mode        = NON_SECURE;
     justHeaders = false;
+    justNew     = false;
     retVal = this->ProcessArguments(argc, argv);
     if(SUCCESS == retVal)
     {
@@ -51,7 +52,6 @@ bool ImapClientConfig::GetClientMode()
 {
     return mode;
 }
-
 
 std::string ImapClientConfig::GetServerAddress()
 {
@@ -66,6 +66,11 @@ std::string ImapClientConfig::GetOutputDirectory()
 std::string ImapClientConfig::GetMailbox()
 {
     return mailboxD;
+}
+
+bool ImapClientConfig::GetNewOnly()
+{
+    return justNew;
 }
 
 bool ImapClientConfig::GetHeadersOnly()

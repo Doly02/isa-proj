@@ -35,6 +35,7 @@ class NonSecureImapClient : public BaseImapClient
         std::string mailbox;        //!< Mailbox to fetch emails from
         std::string outputDir;      //!< Directory to store the emails
         bool        headersOnly;
+        bool        newOnly;
     public:
 
         /**
@@ -42,7 +43,7 @@ class NonSecureImapClient : public BaseImapClient
         * @param[in]    mailbox The Name of The Mailbox To Fetch Emails From.
         * @param[in]    outputDir The Directory To Save The Downloaded Emails.
         */
-        NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly);
+        NonSecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly, bool NewOnly);
         
         /**
         * @brief    Connects to the IMAP server.
