@@ -39,8 +39,8 @@ class ImapClientConfig
         std::string     authF;          //<! Defines Authentication File.
         std::string     mailboxD;       //<! Specifies Mailbox Directory.
         std::string     outputD;
-        bool            justNew;        //<! Only New Emails Will Be Read.
-        bool            justHeaders;    //<! Just Header Will Be Downloaded.
+        bool            onlyNew;        //<! Only New Emails Will Be Read.
+        bool            onlyHeaders;    //<! Just Header Will Be Downloaded.
 
 
     public:
@@ -65,9 +65,11 @@ class ImapClientConfig
 
         std::string GetMailbox(void);
 
-        bool GetNewOnly(void);
+        bool GetOnlyNew(void);
 
-        bool GetHeadersOnly(void);
+        bool GetOnlyHeaders(void);
+
+        bool ProcessArguments(int argc, char* argv[]);
 
         /**
          * @brief       Parses Command Line Arguments.
@@ -78,8 +80,6 @@ class ImapClientConfig
          * @return      Arguments Are Not Valid, Exits With Error Code 1, Otherwise Returns 0.
         */         
         bool ParseArguments(int argc, char* argv[]);   
-
-        bool ProcessArguments(int argc, char* argv[]);
 
         /**
         * @brief        Extracts Username and Password From an Authentication File.

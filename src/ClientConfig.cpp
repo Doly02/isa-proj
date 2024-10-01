@@ -31,21 +31,16 @@ ImapClientConfig::ImapClientConfig()
     certD(DEFAULT_SSL_CERT_LOC),
     mailboxD(DEFAULT_MAILBOX_DIR),
     outputD(EMPTY_STR),
-    justNew(false),
-    justHeaders(false),
+    onlyNew(false),
+    onlyHeaders(false),
     authData{ {EMPTY_STR}, {EMPTY_STR} } {}
 
 ImapClientConfig::ImapClientConfig(int argc, char* argv[])   
 {
-    bool retVal = false;
     mode        = NON_SECURE;
-    justHeaders = false;
-    justNew     = false;
-    retVal = this->ProcessArguments(argc, argv);
-    if(SUCCESS == retVal)
-    {
-        printf("Success!\n");
-    }
+    onlyHeaders = false;
+    onlyNew     = false;
+    this->ProcessArguments(argc, argv);
 }
 
 bool ImapClientConfig::GetClientMode()
@@ -68,16 +63,27 @@ std::string ImapClientConfig::GetMailbox()
     return mailboxD;
 }
 
-bool ImapClientConfig::GetNewOnly()
+bool ImapClientConfig::GetOnlyNew()
 {
-    return justNew;
+    return onlyNew;
 }
 
-bool ImapClientConfig::GetHeadersOnly()
+bool ImapClientConfig::GetOnlyHeaders()
 {
-    return justHeaders;
+    return onlyHeaders;
 }
 
+bool ImapClientConfig::ProcessArguments(int argc, char* argv[])
+{
+    /* Parse The Arguments */
+    ParseArguments(argc, argv);
+
+    /* Checkout The Credentials & Parse Them */
+    if (SUCCESS != ExtractAuthData())
+        return (bool)PARSE_CREDENTIALS_FAILED;
+
+    return (bool)SUCCESS;
+}
 
 bool ImapClientConfig::ParseArguments(int argc, char* argv[])
 {
@@ -113,10 +119,10 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
                 mailboxD = optarg;
                 break;
             case 'n':   /* Just New Messages Will Be Read */
-                justNew = true;
+                onlyNew = true;
                 break;
             case 'h':   /* Just Email Headers Will Be Downloaded */
-                justHeaders = true;
+                onlyHeaders = true;
                 break;
             case 'o':
                 outputD = optarg;
@@ -127,12 +133,6 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
         }
     }
 
-#if (DEBUG_ENABLED == true)
-
-    printf("Choosen Sever: %s, Port: %d\n",server.c_str(), port);
-
-#endif /* (DEBUG_ENABLED == true) */
-
     return true;
 }
 
@@ -141,19 +141,15 @@ int ImapClientConfig::ExtractAuthData(void)
     // Check The Auth. File Path
     std::ifstream in(authF);
 
-#if (DEBUG_ENABLED == true)
-
-    if (!FileExists(authF)) {
+    if (false == FileExists(authF)) {
         std::cerr << "ERR: The file does not exist at path: " << authF << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
-#endif /* (DEBUG_ENABLED == true) */
-
 
     if (false == in.is_open()) 
     {
         /* TODO: Maybe Return Some Err. Code? */
-        printf("ERR: Unable To Open The Authentication File.\n");
+        std::cerr << "ERR: Unable To Open The Authentication File." << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
 
@@ -170,33 +166,9 @@ int ImapClientConfig::ExtractAuthData(void)
     } 
     else 
     {   /* TODO: Maybe Return Some Err. Code? */
-        printf("ERR: Unable To Find Valid Credentials in The File.\n");
+        std::cerr << "ERR: Unable To Find Valid Credentials in The File." << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
 
-#if(DEBUG_ENABLED == true)
-
-    if (!authData.username.empty()) {  
-        std::cerr << "Username: " << authData.username.c_str() << std::endl;
-    }
-
-    if (!authData.password.empty()) { 
-        std::cerr << "Password: " << authData.password.c_str() << std::endl;
-    }
-
-#endif /* (DEBUG_ENABLED == 1) */
-
     return SUCCESS;
-}
-
-bool ImapClientConfig::ProcessArguments(int argc, char* argv[])
-{
-    /* Parse The Arguments */
-    ParseArguments(argc, argv);
-
-    /* Checkout The Credentials & Parse Them */
-    if (SUCCESS != ExtractAuthData())
-        return (bool)PARSE_CREDENTIALS_FAILED;
-
-    return (bool)SUCCESS;
 }

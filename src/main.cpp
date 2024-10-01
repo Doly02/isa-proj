@@ -49,8 +49,8 @@ try
         mail_box = app_config.GetMailbox();
         out_directory = app_config.GetOutputDirectory();
         server_addr = app_config.GetServerAddress();
-        only_headers = app_config.GetHeadersOnly();               /* Only Headers */
-        only_new = app_config.GetNewOnly();
+        only_headers = app_config.GetOnlyHeaders();               
+        only_new = app_config.GetOnlyNew();
 
         NonSecureImapClient client(mail_box, out_directory, only_headers, only_new);
         ret_val = client.Run(server_addr, app_config.authData.username, app_config.authData.password);
