@@ -69,7 +69,7 @@ class ImapClientConfig
 
         bool GetOnlyHeaders(void);
 
-        bool ProcessArguments(int argc, char* argv[]);
+        int ProcessArguments(int argc, char* argv[]);
 
         /**
          * @brief       Parses Command Line Arguments.
@@ -79,7 +79,7 @@ class ImapClientConfig
          * @details     Parsed Arguments Are Stored Into Class Attributes.
          * @return      Arguments Are Not Valid, Exits With Error Code 1, Otherwise Returns 0.
         */         
-        bool ParseArguments(int argc, char* argv[]);   
+        int ParseArguments(int argc, char* argv[]);   
 
         /**
         * @brief        Extracts Username and Password From an Authentication File.

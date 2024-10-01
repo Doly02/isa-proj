@@ -54,6 +54,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define PARSE_EMAIL_FAILED          (-2)
 #define SUCCESS                     (0u)
 #define NO_IP_ADDR_FOUND            (1u)
+#define PARSE_ARGUMENTS_FAILED      (11u)
 #define PARSE_CREDENTIALS_FAILED    (2u)
 #define SERVER_UNKNOWN_RESPONSE     (3u)
 #define TRANSMIT_DATA_FAILED        (4u)

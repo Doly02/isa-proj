@@ -40,7 +40,10 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
     mode        = NON_SECURE;
     onlyHeaders = false;
     onlyNew     = false;
-    this->ProcessArguments(argc, argv);
+    if (SUCCESS != this->ProcessArguments(argc, argv))
+    {
+        exit(PARSE_CREDENTIALS_FAILED);
+    }
 }
 
 bool ImapClientConfig::GetClientMode()
@@ -73,26 +76,27 @@ bool ImapClientConfig::GetOnlyHeaders()
     return onlyHeaders;
 }
 
-bool ImapClientConfig::ProcessArguments(int argc, char* argv[])
+int ImapClientConfig::ProcessArguments(int argc, char* argv[])
 {
     /* Parse The Arguments */
-    ParseArguments(argc, argv);
-
+    if (SUCCESS != ParseArguments(argc, argv))
+    {
+        return PARSE_ARGUMENTS_FAILED; 
+    }
     /* Checkout The Credentials & Parse Them */
     if (SUCCESS != ExtractAuthData())
-        return (bool)PARSE_CREDENTIALS_FAILED;
+        return PARSE_CREDENTIALS_FAILED;
 
-    return (bool)SUCCESS;
+    return SUCCESS;
 }
 
-bool ImapClientConfig::ParseArguments(int argc, char* argv[])
+int ImapClientConfig::ParseArguments(int argc, char* argv[])
 {
     int c = 0; 
 
-    
     if (6 > argc || 16 < argc) 
     {
-        return false;  
+        return PARSE_ARGUMENTS_FAILED;  
     }
     server = argv[1];
 
@@ -130,11 +134,11 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
             case '?':
             default:
                 PrintHelp();
-                return false;
+                return PARSE_ARGUMENTS_FAILED;
         }
     }
 
-    return true;
+    return SUCCESS;
 }
 
 int ImapClientConfig::ExtractAuthData(void)  
