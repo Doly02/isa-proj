@@ -87,21 +87,25 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define DEBUG_ENABLED               (true)
 
 #define OUTPUT_FILE_FORMAT          ".log"
+
 /**
  * @brief Structure For The Email Message.
  */
 typedef struct 
 {
-    std::vector<std::string> from;          //<! Sender Address.
-    
-    std::vector<std::string> to;            //<! Receiver Address.
-    std::vector<std::string> cc;            //<! Carbon Copy.
-    std::vector<std::string> bcc;           //<! Blind Carbon Copy.
+    std::string from;          //<! Sender Address.
+    std::string to;            //<! Receiver Address.
+    std::string cc;            //<! Carbon Copy.
+    std::string bcc;           //<! Blind Carbon Copy.
+    std::string reply_to;      //<! Address for replies.
 
-    std::string subject;                    //<! Subject of The Email.
-    std::string date;                       //<! Date
-    std::string message_id;                 //<! Message-ID
-    std::vector<std::string> content_type;  //<! Content-Type
+    std::string subject;       //<! Subject of The Email.
+    std::string date;          //<! Date.
+    std::string message_id;    //<! Message-ID.
+    std::string in_reply_to;   //<! Message this email is replying to.
+    std::string references;    //<! Other messages related to this message.
+    std::string mime_version;  //<! MIME-Version.
+    std::string content_type;  //<! Content-Type.
 
 } MailHeader_t;
 
