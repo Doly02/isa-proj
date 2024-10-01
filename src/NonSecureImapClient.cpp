@@ -138,15 +138,26 @@ int NonSecureImapClient::SendData(const std::string& data)
 
 std::string NonSecureImapClient::ReceiveData()
 {
-    int i = 0;
+
     char            rx_buffer[RX_BUFFER_SIZE] = { 0 };  //<! Buffer That Interacts With recv()
     ssize_t         bytes_rx = 0;                       //<! Num. of Received Bytes
     std::string     rx_data = EMPTY_STR;                //<! Buffer For Server Response
     int             ret_val = -1;
+    struct timeval  time;
+
+
+    /* Timeout Setup*/
+    time.tv_sec = TIMEOUT;
+    time.tv_usec = 0;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)  //<! Setup of Socket Timeout
+    {   
+        std::cerr << "Error Setting Timeout For recv() Function." << std::endl;
+        return BAD_RESPONSE;
+    }
 
     while(0 < (bytes_rx = recv(sockfd, rx_buffer, RX_BUFFER_SIZE - 1, 0)))
     {
-        i++;
+
         rx_buffer[bytes_rx] = '\0';
         rx_data += rx_buffer;
         ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
@@ -159,8 +170,17 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
+
     /* Handle Error If Occured During Transmission */
-    if (0 > bytes_rx){
+    if (0 > bytes_rx) 
+    {
+        if (EAGAIN == errno || EWOULDBLOCK == errno) 
+        {    
+            std::cerr << "Error: Timeout Overrun While Receiving Data - recv() Timeout." << std::endl;
+        } else 
+        {        
+            std::cerr << "Error Receiving Data: " << strerror(errno) << std::endl;
+        }
         return EMPTY_STR;
     }
     return rx_data;

@@ -45,6 +45,10 @@
 static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 
 /**
+ * @brief Define Timeout For Receiving Data From IMAP Server. Time in [s].
+ */
+#define TIMEOUT                     (5)
+/**
  * @brief Definitions of Return Codes.
  */
 #define PARSE_EMAIL_FAILED          (-2)
