@@ -39,6 +39,7 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
 {
     bool retVal = false;
     mode        = NON_SECURE;
+    justHeaders = false;
     retVal = this->ProcessArguments(argc, argv);
     if(SUCCESS == retVal)
     {

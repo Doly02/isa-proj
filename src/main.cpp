@@ -51,7 +51,7 @@ try
         only_h = app_config.GetHeadersOnly();
 
         NonSecureImapClient client(mail_box, out_directory, only_h);
-        ret_val = client.Launch(server_addr, app_config.authData.username, app_config.authData.password);
+        ret_val = client.Run(server_addr, app_config.authData.username, app_config.authData.password);
         if (SUCCESS != ret_val)
         {
             return ret_val;

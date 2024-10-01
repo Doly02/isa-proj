@@ -256,11 +256,7 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     for (std::string tok; std::getline(parse_uids, tok, ' '); )
     {
         uid = std::atoi(tok.c_str());
-#if (DEBUG_ENABLED == true)
-        if (1 <= uid && uid <= 5)
-#else
         if (0  < uid)
-#endif /* (DEBUG_ENABLED == true) */
             vec_uids.push_back(uid);
     }
 
@@ -313,6 +309,8 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
+        /*if (id >= 27 && id <= 31)
+        {*/
         email = EMPTY_STR;
         email = FetchEmailByUID(id, WHOLE_MESSAGE);
         if (EMPTY_STR == email)
@@ -322,7 +320,9 @@ int NonSecureImapClient::FetchEmails()
         /* Assembly Path To File */
         path = GenerateFilename(id);
         path = GeneratePathToFile(outputDir, path);
+        email = ParseEmail(id, email, false);
         StoreEmail(email, path);
+        /*}*/
 
     }
 
@@ -393,7 +393,6 @@ int NonSecureImapClient::SetMailBox()
         std::cerr << "ERR: Failed to Set Mailbox on IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
     }
-
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) {
         std::cerr << "ERR: Failed to Receive Response For Setup of Mailbox on IMAP Server.\n";
@@ -401,7 +400,6 @@ int NonSecureImapClient::SetMailBox()
     }
 
     curr_state = DEFAULT;
-
     return SUCCESS;
 }
 
@@ -430,17 +428,16 @@ int NonSecureImapClient::DisconnectImapServer(void)
     return SUCCESS; /* TODO: Already Closed */
 }
 
-int NonSecureImapClient::Launch(const std::string& serverAddress, const std::string& username, const std::string& password)
+int NonSecureImapClient::Run(const std::string& serverAddress, const std::string& username, const std::string& password)
 {
     int ret_val = -4;
-
     ret_val = ConnectImapServer(serverAddress, username, password);
     if (SUCCESS != ret_val)
     {
         return ret_val;
     }
 
-    // Set MailBox
+    /* Set MailBox */
     ret_val = SetMailBox();
     if (SUCCESS != ret_val)
     {

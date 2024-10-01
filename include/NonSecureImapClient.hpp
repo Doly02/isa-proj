@@ -84,7 +84,7 @@ class NonSecureImapClient : public BaseImapClient
         */
         int DisconnectImapServer(void);
 
-        int Launch(const std::string& serverAddress, const std::string& username, const std::string& password);
+        int Run(const std::string& serverAddress, const std::string& username, const std::string& password);
 };
 
 

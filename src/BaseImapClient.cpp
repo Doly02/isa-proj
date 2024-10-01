@@ -178,10 +178,10 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             if (std::string::npos != buff.find(current_tag + " OK [READ-ONLY] Select completed"))
                 return SUCCESS;
             /* NO - select failure, now in authenticated state: no such mailbox, can't access mailbox */
-            else if (std::string::npos != buff.find(current_tag + " NO FETCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO Select completed"))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD FETCH completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD Select completed"))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
@@ -201,5 +201,6 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
  * 1) RFC:              A142 OK [READ-WRITE] SELECT completed
  * 2) Real Server:      A0000000002 OK [READ-WRITE] Select completed
  *
- * TODO: Ask If Is Valid To Put Server's Response Automatically to Lowercase.
+ * TODO: Ask If Is Valid To Put Server's Response Automatically to Lowercase. Case-Sensitivity.
+ * TODO: Check If Files Are Correcly Stored.
  */
