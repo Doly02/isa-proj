@@ -129,6 +129,7 @@ bool ImapClientConfig::ParseArguments(int argc, char* argv[])
                 break;
             case '?':
             default:
+                PrintHelp();
                 return false;
         }
     }

@@ -26,8 +26,28 @@
 /************************************************/
 void PrintHelp(void)
 {
-    printf("Usage: ...\n");
-    printf("TODO\n");
+    std::cout << "Usage: imapcl server [-p port] [-T [-c certfile] [-C certaddr]] [-n] [-h] -a authfile [-b mailbox] -o outdir\n\n";
+    
+    std::cout << "Order Of Parameters Is Arbitrary. Parameter Descriptions:\n";
+
+    std::cout << "    server:      The Mandatory Server Name (IP Address Or Domain Name) Of The Desired Resource.\n";
+    std::cout << "    -p port:     Optional Parameter That Specifies The Server Port Number. Choose An Appropriate Default Value Depending On The\n";
+    std::cout << "                 Specification Of The -T Parameter And Port Numbers Registered By The IANA.\n";
+    std::cout << "    -T:          Enables Encryption (IMAPS). If Not Specified, The Unencrypted Version Of The Protocol Will Be Used.\n";
+    std::cout << "    -c certfile: Optional Parameter That Specifies A Certificate File Used To Verify The Validity Of The SSL/TLS Certificate\n";
+    std::cout << "                 Presented By The Server.\n";
+    std::cout << "    -C certaddr: Optional Parameter That Specifies The Directory Where Certificates Will Be Searched To Verify The Validity\n";
+    std::cout << "                 Of The SSL/TLS Certificate Presented By The Server. Default Is /etc/ssl/certs.\n";
+    std::cout << "    -n: When Used, Only New Messages Will Be Read.\n";
+    std::cout << "    -h: When Used, Only Email Headers Will Be Downloaded.\n";
+    std::cout << "    -a authfile: Mandatory Parameter That Refers To The File With Authentication Data (LOGIN Command).\n";
+    std::cout << "    -b mailbox:  Optional Parameter That Specifies The Name Of The Mailbox To Be Used On The Server. Default Is INBOX.\n";
+    std::cout << "    -o outdir:   Mandatory Parameter That Specifies The Output Directory Where The Downloaded Messages Will Be Saved.\n\n";
+
+    std::cout << "Examples Of Usage:\n";
+    std::cout << "    ./imapcl eva.fit.vutbr.cz -p 143 -a ~/auth_file.txt -b INBOX -o ~/output/\n";
+    std::cout << "    ./imapcl eva.fit.vutbr.cz -T -c ~/cert.pem -C /etc/ssl/certs -a ~/auth_file.txt -b INBOX -o ~/output/\n";
+    std::cout << "    ./imapcl eva.fit.vutbr.cz -n -h -a ~/auth_file.txt -o ~/output/\n";
 }
 
 bool FileExists(const std::string& filename) 
