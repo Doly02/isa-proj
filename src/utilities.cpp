@@ -53,6 +53,60 @@ void StoreEmail(std::string content, std::string file_path)
     file << content;
 }
 
+void PrintEmail(const Mail_t& mail, const std::string& file_path) {
+    std::ostringstream oss;
+
+    // Tisk hlavičky
+    if (!mail.header.from.empty()) {
+        oss << "From: " << mail.header.from << "\n";
+    }
+    if (!mail.header.to.empty()) {
+        oss << "To: " << mail.header.to << "\n";
+    }
+    if (!mail.header.cc.empty()) {
+        oss << "Cc: " << mail.header.cc << "\n";
+    }
+    if (!mail.header.bcc.empty()) {
+        oss << "Bcc: " << mail.header.bcc << "\n";
+    }
+    if (!mail.header.reply_to.empty()) {
+        oss << "Reply-To: " << mail.header.reply_to << "\n";
+    }
+    if (!mail.header.subject.empty()) {
+        oss << "Subject: " << mail.header.subject << "\n";
+    }
+    if (!mail.header.date.empty()) {
+        oss << "Date: " << mail.header.date << "\n";
+    }
+    if (!mail.header.message_id.empty()) {
+        oss << "Message-ID: " << mail.header.message_id << "\n";
+    }
+    if (!mail.header.in_reply_to.empty()) {
+        oss << "In-Reply-To: " << mail.header.in_reply_to << "\n";
+    }
+    if (!mail.header.references.empty()) {
+        oss << "References: " << mail.header.references << "\n";
+    }
+    if (!mail.header.mime_version.empty()) {
+        oss << "MIME-Version: " << mail.header.mime_version << "\n";
+    }
+    if (!mail.header.content_type.empty()) {
+        oss << "Content-Type: " << mail.header.content_type << "\n";
+    }
+
+    // Oddělení hlavičky a těla
+    oss << "\n";
+
+    // Tisk těla e-mailu
+    for (const auto& line : mail.body.content) {
+        oss << line << "\n";
+    }
+
+    // Volání funkce pro uložení obsahu do souboru
+    StoreEmail(oss.str(), file_path);
+}
+
+
 std::string ParseEmailHeader(std::string header)
 {
     std::string delete_part = EMPTY_STR;
@@ -68,7 +122,65 @@ std::string ParseEmailHeader(std::string header)
     }
     header = header.substr(0, header.size() - delete_part.size());
     header.erase(0, header.find("\r\n") + 1);
-    return header.erase(0, header.find("\n") + 1);
+    header.erase(0, header.find("\n") + 1);
+    return header;
+}
+
+std::string ParseFieldValue(const std::string& line) {
+    size_t colon_pos = line.find(":");
+    if (colon_pos != std::string::npos) {
+        return line.substr(colon_pos + 2);  // +2 (Jumps Over ": ")
+    }
+    return "";
+}
+
+Mail_t ParseEmailExtended(std::string email)
+{
+    Mail_t mail;
+    std::istringstream iss(email);
+    std::string line;
+    bool in_headers = true;
+
+    // Parse Headers
+    while (std::getline(iss, line) && in_headers) {
+        if (line == "\r" || line == "") {
+            in_headers = false;  // Jumps To Body, Headers are Over
+            continue;
+        }
+
+        if (line.find("From:") == 0) {
+            mail.header.from = ParseFieldValue(line);
+        } else if (line.find("To:") == 0) {
+            mail.header.to = ParseFieldValue(line);
+        } else if (line.find("Cc:") == 0) {
+            mail.header.cc = ParseFieldValue(line);
+        } else if (line.find("Bcc:") == 0) {
+            mail.header.bcc = ParseFieldValue(line);
+        } else if (line.find("Reply-To:") == 0) {
+            mail.header.reply_to = ParseFieldValue(line);
+        } else if (line.find("Subject:") == 0) {
+            mail.header.subject = ParseFieldValue(line);
+        } else if (line.find("Date:") == 0) {
+            mail.header.date = ParseFieldValue(line);
+        } else if (line.find("Message-ID:") == 0) {
+            mail.header.message_id = ParseFieldValue(line);
+        } else if (line.find("In-Reply-To:") == 0) {
+            mail.header.in_reply_to = ParseFieldValue(line);
+        } else if (line.find("References:") == 0) {
+            mail.header.references = ParseFieldValue(line);
+        } else if (line.find("MIME-Version:") == 0) {
+            mail.header.mime_version = ParseFieldValue(line);
+        } else if (line.find("Content-Type:") == 0) {
+            mail.header.content_type = ParseFieldValue(line);
+        }
+    }
+
+    // Parse Email Body
+    while (std::getline(iss, line)) {
+        mail.body.content.push_back(line);
+    }
+
+    return mail;
 }
 
 std::string ParseEmailBody(std::string body)
@@ -76,7 +188,9 @@ std::string ParseEmailBody(std::string body)
     std::string delete_part = EMPTY_STR;
     try
     {
-        std::regex reg_expression("(.*(?=OK FETCH completed)[.|\\s\\S]*)");
+        /* TODO: std::regex_constants::icase For Case Insensitivity 
+         * Another Idea -> Use Or ([ | ] in Regex)*/
+        std::regex reg_expression("(.*(?=OK FETCH completed)[.|\\s\\S]*)", std::regex_constants::icase);
         std::smatch match;
         if (regex_search(body, match, reg_expression) && (1 < match.size()))
         {
