@@ -71,6 +71,8 @@ class BaseImapClient {
 
         std::string FindEndOfResponse(State_t type);
 
+        void PrintNumberOfMessages(int num, bool new_only, bool headers_only);
+
         int FindEndOfResponse(std::string buff);
 
         /**

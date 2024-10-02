@@ -112,7 +112,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
     /* Send Login Command To IMAP Server */
     LoginClient(username, password);
 
-    // TODO: Print To The User That Login Was Successful.
+    // TODO: Print To The User That Login Was Successful?
     curr_state = DEFAULT;
     return SUCCESS; 
 
@@ -127,6 +127,7 @@ int NonSecureImapClient::SendData(const std::string& data)
     {
         return TRANSMIT_DATA_FAILED;
     }
+
     /* Check If All Data Was Transmitted */
     if (static_cast<size_t>(bytes_tx) != message.length())
     {
@@ -171,7 +172,7 @@ std::string NonSecureImapClient::ReceiveData()
         }
     }
 
-    /* Handle Error If Occured During Transmission */
+    /* Handle Error If Ocurred During Transmission */
     if (0 > bytes_rx) 
     {
         if (EAGAIN == errno || EWOULDBLOCK == errno) 
@@ -198,7 +199,8 @@ int NonSecureImapClient::LoginClient(std::string username, std::string password)
         std::cerr << "ERR: Failed to Login to IMAP Server.\n";
         return TRANSMIT_DATA_FAILED;
     }
-    // TODO: Receive Response From The Server & Eval.
+
+    /* Receive Response From The Server & Eval. */
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
@@ -288,7 +290,7 @@ int NonSecureImapClient::FetchUIDs()
     curr_state = SEARCH;
 
     std::string tag = GenerateTag();
-    std::string fetch_uids_cmd = tag + " UID SEARCH"; /* TODO: Here Will Be Update (Right Now -n Is not Avalaible)*/
+    std::string fetch_uids_cmd = tag + " UID SEARCH";
     
     printf("value_true: %s\n", newOnly ? "true" : "false");
     if (false == newOnly)
@@ -351,7 +353,7 @@ int NonSecureImapClient::FetchEmails()
         /*}*/
 
     }
-
+    PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return num_of_uids;
 }
 
@@ -481,3 +483,7 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
     }    
     return SUCCESS;
 }
+
+/**
+ * Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
+ */

@@ -109,6 +109,19 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
     return EMPTY_STR;
 }
 
+void BaseImapClient::PrintNumberOfMessages(int num, bool new_only, bool headers_only)
+{
+    if (false == new_only && false == headers_only)
+        printf("Stored %d Messages\n", num);
+    else if (true == new_only && false == headers_only)
+        printf("Stored %d New Messages\n", num);
+    else if (false == new_only && true == headers_only)
+        printf("Stored %d Message Headers\n", num);
+    else
+        printf("Stored %d New Message Headers\n", num);
+}
+
+
 int BaseImapClient::FindEndOfResponse(std::string buff)
 {
     std::string current_tag = GetTag();
