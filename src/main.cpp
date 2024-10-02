@@ -37,6 +37,7 @@ try
     std::string server_addr     = EMPTY_STR;
     std::string username        = EMPTY_STR;
     std::string password        = EMPTY_STR;
+    int port                    = 0;
 
     int ret_val = 1;
     std::string current_val;
@@ -51,9 +52,10 @@ try
         server_addr = app_config.GetServerAddress();
         only_headers = app_config.GetOnlyHeaders();               
         only_new = app_config.GetOnlyNew();
+        port = app_config.GetPort();
 
         NonSecureImapClient client(mail_box, out_directory, only_headers, only_new);
-        ret_val = client.Run(server_addr, app_config.authData.username, app_config.authData.password);
+        ret_val = client.Run(server_addr, port, app_config.authData.username, app_config.authData.password);
         if (SUCCESS != ret_val)
         {
             return ret_val;

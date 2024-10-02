@@ -28,7 +28,7 @@ NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::
     headersOnly(HeadersOnly),
     newOnly(NewOnly){}
 
-int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password)
+int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
 {
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
@@ -63,7 +63,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         struct sockaddr_in server_addr;
         memset(&server_addr, 0, sizeof(server_addr));
         server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons((uint16_t)PORT_NON_SECURE); // IMAP Standard Port - 143 (Non-Secure)
+        server_addr.sin_port = htons((uint16_t)port); // IMAP Standard Port - 143 (Non-Secure)
         if (0 >= inet_pton(AF_INET, server_ip.c_str(), &server_addr.sin_addr)) 
         {
             std::cerr << "ERR: Invalid IPv4 Address Format.\n";
@@ -91,7 +91,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         struct sockaddr_in6 server_addr;
         memset(&server_addr, 0, sizeof(server_addr));
         server_addr.sin6_family = AF_INET6;
-        server_addr.sin6_port = htons((uint16_t)PORT_NON_SECURE);
+        server_addr.sin6_port = htons((uint16_t)port);
         if (0 >= inet_pton(AF_INET6, server_ip.c_str(), &server_addr.sin6_addr)) 
         {
             std::cerr << "ERR: Invalid IPv6 Address Format.\n";
@@ -454,10 +454,10 @@ int NonSecureImapClient::DisconnectImapServer(void)
     return SUCCESS; /* TODO: Already Closed */
 }
 
-int NonSecureImapClient::Run(const std::string& serverAddress, const std::string& username, const std::string& password)
+int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, const std::string& username, const std::string& password)
 {
     int ret_val = -4;
-    ret_val = ConnectImapServer(serverAddress, username, password);
+    ret_val = ConnectImapServer(serverAddress, username, password, server_port);
     if (SUCCESS != ret_val)
     {
         return ret_val;

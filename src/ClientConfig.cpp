@@ -25,7 +25,7 @@
 /************************************************/
 ImapClientConfig::ImapClientConfig()
     : mode(NON_SECURE), 
-    port(0), 
+    port(PORT_NON_SECURE), 
     server(EMPTY_STR), 
     certF(EMPTY_STR), 
     certD(DEFAULT_SSL_CERT_LOC),
@@ -38,6 +38,7 @@ ImapClientConfig::ImapClientConfig()
 ImapClientConfig::ImapClientConfig(int argc, char* argv[])   
 {
     mode        = NON_SECURE;
+    port        = PORT_NON_SECURE;
     onlyHeaders = false;
     onlyNew     = false;
     if (SUCCESS != this->ProcessArguments(argc, argv))
@@ -74,6 +75,11 @@ bool ImapClientConfig::GetOnlyNew()
 bool ImapClientConfig::GetOnlyHeaders()
 {
     return onlyHeaders;
+}
+
+int ImapClientConfig::GetPort()
+{
+    return port;
 }
 
 int ImapClientConfig::ProcessArguments(int argc, char* argv[])

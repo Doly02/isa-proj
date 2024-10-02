@@ -69,6 +69,8 @@ class ImapClientConfig
 
         bool GetOnlyHeaders(void);
 
+        int GetPort(void);
+
         int ProcessArguments(int argc, char* argv[]);
 
         /**

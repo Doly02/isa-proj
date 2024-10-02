@@ -37,7 +37,6 @@ class NonSecureImapClient : public BaseImapClient
         bool        headersOnly;
         bool        newOnly;
     public:
-        int         port;           //!< Port That Will Be Used For Connection With IMAP Client
 
         /**
         * @brief        Class Constructor.
@@ -51,9 +50,10 @@ class NonSecureImapClient : public BaseImapClient
         * @param[in]    serverAddress IMAP server address.
         * @param[in]    username IMAP account username.
         * @param[in]    password IMAP account password.
+        * @param[in]    port Port Number to Connect To.
         * @retval SUCCESS If Client Has Connected Successfully To IMAP Server.
         */
-        int ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password);
+        int ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port);
 
         /**
          * @brief       Sends Data to the IMAP Server Through a Non-Secure Connection.
@@ -186,10 +186,16 @@ class NonSecureImapClient : public BaseImapClient
 
         /**
         * @brief    Provides The IMAP Client Functionality.
+        * 
+        * @param[in]   serverAddress The Address of The IMAP Server.
+        * @param[in]   server_port The Port Number to Connect To.
+        * @param[in]   username The Username of The IMAP Account.
+        * @param[in]   password The Password of The IMAP Account.
+        * 
         * @retval   SUCCESS If Everything Went Well (From LOGIN, SELECT, FETCH to LOGOUT States).
         * @retval   Non-Zero Error Code Otherwise.
         */
-        int Run(const std::string& serverAddress, const std::string& username, const std::string& password);
+        int Run(const std::string& serverAddress, int server_port, const std::string& username, const std::string& password);
 };
 
 
