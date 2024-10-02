@@ -228,9 +228,7 @@ int NonSecureImapClient::LogoutClient()
         return RECEIVE_DATA_FAILED;
     }
     
-    /* Check Server's Response */
-
-
+    curr_state = DEFAULT;
     return SUCCESS;
 }
 
