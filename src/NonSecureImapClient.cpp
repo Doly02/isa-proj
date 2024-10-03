@@ -54,7 +54,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         if (0 > sockfd)
         {
             std::cerr << "ERR: Unable To Create IPv4 Socket.\n";
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
 
         /* Preparation of IPv4 Server Addr. Struct */
@@ -67,14 +67,14 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
             std::cerr << "ERR: Invalid IPv4 Address Format.\n";
             close(sockfd);
             sockfd = -1;
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
         if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
         {
             std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
             close(sockfd);
             sockfd = -1;
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
     }
     curr_state = LOGIN;
@@ -117,10 +117,11 @@ std::string NonSecureImapClient::ReceiveData()
 
 
     /* Timeout Setup*/
-    time.tv_sec = TIMEOUT;
+    time.tv_sec = TIMEOUT_NON_SECURE;
     time.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)  //<! Setup of Socket Timeout
     {   
+        /*TODO: Should I Close Socket? */
         std::cerr << "Error Setting Timeout For recv() Function." << std::endl;
         return BAD_RESPONSE;
     }
@@ -140,7 +141,10 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-
+#if 0
+    printf("Received Data:\n");
+    printf("%s", rx_data.c_str());
+#endif
     /* Handle Error If Ocurred During Transmission */
     if (0 > bytes_rx) 
     {
@@ -207,11 +211,10 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     std::string deleted_part;
     int uid = 0;
     std::string::size_type found;
-    std::string tag = GetTag(); 
 
     try
     {
-        std::regex reg_expression("(\\r\\n" + tag + "\\s.*)"); 
+        std::regex reg_expression("(\\r\\n.*(?=OK SEARCH completed)[.|\\s\\S]*)");
         std::smatch match;
         if (std::regex_search(response, match, reg_expression) && (1 < match.size()))
         {
@@ -225,10 +228,10 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     catch (std::regex_error& e)
     {
         /* ERR: Regex Error While Parsing UIDs */
-        return PARSE_REGEX_FAILED;
+        return PARSE_BY_REGEX_FAILED;
     }
     response = response.substr(0, response.size() - deleted_part.size());
-    deleted_part = "* SEARCH "; //FIXME: Je zaruceno ze server posle presne retezec "* SEARCH"?
+    deleted_part = "* SEARCH ";
     
     found = response.find(deleted_part);
     if (std::string::npos != found)
@@ -265,7 +268,7 @@ int NonSecureImapClient::FetchUIDs()
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
-        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfied */
+        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfide */
 
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
@@ -295,7 +298,7 @@ int NonSecureImapClient::FetchEmails()
     int ret_val = NON_UIDS_RECEIVED;
     std::string email = EMPTY_STR;
     std::string path = EMPTY_STR;
-    int num_of_uids = int(vec_uids.size());
+    int num_of_uids = 0; 
 
     ret_val = FetchUIDs();
     if (SUCCESS != ret_val)
@@ -306,13 +309,13 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /*if (id >= 46 && id <= 50)
+        /*if (id >= 11 && id <= 20)
         {*/
         email = EMPTY_STR;
         email = FetchEmailByUID(id, WHOLE_MESSAGE);
         if (EMPTY_STR == email)
         {
-            return PARSE_EMAIL_FAILED;   
+            return FETCH_EMAIL_FAILED;   
         }
         /* Assembly Path To File */
         path = GenerateFilename(id);
@@ -322,6 +325,7 @@ int NonSecureImapClient::FetchEmails()
         /*}*/
 
     }
+    num_of_uids = int(vec_uids.size());
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;
 }

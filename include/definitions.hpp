@@ -162,7 +162,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
  * @details Used Only for Non-Secure Client Mode.
  */
-#define TIMEOUT                     (5)
+#define TIMEOUT_NON_SECURE          (5)
 
 /***************************************************************/
 /*                  Specific For Secure Mode                   */

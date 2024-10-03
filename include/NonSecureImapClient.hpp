@@ -110,7 +110,7 @@ class NonSecureImapClient : public BaseImapClient
          * @param[in]   response The Server's Response To The UID SEARCH Command.
          *
          * @retval SUCCESS If UIDs Are Successfully Parsed And Stored.
-         * @retval PARSE_REGEX_FAILED If a Regex Error Occurs During Parsing.
+         * @retval PARSE_BY_REGEX_FAILED If a Regex Error Occurs During Parsing.
          * @retval NON_UIDS_RECEIVED If No UIDs Are Found in The Response.
          */    
         int ParseUIDs(std::string response);
