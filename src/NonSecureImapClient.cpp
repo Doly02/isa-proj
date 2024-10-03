@@ -211,10 +211,11 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     std::string deleted_part;
     int uid = 0;
     std::string::size_type found;
+    std::string tag = GetTag(); 
 
     try
     {
-        std::regex reg_expression("(\\r\\n.*(?=OK SEARCH completed)[.|\\s\\S]*)");
+        std::regex reg_expression("(\\r\\n" + tag + "\\s.*)");
         std::smatch match;
         if (std::regex_search(response, match, reg_expression) && (1 < match.size()))
         {
