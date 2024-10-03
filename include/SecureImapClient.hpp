@@ -44,14 +44,26 @@ class SecureImapClient : public BaseImapClient
 
         SSL*        ssl;            //!< SSL Structure For The Connection
         SSL_CTX*    ctx;            //!< SSL Context Structure For Managing SSL
+
+        std::string certFile;
+        std::string certDir;
     public:
 
         /**
-        * @brief        Class Constructor.
-        * @param[in]    mailbox The Name of The Mailbox To Fetch Emails From.
-        * @param[in]    outputDir The Directory To Save The Downloaded Emails.
-        */
-        SecureImapClient(const std::string& MailBox, const std::string& OutDirectory, bool HeadersOnly, bool NewOnly);
+         * @brief        Class Constructor.
+         * @param[in]    mailbox The Name of The Mailbox To Fetch Emails From.
+         * @param[in]    outputDir The Directory To Save The Downloaded Emails.
+         * @param[in]    headersOnly Fetch Only Email Headers (true) or Entire Emails (false).
+         * @param[in]    newOnly Fetch Only New Emails (true) or All Emails (false).
+         * @param[in]    certFile The Path to The SSL/TLS Certificate File.
+         * @param[in]    certDirectory The Directory Containing SSL/TLS Certificates.
+         */
+        SecureImapClient(const std::string& MailBox, 
+                        const std::string& OutDirectory, 
+                        bool HeadersOnly, 
+                        bool NewOnly,
+                        const std::string& CertFile,
+                        const std::string& CertDirectory);
         
         ~SecureImapClient();
         /**

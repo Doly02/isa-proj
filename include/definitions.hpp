@@ -45,10 +45,6 @@
 static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 
 /**
- * @brief Define Timeout For Receiving Data From IMAP Server. Time in [s].
- */
-#define TIMEOUT                     (5)
-/**
  * @brief Definitions of Return Codes.
  */
 #define PARSE_EMAIL_FAILED          (-2)
@@ -69,20 +65,6 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define NO_RESPONSE                 "No Response :|"
 
 #define NOT_IMPLEMENTED             throw std::runtime_error("Not Implemented Yet!")
-/**
- * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
- */
-#define SECURE                      (true)
-#define PORT_NON_SECURE             (143)
-
-/**
- * @brief Non-Secure IMAP Client Mode. Communicate Just Thru TCP/IP.
- */
-#define NON_SECURE                  (false)
-#define PORT_SECURE                 (993)
-
-#define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
-#define DEFAULT_MAILBOX_DIR         "INBOX"
 
 #define EMPTY_STR                   ""
 
@@ -92,6 +74,44 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define DEBUG_ENABLED               (true)
 
 #define OUTPUT_FILE_FORMAT          ".log"
+
+/***************************************************************/
+/*                  Specific For Non-Secure Mode               */
+/***************************************************************/
+
+/**
+ * @brief Secure IMAP Client Mode. Communicate The SSL/TLS.
+ */
+#define SECURE                      (true)
+/**
+ * @brief Default Port for Non-Secure Mode If Client Not Specify.
+ */
+#define PORT_NON_SECURE             (143)
+/**
+ * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
+ * @details Used Only for Non-Secure Client Mode.
+ */
+#define TIMEOUT                     (5)
+
+/***************************************************************/
+/*                  Specific For Secure Mode                   */
+/***************************************************************/
+/**
+ * @brief Non-Secure IMAP Client Mode. Communicate Just Thru TCP/IP.
+ */
+#define NON_SECURE                  (false)
+/**
+ * @brief Default Port for Secure Mode If Client Not Specify.
+ */
+#define PORT_SECURE                 (993)
+/**
+ * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
+ * @details Used Only for Secure Client Mode.
+ */
+#define TIMEOUT_SECURE              (5)
+
+#define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
+#define DEFAULT_MAILBOX_DIR         "INBOX"
 
 /**
  * @brief Structure For The Email Message.
