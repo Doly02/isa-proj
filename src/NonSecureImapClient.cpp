@@ -32,12 +32,11 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
 {
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
-    bool is_ipv6_addr = isIPv6Address(serverAddress);
 
     /* Set Current State of The Communication With IMAP Server */
     curr_state = LOGIN;
 
-    if (false == is_ipv4_addr && false == is_ipv6_addr)
+    if (false == is_ipv4_addr)
     {
         server_ip = ResolveHostnameToIP(serverAddress, std::to_string(port));
         if (server_ip.empty())
@@ -47,7 +46,6 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
     }
 
     is_ipv4_addr = IsIPv4Address(server_ip);
-    is_ipv6_addr = isIPv6Address(server_ip);
 
     /* Create a Socket For Either IPv4 or IPv6 */
     if (true == is_ipv4_addr)
@@ -74,35 +72,6 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
         {
             std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
-            close(sockfd);
-            sockfd = -1;
-            return -3;
-        }
-    }
-    else if (true == is_ipv6_addr)
-    {
-        sockfd = socket(AF_INET6, SOCK_STREAM, 0);
-        if (0 > sockfd) 
-        {
-            std::cerr << "ERR: Unable To Create IPv6 Socket.\n";
-            return -3;
-        }
-
-        struct sockaddr_in6 server_addr;
-        memset(&server_addr, 0, sizeof(server_addr));
-        server_addr.sin6_family = AF_INET6;
-        server_addr.sin6_port = htons((uint16_t)port);
-        if (0 >= inet_pton(AF_INET6, server_ip.c_str(), &server_addr.sin6_addr)) 
-        {
-            std::cerr << "ERR: Invalid IPv6 Address Format.\n";
-            close(sockfd);
-            sockfd = -1;
-            return -3;
-        }
-
-        if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr))) 
-        {
-            std::cerr << "ERR: Unable to connect to the IMAP server (IPv6).\n";
             close(sockfd);
             sockfd = -1;
             return -3;
