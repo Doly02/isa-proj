@@ -34,8 +34,9 @@ class NonSecureImapClient : public BaseImapClient
         /* IMAP Server Informations */
         std::string mailbox;        //!< Mailbox to Fetch Emails From
         std::string outputDir;      //!< Directory to Store the Emails
-        bool        headersOnly;
-        bool        newOnly;
+        /* Flags */
+        bool        headersOnly;    //!< Flag Indicating Whether to Fetch Only Headers
+        bool        newOnly;        //!< Flag Indicating Whether to Fetch Only New Emails
     public:
 
         /**

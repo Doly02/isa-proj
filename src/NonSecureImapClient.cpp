@@ -39,7 +39,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
 
     if (false == is_ipv4_addr && false == is_ipv6_addr)
     {
-        server_ip = ResolveHostnameToIP(serverAddress,"143");
+        server_ip = ResolveHostnameToIP(serverAddress, std::to_string(port));
         if (server_ip.empty())
         {
             std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
@@ -185,7 +185,6 @@ std::string NonSecureImapClient::ReceiveData()
         return EMPTY_STR;
     }
     return rx_data;
-
 }
 
 int NonSecureImapClient::LoginClient(std::string username, std::string password)
