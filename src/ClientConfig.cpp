@@ -41,6 +41,10 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
     port        = PORT_NON_SECURE;
     onlyHeaders = false;
     onlyNew     = false;
+    
+    certF       = EMPTY_STR;
+    certD       = DEFAULT_SSL_CERT_LOC;
+
     if (SUCCESS != this->ProcessArguments(argc, argv))
     {
         exit(PARSE_CREDENTIALS_FAILED);
@@ -65,6 +69,16 @@ std::string ImapClientConfig::GetOutputDirectory()
 std::string ImapClientConfig::GetMailbox()
 {
     return mailboxD;
+}
+
+std::string ImapClientConfig::GetCertFile()
+{
+    return certF;
+}
+
+std::string ImapClientConfig::GetCertDirectory()
+{
+    return certD;
 }
 
 bool ImapClientConfig::GetOnlyNew()
