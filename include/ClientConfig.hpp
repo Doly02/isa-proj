@@ -65,6 +65,10 @@ class ImapClientConfig
 
         std::string GetMailbox(void);
 
+        std::string GetCertFile(void);
+
+        std::string GetCertDirectory(void);
+
         bool GetOnlyNew(void);
 
         bool GetOnlyHeaders(void);
