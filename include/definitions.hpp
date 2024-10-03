@@ -32,7 +32,7 @@
 #include <sys/socket.h>     /*<! Hostname Relevant. */
 #include <sys/stat.h>       /*<! For FileExists()   */
 #include <netinet/in.h>
-#include <arpa/inet.h>      /*<!  Hostname Relevant. */
+#include <arpa/inet.h>      /*<! Hostname Relevant. */
 #include <netdb.h>          /*<! For getaddrinfo() + Hostname Relevant.*/
 
 /************************************************/
@@ -45,35 +45,106 @@
 static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 
 /**
- * @brief Definitions of Return Codes.
+ * @defgroup ReturnCodes Definitions of Return Codes
+ * @brief This Group Contains The Return codes Used By The Application.
+ * @{
  */
-#define PARSE_EMAIL_FAILED          (-2)
-#define SUCCESS                     (0u)
-#define NO_IP_ADDR_FOUND            (1u)
-#define PARSE_ARGUMENTS_FAILED      (11u)
-#define PARSE_CREDENTIALS_FAILED    (2u)
-#define SERVER_UNKNOWN_RESPONSE     (3u)
-#define TRANSMIT_DATA_FAILED        (4u)
-#define RECEIVE_DATA_FAILED         (5u)
-#define RESPONSE_NOT_FOUND          (6u)
-#define PARSE_REGEX_FAILED          (7u)
-#define NON_UIDS_RECEIVED           (8u)
-#define CONTINUE_IN_RECEIVING       (9u)
-#define UNDEFINED_STATE             (10u)
 
-#define BAD_RESPONSE                "Bad Response :("
-#define NO_RESPONSE                 "No Response :|"
+/**
+ * @brief Return Code When Creating a Connection With IMAP Server Failed.
+ */
+#define CREATE_CONNECTION_FAILED        (-4)
 
-#define NOT_IMPLEMENTED             throw std::runtime_error("Not Implemented Yet!")
+/**
+ * @brief Return Code When SSL Cert. Verification Failed.
+ */
+#define SSL_CERT_VERIFICATION_FAILED    (-3)
 
-#define EMPTY_STR                   ""
+/**
+ * @brief Return Code When Fetching Email By UID Failed.
+ */
+#define FETCH_EMAIL_FAILED              (-2)
 
-#define WHOLE_MESSAGE               (true)
-#define JUST_HEADER                 (false)
+/**
+ * @brief Operation was successful.
+ */
+#define SUCCESS                         (0u)
 
-#define DEBUG_ENABLED               (true)
+/**
+ * @brief No IPv4 Address was Found.
+ */
+#define NO_IP_ADDR_FOUND                (1u)
 
-#define OUTPUT_FILE_FORMAT          ".log"
+/**
+ * @brief Return Code When Parsing Program's Arguments Failed.
+ */
+#define PARSE_ARGUMENTS_FAILED          (2u)
+
+/**
+ * @brief Return Code When Parsing Credentials Failed.
+ */
+#define PARSE_CREDENTIALS_FAILED        (3u)
+
+/**
+ * @brief Server Sent an Unknown Response.
+ */
+#define SERVER_UNKNOWN_RESPONSE         (4u)
+
+/**
+ * @brief Transmission of Data Failed.
+ */
+#define TRANSMIT_DATA_FAILED            (5u)
+
+/**
+ * @brief Reception of Data Failed.
+ */
+#define RECEIVE_DATA_FAILED             (6u)
+
+/**
+ * @brief Expected Server's Response Was Not Found (e.g. "<tag> OK",...).
+ */
+#define RESPONSE_NOT_FOUND              (7u)
+
+/**
+ * @brief Parsing of Regular Expression failed.
+ */
+#define PARSE_BY_REGEX_FAILED           (8u)
+
+/**
+ * @brief None UIDs Were Received From The IMAP Server.
+ */
+#define NON_UIDS_RECEIVED               (9u)
+
+/**
+ * @brief Continue Receiving More Data.
+ */
+#define CONTINUE_IN_RECEIVING           (10u)
+
+/**
+ * @brief Undefined State Encountered.
+ */
+#define UNDEFINED_STATE                 (11u)
+
+/**
+ * @brief Error During Receiving of Server's Response.
+ * @details Special Return Code For Methods That Returns String.
+ */
+#define BAD_RESPONSE                    "Bad Response :("
+
+/** @} */ // End of ReturnCodes group
+
+
+
+#define NOT_IMPLEMENTED                 throw std::runtime_error("Not Implemented Yet!")
+
+#define EMPTY_STR                       ""
+
+#define WHOLE_MESSAGE                   (true)
+#define JUST_HEADER                     (false)
+
+#define DEBUG_ENABLED                   (true)
+
+#define OUTPUT_FILE_FORMAT              ".log"
 
 /***************************************************************/
 /*                  Specific For Non-Secure Mode               */
@@ -108,7 +179,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
  * @details Used Only for Secure Client Mode.
  */
-#define TIMEOUT_SECURE              (5)
+#define TIMEOUT_SECURE              (10)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"

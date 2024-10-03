@@ -40,7 +40,6 @@ SecureImapClient::SecureImapClient(const std::string& MailBox,
     /* SSL/TLS Lib. Initialization */
     SSL_library_init();
     SSL_load_error_strings();
-    /* ERR_load_BIO_strings();  TODO: Maybe Deprecated Function of SSL Library */
     OpenSSL_add_all_algorithms();
 
 }
@@ -57,11 +56,6 @@ SecureImapClient::~SecureImapClient()
     {
         SSL_CTX_free(ctx);
     }
-
-    if (0 <= sockfd)
-    {
-        close(sockfd);
-    }
 }
 
 int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
@@ -71,7 +65,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
     if (!ctx)
     {
         std::cerr << "ERR: Unable to Create SSL Context.\n";
-        return -3;
+        return CREATE_CONNECTION_FAILED;
     }
 
     /* Setup of File With Certificate */
@@ -81,7 +75,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         {
             std::cerr << "ERR: Failed to Load Certificate From File: " << certFile << "\n";
             SSL_CTX_free(ctx);
-            return -3;
+            return SSL_CERT_VERIFICATION_FAILED;
         }
     }
 
@@ -92,7 +86,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         {
             std::cerr << "ERR: Failed to Load Certificates From Directory: " << certDir << "\n";
             SSL_CTX_free(ctx);
-            return -3;
+            return SSL_CERT_VERIFICATION_FAILED;
         }
     }
 
@@ -107,7 +101,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         {
             std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
             SSL_CTX_free(ctx);
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
     }
 
@@ -119,7 +113,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         {
             std::cerr << "ERR: Unable To Create IPv4 Socket.\n";
             SSL_CTX_free(ctx);
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
 
         struct sockaddr_in server_addr;
@@ -129,9 +123,10 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         if (0 >= inet_pton(AF_INET, server_ip.c_str(), &server_addr.sin_addr))
         {
             std::cerr << "ERR: Invalid IPv4 Address Format.\n";
-            close(sockfd);      // TODO: Set Socket To -1 (Invalid Value)
+            close(sockfd);
+            sockfd = -1;
             SSL_CTX_free(ctx);
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
 
         /* Connection to IMAP Server */
@@ -139,15 +134,16 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         {
             std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
             close(sockfd);
+            sockfd = -1;
             SSL_CTX_free(ctx);
-            return -3;
+            return CREATE_CONNECTION_FAILED;
         }
     }
     else
     {
         std::cerr << "ERR: Server Address Is Not Valid IPv4.\n";
         SSL_CTX_free(ctx);
-        return -3;
+        return CREATE_CONNECTION_FAILED;
     }
 
     /* Creation of SSL/TLS Connection */
@@ -163,7 +159,8 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         SSL_CTX_free(ctx);
         ctx = nullptr;
         close(sockfd);
-        return -3;
+        sockfd = -1;
+        return CREATE_CONNECTION_FAILED;
     }
     /* Set LOGIN State */
     LoginClient(username, password);
@@ -208,7 +205,7 @@ std::string SecureImapClient::ReceiveData(void)
 
     if (nullptr == ssl)
     {
-        std::cerr << "ERR: SSL object is not initialized.\n";
+        std::cerr << "ERR: SSL Object Is Not Initialized.\n";
         return BAD_RESPONSE;
     }
 
@@ -236,6 +233,7 @@ std::string SecureImapClient::ReceiveData(void)
             return BAD_RESPONSE;
         }
     }
+
 #if 0
     printf("Received Data:\n");
     printf("%s", rx_data.c_str());
@@ -246,7 +244,7 @@ std::string SecureImapClient::ReceiveData(void)
     time.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
     {
-        std::cerr << "Error Resetting Timeout for SSL_read() function.\n";
+        std::cerr << "Error Resetting Timeout for SSL_read() Function.\n";
         return BAD_RESPONSE;
     }
 
@@ -257,11 +255,11 @@ std::string SecureImapClient::ReceiveData(void)
         int ssl_error = SSL_get_error(ssl, bytes_rx);
         if (SSL_ERROR_WANT_READ == ssl_error || SSL_ERROR_WANT_WRITE == ssl_error)
         {
-            std::cerr << "Error: Timeout while receiving data with SSL_read().\n";
+            std::cerr << "Error: Timeout While Receiving Data With SSL_read().\n";
         }
         else
         {
-            std::cerr << "Error: Failed to receive data over SSL - " << strerror(errno) << std::endl;
+            std::cerr << "Error: Failed to Receive Data Over SSL - " << strerror(errno) << std::endl;
         }
         return EMPTY_STR;
     }
@@ -342,7 +340,7 @@ int SecureImapClient::ParseUIDs(std::string response)
     catch (std::regex_error& e)
     {
         /* ERR: Regex Error While Parsing UIDs */
-        return PARSE_REGEX_FAILED;
+        return PARSE_BY_REGEX_FAILED;
     }
     response = response.substr(0, response.size() - deleted_part.size());
     deleted_part = "* SEARCH "; //FIXME:
@@ -411,7 +409,7 @@ int SecureImapClient::FetchEmails()
     int ret_val = NON_UIDS_RECEIVED;
     std::string email = EMPTY_STR;
     std::string path = EMPTY_STR;
-    int num_of_uids = int(vec_uids.size());
+    int num_of_uids = 0;
 
     ret_val = FetchUIDs();
     if (SUCCESS != ret_val)
@@ -422,22 +420,23 @@ int SecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        if (id >= 51 && id <= 55)
+        /*if (id >= 1 && id <= 10)
+        {*/
+        email = EMPTY_STR;
+        email = FetchEmailByUID(id, WHOLE_MESSAGE);
+        if (EMPTY_STR == email)
         {
-            email = EMPTY_STR;
-            email = FetchEmailByUID(id, WHOLE_MESSAGE);
-            if (EMPTY_STR == email)
-            {
-                return PARSE_EMAIL_FAILED;   
-            }
-            /* Assembly Path To File */
-            path = GenerateFilename(id);
-            path = GeneratePathToFile(outputDir, path);
-            email = ParseEmail(id, email, false);
-            StoreEmail(email, path);
+            return FETCH_EMAIL_FAILED;   
         }
+        /* Assembly Path To File */
+        path = GenerateFilename(id);
+        path = GeneratePathToFile(outputDir, path);
+        email = ParseEmail(id, email, false);
+        StoreEmail(email, path);
+        /*}*/
 
     }
+    num_of_uids = int(vec_uids.size());
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;
 }

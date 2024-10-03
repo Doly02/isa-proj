@@ -32,9 +32,9 @@ BaseImapClient::BaseImapClient() : mCurrentTagValue(0),
 BaseImapClient::~BaseImapClient(){
     if (sockfd >= 0) {
         if (close(sockfd) < 0) {
-            std::cerr << "ERR: Failed to Close Socket in Destructor.\n";
+            std::cerr << "DEBUG: Failed to Close Socket in Destructor.\n";
         }
-        sockfd = -1;  // Nastav deskriptor na neplatnou hodnotu
+        sockfd = -1;
     }
 }
 
@@ -73,7 +73,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
     // Get address info
     if ((status = getaddrinfo(hostname.c_str(), port.c_str(), &hints, &res)) != 0) {
-        std::cerr << "ERR: Unable to resolve hostname to IP address: " << gai_strerror(status) << "\n";
+        std::cerr << "ERR: Unable to Resolve Hostname to IP Address: " << gai_strerror(status) << "\n";
         return EMPTY_STR;
     }
 
@@ -97,7 +97,7 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
         // Convert the IP to a readable string
         inet_ntop(p->ai_family, addr, ip_str, sizeof ip_str);
-        std::cout << "INFO: Resolved " << hostname << " to " << ipVersion << " address: " << ip_str << "\n";
+        std::cout << "DEBUG: Info: Resolved " << hostname << " To " << ipVersion << " Address: " << ip_str << "\n";
 
         // Clean up and return the first resolved IP
         freeaddrinfo(res);
@@ -129,72 +129,65 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
     {   /*TODO: Update Return Value For All TRANSMIT_DATA_FAILED */
         case LOGIN:
             /* login completed, now in authenticated state */
-            if (std::string::npos != buff.find(current_tag + " OK LOGIN completed"))
+            if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS; 
             /* Greeting from IMAP Server FIXME */
             else if (std::string::npos != buff.find(current_tag + "* OK "))
                 return TRANSMIT_DATA_FAILED; 
-            /* It's Also Possible That Server Will Respond With CAPABILITY... */
-            else if (std::string::npos != buff.find(current_tag + " OK [CAPABILITY") &&
-             std::string::npos != buff.find("Logged in"))
-                return SUCCESS;
             /* login failure: user name or password rejected */
-            else if (std::string::npos != buff.find(current_tag + " NO LOGIN completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO "))
                 return TRANSMIT_DATA_FAILED; 
             /* command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD LOGIN completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD "))
                 return TRANSMIT_DATA_FAILED; 
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case LOGOUT:
-            if (std::string::npos != buff.find(current_tag + " OK LOGOUT completed"))
+            if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS;
-            else if (std::string::npos != buff.find(current_tag + " BAD LOGOUT completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD "))
                 return TRANSMIT_DATA_FAILED; 
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case SEARCH:
             /* OK - search completed */
-            if (std::string::npos != buff.find(current_tag + " OK Search completed"))
+            if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS;
             /* NO - search error: can't search that [CHARSET] or criteria*/
-            else if (std::string::npos != buff.find(current_tag + " NO Search completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO "))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD Search completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD "))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case FETCH:
             /* OK - fetch completed */
-            if (std::string::npos != buff.find(current_tag + " OK Fetch completed"))
+            if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS;
             /* NO - fetch error: can't fetch that data */
-            else if (std::string::npos != buff.find(current_tag + " NO Fetch completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO "))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD Fetch completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD "))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
             break;
         case SELECT:
-            /* OK - select completed, now in selected state -> Client is Able To Modify Mailbox */
-            if (std::string::npos != buff.find(current_tag + " OK [READ-WRITE] Select completed"))
-                return SUCCESS;
-
-            /* The Client is Not Permitted To Modify The Mailbox But is Permitted Read Access, 
+            /* OK [READ-WRITE] - select completed, now in selected state -> Client is Able To Modify Mailbox */
+            /* OK [READ-ONLY] The Client is Not Permitted To Modify The Mailbox But is Permitted Read Access, 
                The Mailbox is Selected as Read-Only*/
-            if (std::string::npos != buff.find(current_tag + " OK [READ-ONLY] Select completed"))
+            if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS;
             /* NO - select failure, now in authenticated state: no such mailbox, can't access mailbox */
-            else if (std::string::npos != buff.find(current_tag + " NO Select completed"))
+            else if (std::string::npos != buff.find(current_tag + " NO "))
                 return TRANSMIT_DATA_FAILED;
             /* BAD - command unknown or arguments invalid */
-            else if (std::string::npos != buff.find(current_tag + " BAD Select completed"))
+            else if (std::string::npos != buff.find(current_tag + " BAD "))
                 return TRANSMIT_DATA_FAILED;
             else
                 return CONTINUE_IN_RECEIVING;
