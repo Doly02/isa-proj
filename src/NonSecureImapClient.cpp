@@ -207,10 +207,11 @@ int NonSecureImapClient::ParseUIDs(std::string response)
     std::string deleted_part;
     int uid = 0;
     std::string::size_type found;
+    std::string tag = GetTag(); 
 
     try
     {
-        std::regex reg_expression("(\\r\\n.*(?=OK SEARCH completed)[.|\\s\\S]*)");
+        std::regex reg_expression("(\\r\\n" + tag + "\\s.*)"); 
         std::smatch match;
         if (std::regex_search(response, match, reg_expression) && (1 < match.size()))
         {
@@ -227,7 +228,7 @@ int NonSecureImapClient::ParseUIDs(std::string response)
         return PARSE_REGEX_FAILED;
     }
     response = response.substr(0, response.size() - deleted_part.size());
-    deleted_part = "* SEARCH ";
+    deleted_part = "* SEARCH "; //FIXME: Je zaruceno ze server posle presne retezec "* SEARCH"?
     
     found = response.find(deleted_part);
     if (std::string::npos != found)
@@ -264,7 +265,7 @@ int NonSecureImapClient::FetchUIDs()
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
-        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfide */
+        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfied */
 
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
@@ -305,7 +306,7 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /*if (id >= 36 && id <= 40)
+        /*if (id >= 46 && id <= 50)
         {*/
         email = EMPTY_STR;
         email = FetchEmailByUID(id, WHOLE_MESSAGE);
@@ -322,7 +323,7 @@ int NonSecureImapClient::FetchEmails()
 
     }
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
-    return num_of_uids;
+    return SUCCESS;
 }
 
 std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
@@ -441,8 +442,10 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
     }
 
     ret_val = FetchEmails();
-    
-    printf("Fetched New: %d Emails!", ret_val);
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
 
     ret_val = LogoutClient();
     if (SUCCESS != ret_val)
