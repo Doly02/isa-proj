@@ -266,7 +266,7 @@ int NonSecureImapClient::FetchUIDs()
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
-        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfide */
+        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfied */
 
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
@@ -346,6 +346,7 @@ int NonSecureImapClient::CheckUIDValidity()
 {
     int ret_val = -1;
     std::string uidvalidity_file = GeneratePathToFile(outputDir, UIDVALIDITY_FILE);
+    printf("DEBUG: local_path=%s\n",uidvalidity_file.c_str());
 
     ret_val = GetUIDValidity();
     if (SUCCESS != ret_val)
@@ -520,6 +521,8 @@ int NonSecureImapClient::DisconnectImapServer(void)
             std::cerr << "ERR: Failed to Receive LOGOUT Response.\n";
             return false;
         }
+
+        curr_state = DEFAULT;
         return SUCCESS;
     }
     return SUCCESS; /* TODO: Already Closed */

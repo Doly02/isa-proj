@@ -47,6 +47,8 @@ class SecureImapClient : public BaseImapClient
 
         std::string certFile;
         std::string certDir;
+
+        int         uidValidity;    //!< UIDVALIDITY Value of The Mailbox
     public:
 
         /**
@@ -149,6 +151,9 @@ class SecureImapClient : public BaseImapClient
          */
         int FetchUIDs(void);
         
+        int GetUIDValidity(void);
+
+        int CheckUIDValidity(void);
         /**
         * @brief    Fetches Emails From The Connected Mailbox.
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.

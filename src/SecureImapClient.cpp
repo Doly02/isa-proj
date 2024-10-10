@@ -35,7 +35,8 @@ SecureImapClient::SecureImapClient(const std::string& MailBox,
       ssl(nullptr),             /* SSL Pointer      */
       ctx(nullptr),             /* SSL_CTX Pointer  */ 
       certFile(CertFile),
-      certDir(CertDirectory)
+      certDir(CertDirectory),
+	  uidValidity(0)
 {
     /* SSL/TLS Lib. Initialization */
     SSL_library_init();
@@ -99,8 +100,6 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         server_ip = ResolveHostnameToIP(serverAddress, std::to_string(port));
         if (server_ip.empty())
         {
-            std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
-            SSL_CTX_free(ctx);
             return CREATE_CONNECTION_FAILED;
         }
     }
@@ -234,11 +233,6 @@ std::string SecureImapClient::ReceiveData(void)
         }
     }
 
-#if 0
-    printf("Received Data:\n");
-    printf("%s", rx_data.c_str());
-#endif
-
     /* Disabled Timeout */
     time.tv_sec = 0;
     time.tv_usec = 0;
@@ -247,7 +241,6 @@ std::string SecureImapClient::ReceiveData(void)
         std::cerr << "Error Resetting Timeout for SSL_read() Function.\n";
         return BAD_RESPONSE;
     }
-
 
     /* Handle Errors During Transmission */
     if (0 > bytes_rx)
@@ -397,13 +390,108 @@ int SecureImapClient::FetchUIDs()
     if (SUCCESS != ParseUIDs(recv_data)) 
     {
         std::cerr << "ERR: Failed to Parse UIDs.\n";
-        return NON_UIDS_RECEIVED;                       /* TODO: Update Logic of RetVal! */
+        return NON_UIDS_RECEIVED;
     }
 
     curr_state = DEFAULT;
     return SUCCESS;    
 }
 
+int SecureImapClient::GetUIDValidity()
+{
+    curr_state = SELECT;
+    std::string tag = GenerateTag();
+    std::string select_cmd = tag + " SELECT " + mailbox;  // UIDVALIDITY in The Select of The Mailbox
+    std::string recv_data = EMPTY_STR;
+
+    if (SUCCESS != SendData(select_cmd)) 
+    {
+        std::cerr << "ERR: Failed to Fetch UIDs From IMAP Server.\n";
+        return TRANSMIT_DATA_FAILED;
+    }
+
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
+        std::cerr << "ERR: Failed to Receive UIDs From IMAP Server.\n";
+        return RECEIVE_DATA_FAILED;
+    }
+
+    /* Regular Expression to Find Value of UID Validity */
+    std::regex uidvalidity_regex("\\*\\s+OK\\s+\\[UIDVALIDITY\\s+(\\d+)\\]");
+    std::smatch match;
+
+    if (std::regex_search(recv_data, match, uidvalidity_regex)) {
+        if (1 < match.size()) 
+        {
+            std::string uidvalidity_str = match.str(1);
+
+            try 
+            {
+                uidValidity = std::stoi(uidvalidity_str);
+                printf("DEBUG: UIDVALIDITY Value: %d (From Server)\n", uidValidity);
+                curr_state = DEFAULT; /* Clear The State */
+                return SUCCESS;  
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << "ERR: Invalid UIDVALIDITY value format.\n";
+                return UID_VALIDITY_ERROR_IN_RECV;
+            }
+            catch (const std::out_of_range& e) {
+                std::cerr << "ERR: UIDVALIDITY value out of range.\n";
+                return UID_VALIDITY_ERROR_IN_RECV;
+            }
+        }
+    }
+
+    std::cerr << "ERR: UIDVALIDITY Not Found in the Response.\n";
+    return UID_VALIDITY_ERROR_IN_RECV;
+}
+
+int SecureImapClient::CheckUIDValidity()
+{
+    int ret_val = -1;
+    std::string uidvalidity_file = GeneratePathToFile(outputDir, UIDVALIDITY_FILE);
+    printf("DEBUG: local_path=%s\n",uidvalidity_file.c_str());
+
+    ret_val = GetUIDValidity();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
+    ret_val = ReadUIDVALIDITYFile(uidvalidity_file);
+    if ((UIDVALIDITY_FILE_NOT_FOUND != ret_val) && (0 > ret_val))
+    {
+        /**
+         * ReadUIDVALIDITYFile Return UIDVALIDITY Values Stored In Local (Output) Directory,
+         * If The Return Values Is < 0, It Means That Some Error With Read of The Value.
+         */
+        return ret_val;
+    }
+    
+    if (ret_val == uidValidity)
+    {
+        /* Program Will Run As Normal */
+        printf("DEBUG: .uidvalidity Has Same Value or Does Not Exist.\n");
+    }
+    else
+    {
+        /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
+        printf("DEBUG: UIDVALIDITY Differs.\n");
+        /* Remove Email Files From Output Directory */
+        ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
+        if (SUCCESS != ret_val)
+        {
+            return ret_val;
+        }
+        /* Store Current Value of UIDVALIDITY */
+        StoreUIDVALIDITY(uidValidity, outputDir);
+
+        /* Emails Are Removed, From Now Client Can Operate as Usual */
+    }
+    return SUCCESS;
+}
 int SecureImapClient::FetchEmails()
 {
     int ret_val = NON_UIDS_RECEIVED;
@@ -420,20 +508,22 @@ int SecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /*if (id >= 1 && id <= 10)
-        {*/
-        email = EMPTY_STR;
-        email = FetchEmailByUID(id, WHOLE_MESSAGE);
-        if (EMPTY_STR == email)
+        if (id >= 6 && id <= 10)
         {
-            return FETCH_EMAIL_FAILED;   
+            email = EMPTY_STR;
+            email = FetchEmailByUID(id, WHOLE_MESSAGE);
+            if (EMPTY_STR == email)
+            {
+                return FETCH_EMAIL_FAILED;   
+            }
+            /* Assembly Path To File */
+            path = GenerateFilename(id);
+            path = GeneratePathToFile(outputDir, path);
+                if (1==id)
+                    printf("DEBUG: path=%s (email)\n",path.c_str());
+            email = ParseEmail(id, email, false);
+            StoreEmail(email, path);
         }
-        /* Assembly Path To File */
-        path = GenerateFilename(id);
-        path = GeneratePathToFile(outputDir, path);
-        email = ParseEmail(id, email, false);
-        StoreEmail(email, path);
-        /*}*/
 
     }
     num_of_uids = int(vec_uids.size());
@@ -558,8 +648,18 @@ int SecureImapClient::Run(const std::string& serverAddress, int server_port, con
         return ret_val;
     }
 
+    ret_val = CheckUIDValidity();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
     ret_val = FetchEmails();
-    
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
     ret_val = LogoutClient();
     if (SUCCESS != ret_val)
     {
