@@ -326,6 +326,7 @@ int NonSecureImapClient::GetUIDValidity()
             try 
             {
                 UidValidity = std::stoi(uidvalidity_str);
+                printf("DEBUG: UIDVALIDITY Value: %d (From Server)\n", UidValidity);
                 curr_state = DEFAULT; /* Clear The State */
                 return SUCCESS;  
             }
@@ -356,7 +357,7 @@ int NonSecureImapClient::CheckUIDValidity()
     }
 
     ret_val = ReadUIDVALIDITYFile(uidvalidity_file);
-    if (0 > ret_val)
+    if ((UIDVALIDITY_FILE_NOT_FOUND != ret_val) && (0 > ret_val))
     {
         /**
          * ReadUIDVALIDITYFile Return UIDVALIDITY Values Stored In Local (Output) Directory,
@@ -364,23 +365,27 @@ int NonSecureImapClient::CheckUIDValidity()
          */
         return ret_val;
     }
-
+    
     if (ret_val == UidValidity)
     {
         /* Program Will Run As Normal */
+        printf("DEBUG: .uidvalidity Has Same Value or Does Not Exist.\n");
         uidvState = OK;
     }
     else
     {
         /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
         uidvState = DIFFERENT;
-
+        printf("DEBUG: UIDVALIDITY Differs.\n");
         /* Remove Email Files From Output Directory */
         ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
         if (SUCCESS != ret_val)
         {
             return ret_val;
         }
+        /* Store Current Value of UIDVALIDITY */
+        StoreUIDVALIDITY(UidValidity, outputDir);
+
         /* Emails Are Removed, From Now Client Can Operate as Usual */
     }
     return SUCCESS;
@@ -402,20 +407,23 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /*if (id >= 11 && id <= 20)
-        {*/
-        email = EMPTY_STR;
-        email = FetchEmailByUID(id, WHOLE_MESSAGE);
-        if (EMPTY_STR == email)
+        if (id >= 1 && id <= 5)
         {
-            return FETCH_EMAIL_FAILED;   
+            email = EMPTY_STR;
+            email = FetchEmailByUID(id, WHOLE_MESSAGE);
+            if (EMPTY_STR == email)
+            {
+                return FETCH_EMAIL_FAILED;   
+            }
+            /* Assembly Path To File */
+            path = GenerateFilename(id);
+            path = GeneratePathToFile(outputDir, path);
+            if (1==id)
+                printf("DEBUG: path=%s (email)\n",path.c_str());
+
+            email = ParseEmail(id, email, false);
+            StoreEmail(email, path);
         }
-        /* Assembly Path To File */
-        path = GenerateFilename(id);
-        path = GeneratePathToFile(outputDir, path);
-        email = ParseEmail(id, email, false);
-        StoreEmail(email, path);
-        /*}*/
 
     }
     num_of_uids = int(vec_uids.size());
@@ -538,6 +546,12 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
         return ret_val;
     }
 
+    ret_val = CheckUIDValidity();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
     ret_val = FetchEmails();
     if (SUCCESS != ret_val)
     {
@@ -556,4 +570,5 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
  * TODO:
  * - Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
  * - Co se stane pokud se zachova stejne UIDVALIDITY a stahnou se znova emaily?
+ * - Co se stane kdyz si uzivatel stahne emaily z vice mailboxu?
  */

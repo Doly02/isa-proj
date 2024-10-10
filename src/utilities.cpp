@@ -81,8 +81,8 @@ int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& p
 
 void StoreUIDVALIDITY(int uid_validity,std::string output_dir)
 {
-    std::string filename =  ".uidvalidity" + std::string(OUTPUT_FILE_FORMAT);
-    std::string path = output_dir + "/" + filename;
+    std::string filename =  std::string(UIDVALIDITY_FILE); /* TODO: Clean The Rubbish With Suffixes */
+    std::string path = output_dir + filename;
     std::ofstream file(path);
     
     if (!file.is_open())
@@ -103,8 +103,10 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
     std::ifstream file(filepath);   /* Path to .uidvalidity File */
     std::string content;            /* .uidvalidity File Content */
 
+    printf("DEBUG: path=%s\n",filepath.c_str());
     if (false == FileExists(filepath)) 
     {
+        printf("DEBUG: File Not Found.\n");
         return UIDVALIDITY_FILE_NOT_FOUND; /* No Need To Check UIDVALIDITY No More Just Download All Messages. */
     }
 
@@ -119,6 +121,7 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
     {
         size_t pos;
         int uidvalidity_num = std::stoi(content, &pos);
+        printf("DEBUG: UIDVALIDITY Value: %d\n", uidvalidity_num);
 
         /* Check If File Does Not Contain Any Other Characters */
         if (pos != content.length()) 
@@ -147,7 +150,7 @@ std::string GenerateFilename(int uid)
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)
 {
-    return (output_dir + "/" + f_name);
+    return (output_dir + f_name);
 }
 
 void StoreEmail(std::string content, std::string file_path)

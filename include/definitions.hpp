@@ -128,12 +128,12 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 /**
  * @brief .uidvalidity File Not Found.
  */
-#define UIDVALIDITY_FILE_NOT_FOUND      (-12u)
+#define UIDVALIDITY_FILE_NOT_FOUND      (-12)
 
 /**
  * @brief Error With .uidvalidity File (Could Not Be Opened, Invalid Format, Out of Range of INT).
  */
-#define UIDVALIDITY_FILE_ERROR          (-13u)
+#define UIDVALIDITY_FILE_ERROR          (-13)
 
 /**
  * @brief Unable to Receive UIDVALIDITY From The Server.
