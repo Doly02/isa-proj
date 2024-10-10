@@ -26,7 +26,8 @@ NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::
     : mailbox(MailBox), 
     outputDir(OutDirectory),
     headersOnly(HeadersOnly),
-    newOnly(NewOnly){}
+    newOnly(NewOnly),
+    uidValidity(0){}
 
 int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
 {
@@ -141,10 +142,7 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
-#if 0
-    printf("Received Data:\n");
-    printf("%s", rx_data.c_str());
-#endif
+
     /* Handle Error If Ocurred During Transmission */
     if (0 > bytes_rx) 
     {
@@ -325,8 +323,8 @@ int NonSecureImapClient::GetUIDValidity()
 
             try 
             {
-                UidValidity = std::stoi(uidvalidity_str);
-                printf("DEBUG: UIDVALIDITY Value: %d (From Server)\n", UidValidity);
+                uidValidity = std::stoi(uidvalidity_str);
+                printf("DEBUG: UIDVALIDITY Value: %d (From Server)\n", uidValidity);
                 curr_state = DEFAULT; /* Clear The State */
                 return SUCCESS;  
             }
@@ -366,16 +364,14 @@ int NonSecureImapClient::CheckUIDValidity()
         return ret_val;
     }
     
-    if (ret_val == UidValidity)
+    if (ret_val == uidValidity)
     {
         /* Program Will Run As Normal */
         printf("DEBUG: .uidvalidity Has Same Value or Does Not Exist.\n");
-        uidvState = OK;
     }
     else
     {
         /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
-        uidvState = DIFFERENT;
         printf("DEBUG: UIDVALIDITY Differs.\n");
         /* Remove Email Files From Output Directory */
         ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
@@ -384,7 +380,7 @@ int NonSecureImapClient::CheckUIDValidity()
             return ret_val;
         }
         /* Store Current Value of UIDVALIDITY */
-        StoreUIDVALIDITY(UidValidity, outputDir);
+        StoreUIDVALIDITY(uidValidity, outputDir);
 
         /* Emails Are Removed, From Now Client Can Operate as Usual */
     }
@@ -571,4 +567,12 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
  * - Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
  * - Co se stane pokud se zachova stejne UIDVALIDITY a stahnou se znova emaily?
  * - Co se stane kdyz si uzivatel stahne emaily z vice mailboxu?
+ * - Jak se ma program chovat s -o ../hey a -o ../hey
+ * 
+ * - Ctyri ERRORY pokud se nepripojis k serveru!!!
+ * ERR: Unable to Resolve Hostname to IP Address: No address associated with hostname
+ * ERR: Unable to Resolve Hostname To IP Address.
+ * ERR: Failed to Login to IMAP Server.
+ * ERR: Failed to Set Mailbox on IMAP Server.
+
  */

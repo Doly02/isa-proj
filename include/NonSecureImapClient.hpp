@@ -37,8 +37,7 @@ class NonSecureImapClient : public BaseImapClient
         /* Flags */
         bool                headersOnly;    //!< Flag Indicating Whether to Fetch Only Headers
         bool                newOnly;        //!< Flag Indicating Whether to Fetch Only New Emails
-        int                 UidValidity;    //!< UIDVALIDITY Value of The Mailbox
-        UidValidityState_t  uidvState;
+        int                 uidValidity;    //!< UIDVALIDITY Value of The Mailbox
 
     public:
 

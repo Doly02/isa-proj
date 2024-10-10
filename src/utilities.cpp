@@ -64,9 +64,10 @@ int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& p
         {
             std::string file_name = entry.path().filename().string();
 
-            // Check If The File Starts With The Pattern_Prefix and Ends With The Extension
+            /* Check If The File Starts With The Pattern_Prefix and Ends With The Extension */
             if (0 == file_name.find(pattern_prefix) && extension == file_name.substr(file_name.length() - extension.length())) 
             {
+                printf("DEBUG: File With path=%s REMOVED\n", entry.path().string().c_str());
                 std::filesystem::remove(entry.path());
             }
         }

@@ -252,14 +252,6 @@ typedef struct
 
 } Credentials_t;
 
-typedef enum 
-{
-    OK = 0u,
-    DIFFERENT,
-
-} UidValidityState_t;
-
-
 typedef enum
 {
     /* Responses To Login Command */
