@@ -126,10 +126,32 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define UNDEFINED_STATE                 (11u)
 
 /**
+ * @brief .uidvalidity File Not Found.
+ */
+#define UIDVALIDITY_FILE_NOT_FOUND      (-12u)
+
+/**
+ * @brief Error With .uidvalidity File (Could Not Be Opened, Invalid Format, Out of Range of INT).
+ */
+#define UIDVALIDITY_FILE_ERROR          (-13u)
+
+/**
+ * @brief Unable to Receive UIDVALIDITY From The Server.
+ */
+#define UID_VALIDITY_ERROR_IN_RECV      (14u)
+/**
+ * @brief Failed to Remove Emails When UIDVALIDITY Does Not Match.
+ */
+#define REMOVAL_OF_EMAILS_FAILED        (15u)
+
+/**
  * @brief Error During Receiving of Server's Response.
  * @details Special Return Code For Methods That Returns String.
  */
 #define BAD_RESPONSE                    "Bad Response :("
+
+
+
 
 /** @} */ // End of ReturnCodes group
 
@@ -183,7 +205,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
-
+#define UIDVALIDITY_FILE            ".uidvalidity.txt"
 /**
  * @brief Structure For The Email Message.
  */
@@ -229,6 +251,13 @@ typedef struct
     std::string password;           
 
 } Credentials_t;
+
+typedef enum 
+{
+    OK = 0u,
+    DIFFERENT,
+
+} UidValidityState_t;
 
 
 typedef enum

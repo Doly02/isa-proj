@@ -294,6 +294,98 @@ int NonSecureImapClient::FetchUIDs()
     return SUCCESS;    
 }
 
+int NonSecureImapClient::GetUIDValidity()
+{
+    curr_state = SELECT;
+    std::string tag = GenerateTag();
+    std::string select_cmd = tag + " SELECT " + mailbox;  // UIDVALIDITY in The Select of The Mailbox
+    std::string recv_data = EMPTY_STR;
+
+    if (SUCCESS != SendData(select_cmd)) 
+    {
+        std::cerr << "ERR: Failed to Fetch UIDs From IMAP Server.\n";
+        return TRANSMIT_DATA_FAILED;
+    }
+
+    recv_data = ReceiveData();
+    if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
+    {
+        std::cerr << "ERR: Failed to Receive UIDs From IMAP Server.\n";
+        return RECEIVE_DATA_FAILED;
+    }
+
+    /* Regular Expression to Find Value of UID Validity */
+    std::regex uidvalidity_regex("\\*\\s+OK\\s+\\[UIDVALIDITY\\s+(\\d+)\\]");
+    std::smatch match;
+
+    if (std::regex_search(recv_data, match, uidvalidity_regex)) {
+        if (1 < match.size()) 
+        {
+            std::string uidvalidity_str = match.str(1);
+
+            try 
+            {
+                UidValidity = std::stoi(uidvalidity_str);
+                curr_state = DEFAULT; /* Clear The State */
+                return SUCCESS;  
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << "ERR: Invalid UIDVALIDITY value format.\n";
+                return UID_VALIDITY_ERROR_IN_RECV;
+            }
+            catch (const std::out_of_range& e) {
+                std::cerr << "ERR: UIDVALIDITY value out of range.\n";
+                return UID_VALIDITY_ERROR_IN_RECV;
+            }
+        }
+    }
+
+    std::cerr << "ERR: UIDVALIDITY Not Found in the Response.\n";
+    return UID_VALIDITY_ERROR_IN_RECV;
+}
+
+int NonSecureImapClient::CheckUIDValidity()
+{
+    int ret_val = -1;
+    std::string uidvalidity_file = GeneratePathToFile(outputDir, UIDVALIDITY_FILE);
+
+    ret_val = GetUIDValidity();
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
+
+    ret_val = ReadUIDVALIDITYFile(uidvalidity_file);
+    if (0 > ret_val)
+    {
+        /**
+         * ReadUIDVALIDITYFile Return UIDVALIDITY Values Stored In Local (Output) Directory,
+         * If The Return Values Is < 0, It Means That Some Error With Read of The Value.
+         */
+        return ret_val;
+    }
+
+    if (ret_val == UidValidity)
+    {
+        /* Program Will Run As Normal */
+        uidvState = OK;
+    }
+    else
+    {
+        /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
+        uidvState = DIFFERENT;
+
+        /* Remove Email Files From Output Directory */
+        ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
+        if (SUCCESS != ret_val)
+        {
+            return ret_val;
+        }
+        /* Emails Are Removed, From Now Client Can Operate as Usual */
+    }
+    return SUCCESS;
+}
+
 int NonSecureImapClient::FetchEmails()
 {
     int ret_val = NON_UIDS_RECEIVED;
@@ -461,5 +553,7 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
 }
 
 /**
- * Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
+ * TODO:
+ * - Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
+ * - Co se stane pokud se zachova stejne UIDVALIDITY a stahnou se znova emaily?
  */

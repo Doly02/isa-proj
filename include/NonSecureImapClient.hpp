@@ -32,11 +32,14 @@ class NonSecureImapClient : public BaseImapClient
 {
     private:
         /* IMAP Server Informations */
-        std::string mailbox;        //!< Mailbox to Fetch Emails From
-        std::string outputDir;      //!< Directory to Store the Emails
+        std::string         mailbox;        //!< Mailbox to Fetch Emails From
+        std::string         outputDir;      //!< Directory to Store the Emails
         /* Flags */
-        bool        headersOnly;    //!< Flag Indicating Whether to Fetch Only Headers
-        bool        newOnly;        //!< Flag Indicating Whether to Fetch Only New Emails
+        bool                headersOnly;    //!< Flag Indicating Whether to Fetch Only Headers
+        bool                newOnly;        //!< Flag Indicating Whether to Fetch Only New Emails
+        int                 UidValidity;    //!< UIDVALIDITY Value of The Mailbox
+        UidValidityState_t  uidvState;
+
     public:
 
         /**
@@ -129,6 +132,9 @@ class NonSecureImapClient : public BaseImapClient
          */
         int FetchUIDs(void);
         
+        int GetUIDValidity(void);
+
+        int CheckUIDValidity(void);
         /**
         * @brief    Fetches Emails From The Connected Mailbox.
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.

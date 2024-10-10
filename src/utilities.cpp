@@ -19,7 +19,7 @@
 /*                  Libraries                   */
 /************************************************/
 #include "../include/utilities.hpp"
-
+#include <filesystem>
 
 /************************************************/
 /*                  Code                        */
@@ -56,6 +56,90 @@ bool FileExists(const std::string& filename)
     return (0 == stat(filename.c_str(), &buffer));
 }
 
+int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& pattern_prefix, const std::string& extension)
+{
+    try 
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(dir_path)) 
+        {
+            std::string file_name = entry.path().filename().string();
+
+            // Check If The File Starts With The Pattern_Prefix and Ends With The Extension
+            if (0 == file_name.find(pattern_prefix) && extension == file_name.substr(file_name.length() - extension.length())) 
+            {
+                std::filesystem::remove(entry.path());
+            }
+        }
+        return SUCCESS;
+    }
+    catch (const std::filesystem::filesystem_error& e) 
+    {
+        std::cerr << "ERR: " << e.what() << std::endl;
+        return REMOVAL_OF_EMAILS_FAILED;
+    }
+}
+
+void StoreUIDVALIDITY(int uid_validity,std::string output_dir)
+{
+    std::string filename =  ".uidvalidity" + std::string(OUTPUT_FILE_FORMAT);
+    std::string path = output_dir + "/" + filename;
+    std::ofstream file(path);
+    
+    if (!file.is_open())
+    {
+        std::cerr << "ERR: Unable To Open File: " << path << std::endl;
+        return;
+    }
+    
+    file << uid_validity;
+    file.close();
+}
+/**
+ * retval Number from UIDVALIDITY File.
+ * retval Non-Positive Values if Error Occurs.
+ */
+int ReadUIDVALIDITYFile(const std::string& filepath)
+{
+    std::ifstream file(filepath);   /* Path to .uidvalidity File */
+    std::string content;            /* .uidvalidity File Content */
+
+    if (false == FileExists(filepath)) 
+    {
+        return UIDVALIDITY_FILE_NOT_FOUND; /* No Need To Check UIDVALIDITY No More Just Download All Messages. */
+    }
+
+    if (false == file.is_open()) 
+    {
+        std::cerr << "ERR: Unable To Open The .uidvalidity File." << std::endl;
+        return UIDVALIDITY_FILE_ERROR;
+    }
+    /* Load Content */
+    std::getline(file, content);
+    try 
+    {
+        size_t pos;
+        int uidvalidity_num = std::stoi(content, &pos);
+
+        /* Check If File Does Not Contain Any Other Characters */
+        if (pos != content.length()) 
+        {
+            std::cerr << "ERR: File contains extra non-numeric characters.\n";
+            return UIDVALIDITY_FILE_ERROR; 
+        }
+        return uidvalidity_num;
+    }
+    catch (const std::invalid_argument& e)  /* Non-Valid Format */ 
+    {
+        std::cerr << "ERR: The file does not contain a valid number.\n";
+        return UIDVALIDITY_FILE_ERROR;
+    }
+    catch (const std::out_of_range& e)      /* Out of The Range of Type INT */
+    {
+        std::cerr << "ERR: The number in the file is out of range.\n";
+        return UIDVALIDITY_FILE_ERROR; 
+    }
+}
+
 std::string GenerateFilename(int uid)
 {
     return ("MSG_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
@@ -65,7 +149,6 @@ std::string GeneratePathToFile(std::string output_dir, std::string f_name)
 {
     return (output_dir + "/" + f_name);
 }
-
 
 void StoreEmail(std::string content, std::string file_path)
 {
