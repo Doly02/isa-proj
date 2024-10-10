@@ -42,7 +42,7 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
         server_ip = ResolveHostnameToIP(serverAddress, std::to_string(port));
         if (server_ip.empty())
         {
-            std::cerr << "ERR: Unable to Resolve Hostname To IP Address.\n";
+            return CREATE_CONNECTION_FAILED;
         }
     }
 
@@ -77,15 +77,14 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
             sockfd = -1;
             return CREATE_CONNECTION_FAILED;
         }
+        curr_state = LOGIN;
+        /* Send Login Command To IMAP Server */
+        LoginClient(username, password);
+
+        curr_state = DEFAULT;
+        return SUCCESS; 
     }
-    curr_state = LOGIN;
-    /* Send Login Command To IMAP Server */
-    LoginClient(username, password);
-
-    // TODO: Print To The User That Login Was Successful?
-    curr_state = DEFAULT;
-    return SUCCESS; 
-
+    return CREATE_CONNECTION_FAILED;
 }
 
 int NonSecureImapClient::SendData(const std::string& data)
@@ -284,7 +283,7 @@ int NonSecureImapClient::FetchUIDs()
     if (SUCCESS != ParseUIDs(recv_data)) 
     {
         std::cerr << "ERR: Failed to Parse UIDs.\n";
-        return NON_UIDS_RECEIVED;                       /* TODO: Update Logic of RetVal! */
+        return NON_UIDS_RECEIVED;
     }
 
     curr_state = DEFAULT;
@@ -512,7 +511,7 @@ int NonSecureImapClient::DisconnectImapServer(void)
         
         if (SUCCESS != SendData(logout_cmd))
         {
-            std::cerr << "ERR: Failed to Login to IMAP Server.\n";
+            std::cerr << "ERR: Failed to Logout to IMAP Server.\n";
             return TRANSMIT_DATA_FAILED;
         }
         recv_data = ReceiveData();
@@ -567,7 +566,7 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
  * - Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
  * - Co se stane pokud se zachova stejne UIDVALIDITY a stahnou se znova emaily?
  * - Co se stane kdyz si uzivatel stahne emaily z vice mailboxu?
- * - Jak se ma program chovat s -o ../hey a -o ../hey
+ * - Jak se ma program chovat s -o ../hey/ a -o ../hey
  * 
  * - Ctyri ERRORY pokud se nepripojis k serveru!!!
  * ERR: Unable to Resolve Hostname to IP Address: No address associated with hostname

@@ -126,7 +126,7 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
 {
     std::string current_tag = GetTag();
     switch(curr_state)
-    {   /*TODO: Update Return Value For All TRANSMIT_DATA_FAILED */
+    {   
         case LOGIN:
             /* login completed, now in authenticated state */
             if (std::string::npos != buff.find(current_tag + " OK "))
@@ -207,6 +207,5 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
  * 1) RFC:              A142 OK [READ-WRITE] SELECT completed
  * 2) Real Server:      A0000000002 OK [READ-WRITE] Select completed
  *
- * TODO: Ask If Is Valid To Put Server's Response Automatically to Lowercase. Case-Sensitivity.
  * TODO: Check If Files Are Correcly Stored.
  */
