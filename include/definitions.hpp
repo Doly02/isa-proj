@@ -206,44 +206,6 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
 #define UIDVALIDITY_FILE            ".uidvalidity.txt"
-/**
- * @brief Structure For The Email Message.
- */
-typedef struct 
-{
-    std::string from;          //<! Sender Address.
-    std::string to;            //<! Receiver Address.
-    std::string cc;            //<! Carbon Copy.
-    std::string bcc;           //<! Blind Carbon Copy.
-    std::string reply_to;      //<! Address for replies.
-
-    std::string subject;       //<! Subject of The Email.
-    std::string date;          //<! Date.
-    std::string message_id;    //<! Message-ID.
-    std::string in_reply_to;   //<! Message this email is replying to.
-    std::string references;    //<! Other messages related to this message.
-    std::string mime_version;  //<! MIME-Version.
-    std::string content_type;  //<! Content-Type.
-
-} MailHeader_t;
-
-/**
- * @brief Structure of The Email Body.
- */
-typedef struct 
-{
-    std::vector<std::string> content;           //<! Mail Content.
-
-} MailBody_t;
-
-/**
- * @brief Structure of The Email.
- */
-typedef struct
-{
-    MailHeader_t    header;
-    MailBody_t      body;                   //<! Header of The Mail.
-} Mail_t;
 
 typedef struct 
 {
