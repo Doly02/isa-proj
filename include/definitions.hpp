@@ -51,6 +51,21 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  */
 
 /**
+ * @brief Output Directory Could Not Be Created.
+ */
+#define OUTPUT_DIR_NOT_CREATED          (-7)
+
+/**
+ * @brief .uidvalidity File Not Found.
+ */
+#define UIDVALIDITY_FILE_NOT_FOUND      (-6)
+
+/**
+ * @brief Error With .uidvalidity File (Could Not Be Opened, Invalid Format, Out of Range of INT).
+ */
+#define UIDVALIDITY_FILE_ERROR          (-5)
+
+/**
  * @brief Return Code When Creating a Connection With IMAP Server Failed.
  */
 #define CREATE_CONNECTION_FAILED        (-4)
@@ -124,16 +139,6 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  * @brief Undefined State Encountered.
  */
 #define UNDEFINED_STATE                 (11u)
-
-/**
- * @brief .uidvalidity File Not Found.
- */
-#define UIDVALIDITY_FILE_NOT_FOUND      (-12)
-
-/**
- * @brief Error With .uidvalidity File (Could Not Be Opened, Invalid Format, Out of Range of INT).
- */
-#define UIDVALIDITY_FILE_ERROR          (-13)
 
 /**
  * @brief Unable to Receive UIDVALIDITY From The Server.

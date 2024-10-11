@@ -56,6 +56,25 @@ bool FileExists(const std::string& filename)
     return (0 == stat(filename.c_str(), &buffer));
 }
 
+int CreateDirectoryIfNotExists(const std::string& dir_path)
+{
+    std::filesystem::path path(dir_path);
+
+    if (!std::filesystem::exists(path)) 
+    {
+        if (std::filesystem::create_directories(path)) 
+        {
+            return SUCCESS;
+        } 
+        else 
+        {
+            std::cerr << "Error: Failed To Create Directory: " << dir_path << std::endl;
+            return OUTPUT_DIR_NOT_CREATED;
+        }
+    }
+    return SUCCESS;
+}
+
 int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& pattern_prefix, const std::string& extension)
 {
     try 

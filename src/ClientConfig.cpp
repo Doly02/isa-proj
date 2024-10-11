@@ -49,6 +49,11 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
     {
         exit(PARSE_CREDENTIALS_FAILED);
     }
+
+    if (SUCCESS != CreateDirectoryIfNotExists(outputD))
+    {
+        exit(OUTPUT_DIR_NOT_CREATED);
+    }
 }
 
 bool ImapClientConfig::GetClientMode()

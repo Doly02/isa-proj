@@ -37,6 +37,8 @@ void PrintHelp(void);
 
 bool FileExists(const std::string& filename);
 
+int CreateDirectoryIfNotExists(const std::string& dir_path);
+
 int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& pattern_prefix, const std::string& extension);
 
 void StoreUIDVALIDITY(int uid_validity,std::string output_dir);
