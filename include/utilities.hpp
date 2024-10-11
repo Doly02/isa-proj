@@ -59,7 +59,7 @@ void StoreEmail(std::string content, std::string file_path);
 
 std::string ParseEmailHeader(std::string header);
 
-std::string ParseEmailBody(std::string body);
+std::string ParseEmailBody(std::string body, std::string tag);
 
 /**
 * @brief        Checks Whether The String Is IPv4 Address.

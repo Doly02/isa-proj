@@ -519,14 +519,12 @@ int SecureImapClient::FetchEmails()
             /* Assembly Path To File */
             path = GenerateFilename(id);
             path = GeneratePathToFile(outputDir, path);
-                if (1==id)
-                    printf("DEBUG: path=%s (email)\n",path.c_str());
             email = ParseEmail(id, email, false);
             StoreEmail(email, path);
+            num_of_uids++;
         }
 
     }
-    num_of_uids = int(vec_uids.size());
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;
 }
@@ -568,11 +566,13 @@ std::string SecureImapClient::ParseEmail(int uid, std::string email, bool just_h
 {
     std::string email_content;
     std::string email_body;
+    std::string tag = EMPTY_STR;
 
     if (false == just_headers)
     {
         email_body = FetchEmailByUID(uid, JUST_HEADER);
-        email_body = ParseEmailBody(email_body);
+        tag = GetTag();
+        email_body = ParseEmailBody(email_body, tag);
     }
     email_content = ParseEmailHeader(email);
 

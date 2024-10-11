@@ -104,7 +104,6 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
     std::ifstream file(filepath);   /* Path to .uidvalidity File */
     std::string content;            /* .uidvalidity File Content */
 
-    printf("DEBUG: path=%s\n",filepath.c_str());
     if (false == FileExists(filepath)) 
     {
         printf("DEBUG: File Not Found.\n");
@@ -179,22 +178,22 @@ std::string ParseEmailHeader(std::string header)
     return header;
 }
 
-std::string ParseEmailBody(std::string body)
+std::string ParseEmailBody(std::string body, std::string tag)
 {
     std::string delete_part = EMPTY_STR;
     try
     {
-        /* TODO: std::regex_constants::icase For Case Insensitivity 
-         * Another Idea -> Use Or ([ | ] in Regex)*/
-        std::regex reg_expression("(.*(?=OK FETCH completed)[.|\\s\\S]*)", std::regex_constants::icase);
+        std::regex reg_expression("(" + tag + "\\s+.*(?=OK)[.|\\s\\S]*)");
         std::smatch match;
-        if (regex_search(body, match, reg_expression) && (1 < match.size()))
+        if (regex_search(body, match, reg_expression))
         {
-            delete_part = match.str(1);
+            delete_part = match.str(0);
         }
+    
         body = body.substr(0, body.size() - delete_part.size());
         body.erase(0, body.find("\r\n") + 1);
-        return body.erase(0, body.find("\n") + 1);
+        body = body.substr(0, body.size()-5);
+        return body; 
     }
     catch(std::regex_error& e) {
         return BAD_RESPONSE;
