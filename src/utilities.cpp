@@ -86,7 +86,6 @@ int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& p
             /* Check If The File Starts With The Pattern_Prefix and Ends With The Extension */
             if (0 == file_name.find(pattern_prefix) && extension == file_name.substr(file_name.length() - extension.length())) 
             {
-                printf("DEBUG: File With path=%s REMOVED\n", entry.path().string().c_str());
                 std::filesystem::remove(entry.path());
             }
         }
@@ -125,7 +124,6 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
 
     if (false == FileExists(filepath)) 
     {
-        printf("DEBUG: File Not Found.\n");
         return UIDVALIDITY_FILE_NOT_FOUND; /* No Need To Check UIDVALIDITY No More Just Download All Messages. */
     }
 
@@ -140,7 +138,6 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
     {
         size_t pos;
         int uidvalidity_num = std::stoi(content, &pos);
-        printf("DEBUG: UIDVALIDITY Value: %d\n", uidvalidity_num);
 
         /* Check If File Does Not Contain Any Other Characters */
         if (pos != content.length()) 

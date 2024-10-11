@@ -31,9 +31,7 @@ BaseImapClient::BaseImapClient() : mCurrentTagValue(0),
 
 BaseImapClient::~BaseImapClient(){
     if (sockfd >= 0) {
-        if (close(sockfd) < 0) {
-            std::cerr << "DEBUG: Failed to Close Socket in Destructor.\n";
-        }
+        close(sockfd);
         sockfd = -1;
     }
 }
@@ -97,7 +95,6 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 
         // Convert the IP to a readable string
         inet_ntop(p->ai_family, addr, ip_str, sizeof ip_str);
-        std::cout << "DEBUG: Info: Resolved " << hostname << " To " << ipVersion << " Address: " << ip_str << "\n";
 
         // Clean up and return the first resolved IP
         freeaddrinfo(res);

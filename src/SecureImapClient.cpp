@@ -429,7 +429,6 @@ int SecureImapClient::GetUIDValidity()
             try 
             {
                 uidValidity = std::stoi(uidvalidity_str);
-                printf("DEBUG: UIDVALIDITY Value: %d (From Server)\n", uidValidity);
                 curr_state = DEFAULT; /* Clear The State */
                 return SUCCESS;  
             }
@@ -452,7 +451,6 @@ int SecureImapClient::CheckUIDValidity()
 {
     int ret_val = -1;
     std::string uidvalidity_file = GeneratePathToFile(outputDir, UIDVALIDITY_FILE);
-    printf("DEBUG: local_path=%s\n",uidvalidity_file.c_str());
 
     ret_val = GetUIDValidity();
     if (SUCCESS != ret_val)
@@ -470,15 +468,10 @@ int SecureImapClient::CheckUIDValidity()
         return ret_val;
     }
     
-    if (ret_val == uidValidity)
-    {
-        /* Program Will Run As Normal */
-        printf("DEBUG: .uidvalidity Has Same Value or Does Not Exist.\n");
-    }
-    else
+    if (ret_val != uidValidity)
     {
         /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
-        printf("DEBUG: UIDVALIDITY Differs.\n");
+        
         /* Remove Email Files From Output Directory */
         ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
         if (SUCCESS != ret_val)
@@ -489,6 +482,10 @@ int SecureImapClient::CheckUIDValidity()
         StoreUIDVALIDITY(uidValidity, outputDir);
 
         /* Emails Are Removed, From Now Client Can Operate as Usual */
+    }
+    else
+    {
+        ; /* Program Will Run As Normal */
     }
     return SUCCESS;
 }
