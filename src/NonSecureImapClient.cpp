@@ -262,7 +262,6 @@ int NonSecureImapClient::FetchUIDs()
     std::string tag = GenerateTag();
     std::string fetch_uids_cmd = tag + " UID SEARCH";
     
-    printf("value_true: %s\n", newOnly ? "true" : "false");
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
@@ -399,21 +398,18 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        if (id >= 1 && id < 5)
+        email = EMPTY_STR;
+        email = FetchEmailByUID(id, WHOLE_MESSAGE);
+        if (EMPTY_STR == email)
         {
-            email = EMPTY_STR;
-            email = FetchEmailByUID(id, WHOLE_MESSAGE);
-            if (EMPTY_STR == email)
-            {
-                return FETCH_EMAIL_FAILED;   
-            }
-            /* Assembly Path To File */
-            path = GenerateFilename(id);
-            path = GeneratePathToFile(outputDir, path);
-            email = ParseEmail(id, email, false);
-            StoreEmail(email, path);
-            num_of_uids++;
+            return FETCH_EMAIL_FAILED;   
         }
+        /* Assembly Path To File */
+        path = GenerateFilename(id);
+        path = GeneratePathToFile(outputDir, path);
+        email = ParseEmail(id, email, false);
+        StoreEmail(email, path);
+        num_of_uids++;
 
     }
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
