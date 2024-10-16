@@ -10,6 +10,8 @@
 \usepackage{graphics}
 \usepackage{pdflscape}
 \usepackage{float}
+\usepackage{tabularx}
+\usepackage{array}
 
 
 \usepackage[unicode, hidelinks]{hyperref}
@@ -91,7 +93,29 @@ These parameters are used to define further behavior of the program and their de
 Then, from the user's point of view, the classes only need to call the Run method with the parameters 
 server address, port login and password. This method interacts with the server and its behaviour is as follows.
 
+\subsection{Program's Features}
+The program also contains some of the extra features, the first of which is that the client 
+saves a special \verb!.uidvalidity! file with the value \verb!UIDVALIDITY! when downloading 
+to a specific output directory for the first time, this value is used in case the user wants 
+to repeatedly download files to the same \verb!output directory! and have synchronized mailboxes. 
+On each subsequent run, the \verb!UIDVALIDITY! value is checked to see if it is the same locally 
+(in this \verb!.uidvalidity! file) and on the server, if the values are different, 
+it is a sign that the structure of the mailbox on the server has changed (i.e. the emails 
+have been removed or moved to another mailbox, etc.) and the output directory needs to be purged 
+and the emails downloaded again. This is done to ensure that the locally downloaded emails 
+are always synchronized with those on the server. 
+
+\smallskip
+
+The client always needs to have a specific \verb!output directory! to which it will download emails 
+from the IMAP server, it can happen that the user specifies his/her own location, but the 
+folder on the given path does not exist (for example \verb!-o /Desktop/email/my_mailbox/!) in 
+this case the client is able to create the folder on the given path 
+(for example \verb!/Desktop/email/my_mailbox/!) and store the emails in it.
+
+
 \newpage
+
 \subsection{Program Flow}
 Here Will Be Description.
 
@@ -127,56 +151,62 @@ Here Will Be Description.
 \end{figure}
 
 \newpage
+
 \section{Return Codes}
+The program is designed in such a way that in case of an error or failure, the user 
+is always informed about the situation that has occurred. In case of success the program 
+always returns the return value 0 (respectively \verb!SUCCESS!), in other cases the program gives the return 
+values according to the table below.
+
 \begin{center}
     \vspace{0.5cm} % % Space before table
-    \begin{tabular}{|c|c|c|}
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{6.5cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{1.5cm}|>{\raggedright\arraybackslash}X|}
         \hline
-        \textbf{Name} & \textbf{Data Type} & \textbf{Value} \\
+        \textbf{Name} & \textbf{Data Type} & \textbf{Value} & \textbf{Description} \\
         \hline
-        OUTPUT\_DIR\_NOT\_CREATED & int & -7 \\
+        OUTPUT\_DIR\_NOT\_CREATED & int & -7 & Output Directory Could Not Be Created \\
         \hline
-        UIDVALIDITY\_FILE\_NOT\_FOUND & int & -6 \\
+        UIDVALIDITY\_FILE\_NOT\_FOUND & int & -6 & .uidvalidity File Not Found \\
         \hline
-        UIDVALIDITY\_FILE\_ERROR & int & -5 \\
+        UIDVALIDITY\_FILE\_ERROR & int & -5 & Error With .uidvalidity File (Invalid Format, Out of Range) \\
         \hline
-        CREATE\_CONNECTION\_FAILED & int & -4 \\
+        CREATE\_CONNECTION\_FAILED & int & -4 & Failed to Create Connection With IMAP Server \\
         \hline
-        SSL\_CERT\_VERIFICATION\_FAILED & int & -3 \\
+        SSL\_CERT\_VERIFICATION\_FAILED & int & -3 & SSL Certificate Verification Failed \\
         \hline
-        FETCH\_EMAIL\_FAILED & int & -2 \\
+        FETCH\_EMAIL\_FAILED & int & -2 & Fetching Email By UID Failed \\
         \hline
-        SUCCESS & int & 0 \\
+        SUCCESS & int & 0 & Operation Was Successful \\
         \hline
-        NO\_IP\_ADDR\_FOUND & int & 1 \\
+        NO\_IP\_ADDR\_FOUND & int & 1 & No IPv4 Address Was Found \\
         \hline
-        PARSE\_ARGUMENTS\_FAILED & int & 2 \\
+        PARSE\_ARGUMENTS\_FAILED & int & 2 & Parsing Program's Arguments Failed \\
         \hline
-        PARSE\_CREDENTIALS\_FAILED & int & 3 \\
+        PARSE\_CREDENTIALS\_FAILED & int & 3 & Parsing Credentials Failed \\
         \hline
-        SERVER\_UNKNOWN\_RESPONSE & int & 4 \\
+        SERVER\_UNKNOWN\_RESPONSE & int & 4 & Server Sent an Unknown Response \\
         \hline
-        TRANSMIT\_DATA\_FAILED & int & 5 \\
+        TRANSMIT\_DATA\_FAILED & int & 5 & Transmission of Data Failed \\
         \hline
-        RECEIVE\_DATA\_FAILED & int & 6 \\
+        RECEIVE\_DATA\_FAILED & int & 6 & Reception of Data Failed \\
         \hline
-        RESPONSE\_NOT\_FOUND & int & 7 \\
+        RESPONSE\_NOT\_FOUND & int & 7 & Expected Server's Response Was Not Found \\
         \hline
-        PARSE\_BY\_REGEX\_FAILED & int & 8 \\
+        PARSE\_BY\_REGEX\_FAILED & int & 8 & Parsing of Regular Expression Failed \\
         \hline
-        NON\_UIDS\_RECEIVED & int & 9 \\
+        NON\_UIDS\_RECEIVED & int & 9 & No UIDs Were Received From The IMAP Server \\
         \hline
-        CONTINUE\_IN\_RECEIVING & int & 10 \\
+        CONTINUE\_IN\_RECEIVING & int & 10 & Continue Receiving More Data \\
         \hline
-        UNDEFINED\_STATE & int & 11 \\
+        UNDEFINED\_STATE & int & 11 & Undefined State Encountered \\
         \hline
-        UID\_VALIDITY\_ERROR\_IN\_RECV & int & 14 \\
+        UID\_VALIDITY\_ERROR\_IN\_RECV & int & 14 & Unable to Receive UIDVALIDITY From The Server \\
         \hline
-        REMOVAL\_OF\_EMAILS\_FAILED & int & 15 \\
+        REMOVAL\_OF\_EMAILS\_FAILED & int & 15 & Failed to Remove Emails When UIDVALIDITY Does Not Match \\
         \hline
-        BAD\_RESPONSE & string & "Bad Response :(" \\
+        BAD\_RESPONSE & string & "Bad Response :(" & Error During Receiving of Server's Response \\
         \hline
-    \end{tabular}
+    \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
 
