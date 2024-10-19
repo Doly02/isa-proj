@@ -41,6 +41,7 @@ ImapClientConfig::ImapClientConfig(int argc, char* argv[])
     port        = PORT_NON_SECURE;
     onlyHeaders = false;
     onlyNew     = false;
+    mailboxD    = DEFAULT_MAILBOX_DIR;
     
     certF       = EMPTY_STR;
     certD       = DEFAULT_SSL_CERT_LOC;
