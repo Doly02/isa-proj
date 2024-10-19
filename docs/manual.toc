@@ -4,5 +4,8 @@
 \contentsline {subsection}{\numberline {2.1}Implementation of Client}{2}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Program's Features}{2}{subsection.2.2}%
 \contentsline {subsection}{\numberline {2.3}Program Flow}{3}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Classes}{4}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Return Codes}{6}{section.3}%
+\contentsline {subsection}{\numberline {2.4}Classes}{5}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Testing}{7}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Testing of Local IMAP Servers}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Testing of Foreign IMAP Servers}{7}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Return Codes}{10}{section.4}%

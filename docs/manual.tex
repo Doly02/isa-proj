@@ -117,7 +117,23 @@ this case the client is able to create the folder on the given path
 \newpage
 
 \subsection{Program Flow}
-Here Will Be Description.
+The behaviour of the program has already been mentioned, this chapter contains a more detailed 
+description and the program flow diagram shows the behaviour of the client in graphical form.
+
+The program parses the program arguments at the beginning - find out how the client should be 
+configured. Next, a client is created according to the request, which establishes a connection 
+to the IMAP server using only \verb!TCP/IP! or a combination of \verb!TCP/IP! with \verb!SSL/TLS!.
+If the connection is established, it sends a \verb!LOGIN! command to the server, which should log 
+the user in. In case of successful login, the SELECT command selects the \verb!mailbox! from which 
+the user wants to download emails (note: the default is \verb!INBOX!), next, the \verb!UIDVALIDITY! 
+value is verified against the local copy (if the local copy does not exist in the 
+\verb!output directory!, it is created). Then all \verb!UIDs! related to the mailbox are retrieved using 
+the \verb!FETCH! command (the collection of retrieved \verb!UIDs! can be influenced by this parameter if the 
+\verb!'-n'! argument is used). After the set of \verb!UIDs! is obtained, the email download sequence 
+starts, the emails are downloaded one by one and the rest of the communication with the IMAP 
+client is removed. Finally, the email is stored in the output directory specified by the 
+\verb!'-o'! argument and the client repeats this process with the next email with a UID from 
+the set of pending emails.
 
 \begin{figure}[H]
     \centering
@@ -149,6 +165,77 @@ Here Will Be Description.
     \caption{Program Flow Diagram}
     \label{figure:imap-clients}
 \end{figure}
+
+\newpage
+
+\section{Testing}
+The \verb!imapcl! program has also been tested. The testing was performed in two ways, 
+the first one was tested using the local implementation of the IMAP server, the second 
+way was chosen to test on foreign IMAP servers provided by the school such as eva or merlin.
+
+\subsection{Testing of Local IMAP Servers}
+To ensure the correct operation of the program, \texttt{imapcl} was tested using a local 
+implementation of the IMAP server. The local IMAP server is available in the repository 
+in the tests folder under the name \texttt{imap\_server.py}. The server is implemented in Python 
+using the \texttt{os}, \texttt{socket}, \texttt{threading}, \texttt{subprocess}, 
+\texttt{time}, and \texttt{signal} libraries and handles all requests from the client 
+implementation such as \texttt{LOGIN}, \texttt{FETCH} (fetch support involves responding to 
+specific requests such as \texttt{'tag' UID 'x' FETCH BODY[HEADER]} or \texttt{'tag' UID 'x' FETCH BODY[TEXT]} 
+where \texttt{'tag'} is specific tag of the request and \texttt{'x'} is UID of the email), 
+\texttt{SELECT}, and \texttt{LOGOUT}.
+
+\subsection{Testing of Foreign IMAP Servers}
+As a complementary method, testing on foreign IMAP servers provided by the school, such as eva 
+or merlin, was chosen to ensure compatibility outside the local environment and to demonstrate 
+the usability of the program.
+
+\begin{center}
+    \vspace{0.5cm} % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
+        Compilation & eva & Successful compilation. & Successful compilation. \\
+        \hline
+        Auth. file parsing & eva & Auth. file successfully parsed & Auth. file successfully parsed. \\
+        \hline
+        Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & eva & Downloaded whole emails (including header and body), note: number emails on server was 1739. & Downloaded 1739 from server with headers and bodies. \\
+        \hline
+        Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. \\
+        \hline
+        Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} and path \texttt{PATH/output/} does not exists & eva & Downloaded whole emails (including header and body) and created output directory in \texttt{PATH/output/} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. in output directory \texttt{PATH/output/}. \\
+        \hline
+        Calling \texttt{./imapcl outlook.office365.com -T -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file thru SSL/TLS on port 993, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. Used SSL/TLS on default port 993.\\
+        \hline
+        Compilation & merlin & Successful Compilation & Successful Compilation \\
+        \hline
+        Auth. file parsing & merlin & Auth. file successfully parsed & Auth. file successfully parsed. \\
+        \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
+
+\begin{center}
+    \vspace{0.5cm} % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded whole emails (including header and body), note: number emails on server was 2349. & Downloaded 2349 from server with headers and bodies. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -h -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only headers, note: number emails on server was 2349. & Downloaded 2349 email headers from server. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (headers + bodies), note: number emails on server was 56. & Downloaded 56 new emails from server with headers and bodies. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -h -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (only headers), note: number emails on server was 56. & Downloaded 56 headers of new emails from server. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -g 143 -h -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Wrong argument \texttt{-g}, help on terminal should be printed. & Printed help to the user on terminal. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143} & merlin & A small number of arguments for calling the program. The error message should be displayed to the user. & Displayed the error message that informs user a small number of arguments for calling the program that were used.\\
+        \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
 
 \newpage
 
