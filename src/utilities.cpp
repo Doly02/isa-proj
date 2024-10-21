@@ -159,9 +159,9 @@ int ReadUIDVALIDITYFile(const std::string& filepath)
     }
 }
 
-std::string GenerateFilename(int uid)
+std::string GenerateFilename(int uid, std::string mailbox)
 {
-    return ("MSG_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
+    return ("MSG_" + mailbox + "_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
 }
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)

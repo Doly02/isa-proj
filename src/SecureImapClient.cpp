@@ -475,7 +475,8 @@ int SecureImapClient::CheckUIDValidity()
         /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
         
         /* Remove Email Files From Output Directory */
-        ret_val = RemoveFilesMatchingPattern(outputDir, "MSG_", OUTPUT_FILE_FORMAT);
+        std::string prefix = "MSG_" + mailbox + "_";
+        ret_val = RemoveFilesMatchingPattern(outputDir, prefix, OUTPUT_FILE_FORMAT);
         if (SUCCESS != ret_val)
         {
             return ret_val;
@@ -508,7 +509,7 @@ int SecureImapClient::FetchEmails()
     for (int id : this->vec_uids)
     {
         /* Assembly Path To File */
-        path = GenerateFilename(id);
+        path = GenerateFilename(id, mailbox);
         path = GeneratePathToFile(outputDir, path);
 
         /**

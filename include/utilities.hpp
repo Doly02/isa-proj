@@ -45,7 +45,7 @@ void StoreUIDVALIDITY(int uid_validity,std::string output_dir);
 
 int ReadUIDVALIDITYFile(const std::string& filepath);
 
-std::string GenerateFilename(int uid);
+std::string GenerateFilename(int uid, std::string mailbox);
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name);
 /**
