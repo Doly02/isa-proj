@@ -212,7 +212,7 @@ std::string SecureImapClient::ReceiveData(void)
     time.tv_usec = 0;               /* None Microsecs */
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
     {
-        std::cerr << "Error Setting Timeout for SSL_read() function.\n";
+        std::cerr << "ERR: Setting Timeout for SSL_read() function.\n";
         return BAD_RESPONSE;
     }
 
@@ -222,25 +222,28 @@ std::string SecureImapClient::ReceiveData(void)
         rx_data += rx_buffer;
 
         /* Check For The End of The Response */
-        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer)); 
+        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_data)); 
         if (SUCCESS == ret_val)
         {
             break;
         }
         else if (TRANSMIT_DATA_FAILED == ret_val)
         {
+            std::cerr << "ERR: Server Side Error Received." << std::endl;
             return BAD_RESPONSE;
         }
     }
 
     /* Disabled Timeout */
+    /*
     time.tv_sec = 0;
     time.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
     {
-        std::cerr << "Error Resetting Timeout for SSL_read() Function.\n";
+        std::cerr << "ERR: Resetting Timeout for SSL_read() Function.\n";
         return BAD_RESPONSE;
     }
+    */
 
     /* Handle Errors During Transmission */
     if (0 > bytes_rx)
@@ -248,11 +251,11 @@ std::string SecureImapClient::ReceiveData(void)
         int ssl_error = SSL_get_error(ssl, bytes_rx);
         if (SSL_ERROR_WANT_READ == ssl_error || SSL_ERROR_WANT_WRITE == ssl_error)
         {
-            std::cerr << "Error: Timeout While Receiving Data With SSL_read().\n";
+            std::cerr << "ERR: Timeout While Receiving Data With SSL_read().\n";
         }
         else
         {
-            std::cerr << "Error: Failed to Receive Data Over SSL - " << strerror(errno) << std::endl;
+            std::cerr << "ERR: Failed to Receive Data Over SSL - " << strerror(errno) << std::endl;
         }
         return EMPTY_STR;
     }
@@ -546,7 +549,7 @@ std::string SecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
-        std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
+        // std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
         return recv_data;
     }
 

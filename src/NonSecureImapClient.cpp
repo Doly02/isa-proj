@@ -122,7 +122,7 @@ std::string NonSecureImapClient::ReceiveData()
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)  //<! Setup of Socket Timeout
     {   
         /*TODO: Should I Close Socket? */
-        std::cerr << "Error Setting Timeout For recv() Function." << std::endl;
+        std::cerr << "ERR: Setting Timeout For recv() Function." << std::endl;
         return BAD_RESPONSE;
     }
 
@@ -131,13 +131,15 @@ std::string NonSecureImapClient::ReceiveData()
 
         rx_buffer[bytes_rx] = '\0';
         rx_data += rx_buffer;
-        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_buffer));
+        
+        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_data));
         if (SUCCESS == ret_val)
         {
             break;
         }
         else if (TRANSMIT_DATA_FAILED == ret_val)
         {
+            std::cerr << "ERR: Server Side Error Received." << std::endl; //TODO:
             return BAD_RESPONSE;
         }
     }
@@ -147,10 +149,11 @@ std::string NonSecureImapClient::ReceiveData()
     {
         if (EAGAIN == errno || EWOULDBLOCK == errno) 
         {    
-            std::cerr << "Error: Timeout Overrun While Receiving Data - recv() Timeout." << std::endl;
-        } else 
+            std::cerr << "ERR: Timeout Overrun While Receiving Data - recv() Timeout." << std::endl;
+        } 
+        else 
         {        
-            std::cerr << "Error Receiving Data: " << strerror(errno) << std::endl;
+            std::cerr << "ERR: Receiving Data: " << strerror(errno) << std::endl;
         }
         return EMPTY_STR;
     }
@@ -441,7 +444,7 @@ std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
-        std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
+        // std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
         return recv_data;
     }
 
@@ -457,7 +460,7 @@ std::string NonSecureImapClient::ParseEmail(int uid, std::string email, bool jus
 
     if (false == just_headers)
     {
-        email_body = FetchEmailByUID(uid, JUST_HEADER);
+        email_body = FetchEmailByUID(uid, JUST_HEADER); // TODO: Check Return Value
         tag = GetTag();
         email_body = ParseEmailBody(email_body, tag);
     }
