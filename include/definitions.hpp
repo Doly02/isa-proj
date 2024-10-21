@@ -182,14 +182,14 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  */
 #define SECURE                      (true)
 /**
- * @brief Default Port for Non-Secure Mode If Client Not Specify.
+ * @brief Default Port for Secure Mode If Client Not Specify.
  */
-#define PORT_NON_SECURE             (143)
+#define PORT_SECURE                 (993)
 /**
  * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
  * @details Used Only for Non-Secure Client Mode.
  */
-#define TIMEOUT_NON_SECURE          (5)
+#define TIMEOUT_NON_SECURE          (20)
 
 /***************************************************************/
 /*                  Specific For Secure Mode                   */
@@ -199,14 +199,14 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
  */
 #define NON_SECURE                  (false)
 /**
- * @brief Default Port for Secure Mode If Client Not Specify.
+ * @brief Default Port for Non-Secure Mode If Client Not Specify.
  */
-#define PORT_SECURE                 (993)
+#define PORT_NON_SECURE             (143)
 /**
  * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
  * @details Used Only for Secure Client Mode.
  */
-#define TIMEOUT_SECURE              (10)
+#define TIMEOUT_SECURE              (30)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
