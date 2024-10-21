@@ -94,6 +94,8 @@ Then, from the user's point of view, the classes only need to call the Run metho
 server address, port login and password. This method interacts with the server and its behaviour is as follows.
 
 \subsection{Program's Features}
+
+\subsubsection{Usage of UIDVALIDITY Value}
 The program also contains some of the extra features, the first of which is that the client 
 saves a special \verb!.uidvalidity! file with the value \verb!UIDVALIDITY! when downloading 
 to a specific output directory for the first time, this value is used in case the user wants 
@@ -105,16 +107,41 @@ have been removed or moved to another mailbox, etc.) and the output directory ne
 and the emails downloaded again. This is done to ensure that the locally downloaded emails 
 are always synchronized with those on the server. 
 
-\smallskip
-
+\subsubsection{Creation of Output Directory}
 The client always needs to have a specific \verb!output directory! to which it will download emails 
 from the IMAP server, it can happen that the user specifies his/her own location, but the 
 folder on the given path does not exist (for example \verb!-o /Desktop/email/my_mailbox/!) in 
 this case the client is able to create the folder on the given path 
-(for example \verb!/Desktop/email/my_mailbox/!) and store the emails in it.
+(in this example on \verb!/Desktop/email/my_mailbox/!) and store the emails in it.
 
+\subsubsection{Store Emails From Multiple Mailboxes Into One Output Directory}
+The user of \verb!imapcl! has the possibility to download emails from several mailboxes 
+into one \verb!output! directory, the names of output files with saved emails are defined 
+according to the \verb!UID value! of the given email and according to the \verb!mailbox! 
+to which the email is saved. it is highly recommended not to mix emails e.g. from two IMAP 
+servers into one output directory, in case of a mailbox name match the emails from the previous 
+download will be deleted and replaced by the current download.
 
-\newpage
+\subsubsection{Gentle Download}
+The program also introduces a \verb!gentle download!, i.e. emails are downloaded only if the 
+emails are downloaded to a given output directory for the first time, or the structure of 
+the local copy of the mailbox or the structure on the IMAP server has changed. For example, 
+in a local folder where emails have been downloaded once before, some email(s) in the folder 
+have been removed (perhaps by mistake) or the mailbox on the IMAP server has been modified 
+and the \verb!UIDVALIDITY! value has changed. The client is always in sync with the IMAP server.
+
+\subsubsection{What If Server Does Sends Any Response?}
+In order to prevent the program from freezing due to waiting for a response from the server, 
+a timeout is set on the sockets (20 seconds for the unsecure version of the program, 
+30 seconds for the secure version). These values can be configured using the macros 
+\verb!TIMEOUT_NON_SECURE! and \verb!TIMEOUT_SECURE! in the \textbf{\textit{definitions.hpp}} 
+file located in the \textbf{\textit{include}} folder.
+
+\subsection{Known Limitations}
+A user's mailbox can often be bulky and contain a number of large emails whose size can exceed 30MB, 
+in which case it was observed during testing that downloading the entire mailbox can take a 
+considerable amount of time and should be taken into account. 
+
 
 \subsection{Program Flow}
 The behaviour of the program has already been mentioned, this chapter contains a more detailed 
@@ -130,10 +157,10 @@ value is verified against the local copy (if the local copy does not exist in th
 \verb!output directory!, it is created). Then all \verb!UIDs! related to the mailbox are retrieved using 
 the \verb!FETCH! command (the collection of retrieved \verb!UIDs! can be influenced by this parameter if the 
 \verb!'-n'! argument is used). After the set of \verb!UIDs! is obtained, the email download sequence 
-starts, the emails are downloaded one by one and the rest of the communication with the IMAP 
-client is removed. Finally, the email is stored in the output directory specified by the 
-\verb!'-o'! argument and the client repeats this process with the next email with a UID from 
-the set of pending emails.
+starts, the emails are downloaded one by one only - if is not yet downloaded locally into this specific output directory 
+and the rest of the communication with the IMAP client is removed. Finally, the email is stored 
+in the output directory specified by the \verb!'-o'! argument and the client repeats this 
+process with the next email with a UID from the set of pending emails.
 
 \begin{figure}[H]
     \centering
@@ -173,7 +200,7 @@ The \verb!imapcl! program has also been tested. The testing was performed in two
 the first one was tested using the local implementation of the IMAP server, the second 
 way was chosen to test on foreign IMAP servers provided by the school such as eva or merlin.
 
-\subsection{Testing of Local IMAP Servers}
+\subsection{Testing of Local IMAP Server}
 To ensure the correct operation of the program, \texttt{imapcl} was tested using a local 
 implementation of the IMAP server. The local IMAP server is available in the repository 
 in the tests folder under the name \texttt{imap\_server.py}. The server is implemented in Python 
@@ -205,12 +232,6 @@ the usability of the program.
         \hline
         Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} and path \texttt{PATH/output/} does not exists & eva & Downloaded whole emails (including header and body) and created output directory in \texttt{PATH/output/} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. in output directory \texttt{PATH/output/}. \\
         \hline
-        Calling \texttt{./imapcl outlook.office365.com -T -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file thru SSL/TLS on port 993, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. Used SSL/TLS on default port 993.\\
-        \hline
-        Compilation & merlin & Successful Compilation & Successful Compilation \\
-        \hline
-        Auth. file parsing & merlin & Auth. file successfully parsed & Auth. file successfully parsed. \\
-        \hline
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
@@ -220,6 +241,12 @@ the usability of the program.
     \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
         \hline
         \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
+        Calling \texttt{./imapcl outlook.office365.com -T -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file thru SSL/TLS on port 993, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. Used SSL/TLS on default port 993.\\
+        \hline
+        Compilation & merlin & Successful Compilation & Successful Compilation \\
+        \hline
+        Auth. file parsing & merlin & Auth. file successfully parsed & Auth. file successfully parsed. \\
         \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded whole emails (including header and body), note: number emails on server was 2349. & Downloaded 2349 from server with headers and bodies. \\
         \hline

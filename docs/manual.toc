@@ -3,9 +3,15 @@
 \contentsline {section}{\numberline {2}Implementation Details}{2}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Implementation of Client}{2}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Program's Features}{2}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Program Flow}{3}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Classes}{5}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.1}Usage of UIDVALIDITY Value}{2}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Creation of Output Directory}{3}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Store Emails From Multiple Mailboxes Into One Output Directory}{3}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Gentle Download}{3}{subsubsection.2.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.5}What If Server Does Sends Any Response?}{3}{subsubsection.2.2.5}%
+\contentsline {subsection}{\numberline {2.3}Known Limitations}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Program Flow}{3}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Classes}{5}{subsection.2.5}%
 \contentsline {section}{\numberline {3}Testing}{7}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Testing of Local IMAP Servers}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.1}Testing of Local IMAP Server}{7}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Testing of Foreign IMAP Servers}{7}{subsection.3.2}%
-\contentsline {section}{\numberline {4}Return Codes}{10}{section.4}%
+\contentsline {section}{\numberline {4}Return Codes}{9}{section.4}%
