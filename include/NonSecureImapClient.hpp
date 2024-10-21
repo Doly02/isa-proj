@@ -131,9 +131,37 @@ class NonSecureImapClient : public BaseImapClient
          */
         int FetchUIDs(void);
         
+        /**
+         * @brief       Retrieves The UIDVALIDITY From The IMAP Server.
+         * 
+         * @details     This Function Sends The "SELECT" Command To The IMAP Server, Which Retrieves 
+         * The UIDVALIDITY Value Of The Mailbox. The UIDVALIDITY Is Used To Validate The 
+         * State Of The Mailbox. If The UIDVALIDITY Value Changes, It Indicates That The 
+         * Mailbox's UIDs May Have Been Invalidated, Requiring A Full Resynchronization.
+         * 
+         * @retval SUCCESS If The UIDVALIDITY Was Successfully Retrieved And Stored.
+         * @retval TRANSMIT_DATA_FAILED If Sending The Command To The Server Failed.
+         * @retval RECEIVE_DATA_FAILED If Receiving The Response From The Server Failed.
+         * @retval UID_VALIDITY_ERROR_IN_RECV If An Error Occurs When Parsing Or Processing The UIDVALIDITY Value.
+         */
         int GetUIDValidity(void);
 
+        /**
+         * @brief       Checks The UIDVALIDITY And Compares It With The Locally Stored Value.
+         * 
+         * @details     This Function Retrieves The UIDVALIDITY From The IMAP Server Using `GetUIDValidity()`
+         * And Compares It With The Locally Stored Value. If The Values Differ, It Indicates
+         * That The Mailbox's UIDs Have Changed, So It Deletes All Stored Email Files And Resynchronizes.
+         * If There Is No Local UIDVALIDITY File, It Treats It As The First Synchronization.
+         * 
+         * @retval SUCCESS If UIDVALIDITY Matches Or The Resynchronization Was Successful.
+         * @retval TRANSMIT_DATA_FAILED If Sending The Command To The Server Failed.
+         * @retval RECEIVE_DATA_FAILED If Receiving The Response From The Server Failed.
+         * @retval UID_VALIDITY_ERROR_IN_RECV If An Error Occurs When Parsing Or Processing The UIDVALIDITY Value.
+         * @retval REMOVAL_OF_EMAILS_FAILED If Removing The Emails From The Output Directory Fails.
+         */
         int CheckUIDValidity(void);
+
         /**
         * @brief    Fetches Emails From The Connected Mailbox.
         * @details  Downloads Emails From The Specified Mailbox and Saves Them To The Output Directory.
