@@ -507,18 +507,31 @@ int SecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        email = EMPTY_STR;
-        email = FetchEmailByUID(id, WHOLE_MESSAGE);
-        if (EMPTY_STR == email)
-        {
-            return FETCH_EMAIL_FAILED;   
-        }
         /* Assembly Path To File */
         path = GenerateFilename(id);
         path = GeneratePathToFile(outputDir, path);
-        email = ParseEmail(id, email, false);
-        StoreEmail(email, path);
-        num_of_uids++;
+
+        /**
+         * If File Exists, Email Does Not Have To Be Downloaded Again.
+         * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
+         */
+        if (false == FileExists(path))
+        {
+            email = EMPTY_STR;
+            email = FetchEmailByUID(id, WHOLE_MESSAGE);
+            if (EMPTY_STR == email)
+            {
+                return FETCH_EMAIL_FAILED;   
+            }
+            email = ParseEmail(id, email, false);
+            if (EMPTY_STR == email)
+            {
+                return FETCH_EMAIL_FAILED;   
+            }
+            StoreEmail(email, path);
+            num_of_uids++;
+        }
+
     }
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;
