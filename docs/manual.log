@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  22 OCT 2024 00:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  28 OCT 2024 11:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -543,40 +543,32 @@ LaTeX Font Info:    Trying to load font information for T1+pcr on input line 58
 .
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
-Overfull \hbox (31.34349pt too wide) in paragraph at lines 68--72
-\T1/ptm/m/n/10.95 gin-ning when the class is in-stan-ti-ated they re-ceive in-f
-or-ma-tion like [][]\T1/pcr/m/n/10.95 MailBox[]\T1/ptm/m/n/10.95 , [][]\T1/pcr/
-m/n/10.95 OutputDirectory[]\T1/ptm/m/n/10.95 , [][]\T1/pcr/m/n/10.95 HeadersOnl
-y
- []
-
-
-Overfull \hbox (9.00415pt too wide) in paragraph at lines 99--109
-\T1/ptm/m/n/10.95 first time, this value is used in case the user wants to re-p
-eat-edly down-load files to the same [][]\T1/pcr/m/n/10.95 output directory
- []
-
-[2]
+) [2]
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
+26.
+ (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+) [3]
 File: program-flow-diagram.eps Graphic file (type eps)
- <program-flow-diagram.eps> [3] [4]
+
+<program-flow-diagram.eps> [4] [5]
 File: ClientConfig.eps Graphic file (type eps)
- <ClientConfig.eps>
+ <ClientConfig.eps> [6]
 File: ImapClient.eps Graphic file (type eps)
  <ImapClient.eps>
-Overfull \hbox (42.04112pt too wide) in paragraph at lines 191--192
+Overfull \hbox (42.04112pt too wide) in paragraph at lines 255--256
  [][] 
  []
 
-[5] [6]
-Overfull \hbox (10.66832pt too wide) in paragraph at lines 204--213
+[7]
+Overfull \hbox (10.66832pt too wide) in paragraph at lines 268--277
 \T1/ptm/m/n/10.95 server. The lo-cal IMAP server is avail-able in the repos-i-t
 ory in the tests folder un-der the name \T1/pcr/m/n/10.95 imap_server.py\T1/ptm
 /m/n/10.95 .
  []
 
 
-Overfull \hbox (3.43326pt too wide) in paragraph at lines 204--213
+Overfull \hbox (3.43326pt too wide) in paragraph at lines 268--277
 \T1/ptm/m/n/10.95 The server is im-ple-mented in Python us-ing the \T1/pcr/m/n/
 10.95 os\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 socket\T1/ptm/m/n/10.95 , \T1/pcr
 /m/n/10.95 threading\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 subprocess\T1/ptm/m/n
@@ -585,18 +577,18 @@ Overfull \hbox (3.43326pt too wide) in paragraph at lines 204--213
  []
 
 
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 235--235
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 339--339
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
-
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 263--263
+[8]
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 363--363
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
-[7] [8]
+[9] [10]
 No file manual.bbl.
-[9] (./manual.aux)
+[11] (./manual.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -605,16 +597,22 @@ L3 programming layer <2024-01-22>
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package rerunfilecheck Info: File `manual.out' has not changed.
-(rerunfilecheck)             Checksum: 2A447C3833DA159D0D9BFE817DA008AB;2811.
+
+Package rerunfilecheck Warning: File `manual.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `manual.out':
+(rerunfilecheck)             Before: 8077FA7B282B8E7753BDEE1D09D4C549;3228
+(rerunfilecheck)             After:  30DB426B2CF87A491FCE12666466B03C;3233.
  ) 
 Here is how much of TeX's memory you used:
- 12738 strings out of 474223
- 204356 string characters out of 5748758
+ 12771 strings out of 474223
+ 204924 string characters out of 5748758
  1944972 words of memory out of 5000000
- 34805 multiletter control sequences out of 15000+600000
- 589356 words of font info for 63 fonts, out of 8000000 for 9000
+ 34834 multiletter control sequences out of 15000+600000
+ 589670 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,8n,79p,1023b,573s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on manual.dvi (10 pages, 45968 bytes).
+Output written on manual.dvi (12 pages, 57500 bytes).

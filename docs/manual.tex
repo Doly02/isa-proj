@@ -67,8 +67,9 @@ a hostname to an IPv4 address.
 \subsection{Implementation of Client}
 The NonSecureImapClient and SecureClient classes are characterized by their very 
 similar behavior, at the beginning when the class is instantiated they receive information 
-like \verb!MailBox!, \verb!OutputDirectory!, \verb!HeadersOnly! and \verb!NewOnly! as input parameters. 
-These parameters are used to define further behavior of the program and their description is given in table below.
+like \verb!MailBox!, \verb!OutputDirectory!, \\ 
+\verb!HeadersOnly! and \verb!NewOnly! as input parameters. These parameters are used to define 
+further behavior of the program and their description is given in table below.
 
 \smallskip
 
@@ -99,13 +100,39 @@ server address, port login and password. This method interacts with the server a
 The program also contains some of the extra features, the first of which is that the client 
 saves a special \verb!.uidvalidity! file with the value \verb!UIDVALIDITY! when downloading 
 to a specific output directory for the first time, this value is used in case the user wants 
-to repeatedly download files to the same \verb!output directory! and have synchronized mailboxes. 
+to repeatedly download files to the same \verb!output! \verb!directory! and have synchronized mailboxes. 
 On each subsequent run, the \verb!UIDVALIDITY! value is checked to see if it is the same locally 
 (in this \verb!.uidvalidity! file) and on the server, if the values are different, 
 it is a sign that the structure of the mailbox on the server has changed (i.e. the emails 
 have been removed or moved to another mailbox, etc.) and the output directory needs to be purged 
-and the emails downloaded again. This is done to ensure that the locally downloaded emails 
-are always synchronized with those on the server. 
+and the emails downloaded again. 
+The \verb!.uidvalidity! file is formatted according to the rule that each \verb!mailbox! has its 
+corresponding line, which contains the mailbox name followed by the equal and finally the 
+\verb!uidvalidity value! for the given mailbox. Note that the file is not associated with the 
+name of the IMAP server or user account, so it is recommended to download only emails from 
+multiple mailboxes of one account to one output directory to maintain clarity and easy orientation 
+in the application output.
+
+An example of the `.uidvalidity` file content:
+
+\begin{verbatim}
+INBOX=1662988148
+SPECIFIC_MAILBOX1=1662988155
+SPECIFIC_MAILBOX2=1362922155
+\end{verbatim}
+
+In this example:
+\begin{itemize}
+    \item \texttt{INBOX=1662988148} indicates that the \texttt{uidvalidity} value for the "INBOX" mailbox is\\ \texttt{1662988148}.
+    \item \texttt{SPECIFIC\_MAILBOX1=1662988155} indicates that the \texttt{uidvalidity} value\\ 
+    for the "SPECIFIC\_MAILBOX1" mailbox is \texttt{1662988155}.
+    \item \texttt{SPECIFIC\_MAILBOX2=1362922155} indicates that the \texttt{uidvalidity} value\\
+     for the "SPECIFIC\_MAILBOX2" mailbox is \texttt{1362922155}.
+\end{itemize}
+
+This is done to ensure that the locally downloaded emails are always synchronized with those 
+on the server and to allow users to download emails from multiple mailboxes to a single output 
+directory. 
 
 \subsubsection{Creation of Output Directory}
 The client always needs to have a specific \verb!output directory! to which it will download emails 
@@ -123,7 +150,7 @@ servers into one output directory, in case of a mailbox name match the emails fr
 download will be deleted and replaced by the current download.
 
 \subsubsection{Gentle Download}
-The program also introduces a \verb!gentle download!, i.e. emails are downloaded only if the 
+The program also introduces a \textbf{gentle download}, i.e. emails are downloaded only if the 
 emails are downloaded to a given output directory for the first time, or the structure of 
 the local copy of the mailbox or the structure on the IMAP server has changed. For example, 
 in a local folder where emails have been downloaded once before, some email(s) in the folder 
@@ -142,6 +169,28 @@ A user's mailbox can often be bulky and contain a number of large emails whose s
 in which case it was observed during testing that downloading the entire mailbox can take a 
 considerable amount of time and should be taken into account. 
 
+\subsection{Adjustable Definitions}
+The relevant adjustable definitions are defined in the \textbf{\textit{definitions.hpp}} file in the \textbf{\textit{include}} folder. 
+Some of them can be modified according to the user's needs, here is the content of the 
+editable definitions:
+
+\begin{itemize}
+    \item \texttt{PORT\_NON\_SECURE} - Default port for non-secure mode if the client does not specify one. The default value is \texttt{143}.
+    
+    \item \texttt{TIMEOUT\_SECURE} - Timeout for receiving data from the IMAP server in secure mode, defined in seconds. The default value is \texttt{30s}.
+    
+    \item \texttt{DEFAULT\_SSL\_CERT\_LOC} - Default location of SSL certificates, set to \texttt{/etc/ssl/certs}.
+    
+    \item \texttt{DEFAULT\_MAILBOX\_DIR} - Default mailbox directory, set to \texttt{INBOX}.
+    
+    \item \texttt{UIDVALIDITY\_FILE} - Filename for storing UID validity information, set to \texttt{.uidvalidity.txt}.
+    
+    \item \texttt{PORT\_SECURE} - Default port for secure mode if the client does not specify one. The default value is \texttt{993}.
+    
+    \item \texttt{TIMEOUT\_NON\_SECURE} - Timeout for receiving data from the IMAP server in non-secure mode, defined in seconds. The default value is \texttt{20s}.
+    
+    \item \texttt{OUTPUT\_FILE\_FORMAT} - Format for output files, set to \texttt{.log}.
+\end{itemize}
 
 \subsection{Program Flow}
 The behaviour of the program has already been mentioned, this chapter contains a more detailed 
@@ -173,32 +222,47 @@ process with the next email with a UID from the set of pending emails.
 
 \newpage
 \subsection{Classes}
-Here Will Be Description.
+This section contains a visualization of the main program classes using a diagram based on 
+the use-case diagram. The aim of these diagrams was to capture the individual classes and the 
+methods/operations they allow.
+
+\subsubsection{ClientConfig}
+A class for processing user arguments, which is also responsible for storing the configuration 
+of the future IMAP Client.
 
 \begin{figure}[H]
     \centering
     \scalebox{0.5}{
         \includegraphics{ClientConfig.eps}
     }
-    \caption{Program Flow Diagram}
+    \caption{Class ClientConfig and ClientConfig Methods}
     \label{figure:client-config}
 \end{figure}
+
+\newpage
+
+\subsubsection{ImapClients}
+Here it may be seen that both \verb!SecureImapClient! and \verb!NonSecureImapClient! 
+have a common ancestor, which is \verb!BaseImapClient! - providing common methods for 
+both successors. On the basis of the configuration, an instance of the \verb!SecureImapClient! 
+or \verb!NonSecureImapClient! class is created, it is responsible for taking care of 
+the whole process of communication with the IMAP server and storing the results.
 
 \begin{figure}[H]
     \centering
     \scalebox{0.4}{
         \includegraphics{ImapClient.eps}
     }
-    \caption{Program Flow Diagram}
+    \caption{ImapClient's Classes and Methods}
     \label{figure:imap-clients}
 \end{figure}
-
-\newpage
 
 \section{Testing}
 The \verb!imapcl! program has also been tested. The testing was performed in two ways, 
 the first one was tested using the local implementation of the IMAP server, the second 
 way was chosen to test on foreign IMAP servers provided by the school such as eva or merlin.
+
+\newpage
 
 \subsection{Testing of Local IMAP Server}
 To ensure the correct operation of the program, \texttt{imapcl} was tested using a local 
@@ -210,6 +274,36 @@ implementation such as \texttt{LOGIN}, \texttt{FETCH} (fetch support involves re
 specific requests such as \texttt{'tag' UID 'x' FETCH BODY[HEADER]} or \texttt{'tag' UID 'x' FETCH BODY[TEXT]} 
 where \texttt{'tag'} is specific tag of the request and \texttt{'x'} is UID of the email), 
 \texttt{SELECT}, and \texttt{LOGOUT}.
+
+The tests folder also contains the test\_emails folder with sample emails that are sent to 
+the IMAP client, at the same time these emails are used to compare what was sent with what 
+was received on the IMAP client, the contents should be the same - the result of the 
+comparison is displayed in the output of the script \texttt{imap\_server.py}.
+
+The local IMAP server was used for basic testing of the application functionality, 
+and at a later stage of development it was used to simulate errors and unusual conditions 
+that can occur during communication between client and server.
+
+\begin{center}
+    \vspace{0.5cm} % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Testcase} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
+        Server does not responds to \texttt{LOGIN} command. & Program should exit with \texttt{BAD\_RESPONSE} error code. & Program ends with \texttt{BAD\_RESPONSE} error code. \\
+        \hline
+        Server sends different end of response string (e.g. not \texttt{TAG OK FETCH Completed} but \texttt{TAG OK fetch}). & Client should handle this kind change and continue. & Client successfully proceeds and completes its download. \\
+        \hline
+        Server sends different \texttt{.uidvalidity} value for mailbox. & Output directory should be cleared and emails should be downloaded again. & Output directory is cleared and emails are downloaded again. \\
+        \hline
+        Server does not respond at all. & Client should successfully end and print error message on stderr. & Client successfully ends and prints error message on stderr.  \\
+        \hline
+        Stress test, sending three emails, size of each of them 33MB. & Emails successfully downloaded. & Emails were successfully downloaded. Note: Speed was not great. \\
+        \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
+
 
 \subsection{Testing of Foreign IMAP Servers}
 As a complementary method, testing on foreign IMAP servers provided by the school, such as eva 
@@ -232,16 +326,6 @@ the usability of the program.
         \hline
         Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} and path \texttt{PATH/output/} does not exists & eva & Downloaded whole emails (including header and body) and created output directory in \texttt{PATH/output/} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. in output directory \texttt{PATH/output/}. \\
         \hline
-    \end{tabularx}
-    \vspace{0.5cm} % Space after table
-\end{center}
-
-\begin{center}
-    \vspace{0.5cm} % Space before table
-    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
-        \hline
-        \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
-        \hline
         Calling \texttt{./imapcl outlook.office365.com -T -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file thru SSL/TLS on port 993, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. Used SSL/TLS on default port 993.\\
         \hline
         Compilation & merlin & Successful Compilation & Successful Compilation \\
@@ -252,7 +336,23 @@ the usability of the program.
         \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -h -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only headers, note: number emails on server was 2349. & Downloaded 2349 email headers from server. \\
         \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
+
+\begin{center}
+    \vspace{0.5cm} % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (headers + bodies), note: number emails on server was 56. & Downloaded 56 new emails from server with headers and bodies. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b BOX1 -o PATH/output/} & merlin & Two emails should be downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} should be stored into \texttt{.uidvalidity.txt} & Two emails were downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} were saved into \texttt{.uidvalidity.txt} \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -T -p 993 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & For SSL cetificates should be used default location - \texttt{/etc/ssl/certs}. & Used default location for SSL certificates, \texttt{/etc/ssl/certs}. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -T -p 993 -n -a PATH/auth\_file.txt -b BOX1 -o PATH/output/} with stored all emails from mailbox and right value of \texttt{UIDVALIDITY} & merlin & Zero emails should be downloaded & Zero emails downloaded. \\
         \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -h -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (only headers), note: number emails on server was 56. & Downloaded 56 headers of new emails from server. \\
         \hline

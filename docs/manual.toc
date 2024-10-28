@@ -8,10 +8,13 @@
 \contentsline {subsubsection}{\numberline {2.2.3}Store Emails From Multiple Mailboxes Into One Output Directory}{3}{subsubsection.2.2.3}%
 \contentsline {subsubsection}{\numberline {2.2.4}Gentle Download}{3}{subsubsection.2.2.4}%
 \contentsline {subsubsection}{\numberline {2.2.5}What If Server Does Sends Any Response?}{3}{subsubsection.2.2.5}%
-\contentsline {subsection}{\numberline {2.3}Known Limitations}{3}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Program Flow}{3}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Classes}{5}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.3}Known Limitations}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Adjustable Definitions}{4}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Program Flow}{4}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Classes}{6}{subsection.2.6}%
+\contentsline {subsubsection}{\numberline {2.6.1}ClientConfig}{6}{subsubsection.2.6.1}%
+\contentsline {subsubsection}{\numberline {2.6.2}ImapClients}{7}{subsubsection.2.6.2}%
 \contentsline {section}{\numberline {3}Testing}{7}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Testing of Local IMAP Server}{7}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Testing of Foreign IMAP Servers}{7}{subsection.3.2}%
-\contentsline {section}{\numberline {4}Return Codes}{9}{section.4}%
+\contentsline {subsection}{\numberline {3.1}Testing of Local IMAP Server}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Testing of Foreign IMAP Servers}{8}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Return Codes}{11}{section.4}%
