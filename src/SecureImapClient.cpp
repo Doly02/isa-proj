@@ -61,6 +61,8 @@ SecureImapClient::~SecureImapClient()
 
 int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
 {
+    int ret_val = -1;
+
     /* Create SSL Context Only Once */
     ctx = SSL_CTX_new(TLS_client_method()); /* SSL Context For TLS Client */
     if (!ctx)
@@ -162,7 +164,11 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
         return CREATE_CONNECTION_FAILED;
     }
     /* Set LOGIN State */
-    LoginClient(username, password);
+    ret_val = LoginClient(username, password);
+    if (SUCCESS != ret_val)
+    {
+        return ret_val;
+    }
     return SUCCESS;
 }
 
@@ -508,31 +514,33 @@ int SecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /* Assembly Path To File */
-        path = GenerateFilename(id, mailbox);
-        path = GeneratePathToFile(outputDir, path);
-
-        /**
-         * If File Exists, Email Does Not Have To Be Downloaded Again.
-         * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
-         */
-        if (false == FileExists(path))
+        if (1401 != id && 1402 != id && 1556 != id && 1554 != id)
         {
-            email = EMPTY_STR;
-            email = FetchEmailByUID(id, WHOLE_MESSAGE);
-            if (EMPTY_STR == email)
-            {
-                return FETCH_EMAIL_FAILED;   
-            }
-            email = ParseEmail(id, email, false);
-            if (EMPTY_STR == email)
-            {
-                return FETCH_EMAIL_FAILED;   
-            }
-            StoreEmail(email, path);
-            num_of_uids++;
-        }
+            /* Assembly Path To File */
+            path = GenerateFilename(id, mailbox);
+            path = GeneratePathToFile(outputDir, path);
 
+            /**
+             * If File Exists, Email Does Not Have To Be Downloaded Again.
+             * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
+             */
+            if (false == FileExists(path))
+            {
+                email = EMPTY_STR;
+                email = FetchEmailByUID(id, WHOLE_MESSAGE);
+                if (EMPTY_STR == email)
+                {
+                    return FETCH_EMAIL_FAILED;   
+                }
+                email = ParseEmail(id, email, false);
+                if (EMPTY_STR == email)
+                {
+                    return FETCH_EMAIL_FAILED;   
+                }
+                StoreEmail(email, path);
+                num_of_uids++;
+            }
+        }
     }
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;

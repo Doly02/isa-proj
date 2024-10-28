@@ -31,6 +31,7 @@ NonSecureImapClient::NonSecureImapClient(const std::string& MailBox, const std::
 
 int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
 {
+    int ret_val = -1;
     std::string server_ip = serverAddress;
     bool is_ipv4_addr = IsIPv4Address(serverAddress);
 
@@ -77,9 +78,14 @@ int NonSecureImapClient::ConnectImapServer(const std::string& serverAddress, con
             sockfd = -1;
             return CREATE_CONNECTION_FAILED;
         }
+        
         curr_state = LOGIN;
         /* Send Login Command To IMAP Server */
-        LoginClient(username, password);
+        ret_val = LoginClient(username, password);
+        if (SUCCESS != ret_val)
+        {
+            return ret_val;
+        }
 
         curr_state = DEFAULT;
         return SUCCESS; 
