@@ -7,6 +7,24 @@ The goal of this project in the subject Network Applications and Network Adminis
 
 ## Table of contents
 - [Requirements](#requirements)
+    - [Compiler](#compiler)
+    - [Libraries](#libraries)
+    - [Build tools](#build-tools)
+    - [Operation system](#operating-system)
+- [Installation](#installation)
+- [Project Organization](#project-organization)
+- [Using the `imapcl` Program](#using-the-imapcl-program)
+    - [Required Parameters](#required-parameters)
+    - [Optional Parameters](#optional-parameters)
+    - [Authentication File Format](#authentication-file-format)
+- [IMAP in Email Services and How It's Used](#imap-in-email-services-and-how-its-used)
+    - [Internet Message Access Protocol](#internet-message-access-protocol)
+    - [How IMAP Works?](#how-imap-works)
+- [Program's Features](#programs-features)
+    - [UIDVALIDITY](#uidvalidity)
+    - [Handling Non-Existent Output Directory](#handling-non-existent-output-directory)
+    - [Storing The Contents of Multiple Mailboxes In One Folder](#storing-the-contents-of-multiple-mailboxes-in-one-folder)
+    - [Gentle Downloading](#gentle-downloading)
 - [Resources](#resources)
 
 ## Requirements
@@ -114,7 +132,7 @@ While IMAP enhances flexibility, it does come with security considerations. By d
 ### How IMAP Works?
 IMAP establishes a connection between the email client and server. In most email applications, IMAP allows users to view email headers quickly and download full messages only when selected, which conserves data. Outgoing emails, on the other hand, are sent via the Simple Mail Transfer Protocol (SMTP), which handles message delivery to the recipient. [7] [8]
 
-## Features 
+## Program's Features 
 
 ### UIDVALIDITY
 The `imapcl` program uses the `UIDVALIDITY` values obtained from the IMAP server. This value indicates the status of a given mailbox for a given account. When downloading to a specific output directory for the first time, the `UIDVALIDITY` value is stored into `.uidvalidity.txt` file, this value is used in case the user wants to repeatedly download files to the same `output directory` and have synchronized mailboxes. On each subsequent run, the `UIDVALIDITY` value is checked to see if it is the same locally (in this `.uidvalidity!` file) and on the IMAP server, if the values are different, it is a sign that the structure of the mailbox on the server has changed (i.e. the emails have been removed or moved to another mailbox, etc.) and the output directory needs to be purged and the emails downloaded. If the value is the same both locally and on the server, the downloaded files in the output directory are preserved and only those missing in the output directory are downloaded (usually new emails).
