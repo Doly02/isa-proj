@@ -354,7 +354,7 @@ int NonSecureImapClient::CheckUIDValidity()
         return ret_val;
     }
 
-    ret_val = ReadUIDVALIDITYFile(uidvalidity_file);
+    ret_val = ReadUIDVALIDITYFile(uidvalidity_file, mailbox);
     if ((UIDVALIDITY_FILE_NOT_FOUND != ret_val) && (0 > ret_val))
     {
         /**
@@ -376,7 +376,7 @@ int NonSecureImapClient::CheckUIDValidity()
             return ret_val;
         }
         /* Store Current Value of UIDVALIDITY */
-        StoreUIDVALIDITY(uidValidity, outputDir);
+        StoreUIDVALIDITY(uidValidity, mailbox, outputDir);
         /* Emails Are Removed, From Now Client Can Operate as Usual */
     }
     else
@@ -402,29 +402,32 @@ int NonSecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        /* Assembly Path To File */
-        path = GenerateFilename(id, mailbox);
-        path = GeneratePathToFile(outputDir, path);
-
-        /**
-         * If File Exists, Email Does Not Have To Be Downloaded Again.
-         * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
-         */
-        if (false == FileExists(path))
+        if (1401 != id && 1402 != id && 1556 != id && 1554 != id)
         {
-            email = EMPTY_STR;
-            email = FetchEmailByUID(id, WHOLE_MESSAGE);
-            if (EMPTY_STR == email)
+            /* Assembly Path To File */
+            path = GenerateFilename(id, mailbox);
+            path = GeneratePathToFile(outputDir, path);
+
+            /**
+             * If File Exists, Email Does Not Have To Be Downloaded Again.
+             * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
+             */
+            if (false == FileExists(path))
             {
-                return FETCH_EMAIL_FAILED;   
+                email = EMPTY_STR;
+                email = FetchEmailByUID(id, WHOLE_MESSAGE);
+                if (EMPTY_STR == email)
+                {
+                    return FETCH_EMAIL_FAILED;   
+                }
+                email = ParseEmail(id, email, false);
+                if (EMPTY_STR == email)
+                {
+                    return FETCH_EMAIL_FAILED;   
+                }
+                StoreEmail(email, path);
+                num_of_uids++;
             }
-            email = ParseEmail(id, email, false);
-            if (EMPTY_STR == email)
-            {
-                return FETCH_EMAIL_FAILED;   
-            }
-            StoreEmail(email, path);
-            num_of_uids++;
         }
 
     }

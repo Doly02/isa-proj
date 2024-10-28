@@ -87,7 +87,7 @@ int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& p
  * @param[in]   uid_validity The UIDVALIDITY Value To Store.
  * @param[in]   output_dir The Directory Where The File Should Be Saved.
  */
-void StoreUIDVALIDITY(int uid_validity,std::string output_dir);
+void StoreUIDVALIDITY(int uid_validity, const std::string& mailbox, const std::string& output_dir);
 
 /**
  * @brief       Reads The UIDVALIDITY Value From A File.
@@ -101,7 +101,7 @@ void StoreUIDVALIDITY(int uid_validity,std::string output_dir);
  * @retval      UIDVALIDITY_FILE_ERROR If An Error Occurs While Reading The File Or If The Content Is Invalid.
  * @retval      The UIDVALIDITY Value If Successfully Read From The File.
  */
-int ReadUIDVALIDITYFile(const std::string& filepath);
+int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox);
 
 /**
  * @brief       Generates A Filename For A Specific Email.

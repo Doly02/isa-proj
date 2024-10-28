@@ -42,7 +42,7 @@
  * @brief   Rx Buffer Size For Receiving Data From IMAP Server.
  * @details 1024 Bytes Should Be Enough.
  */
-static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
+static constexpr int RX_BUFFER_SIZE = 2048; /* RX Buffer = 1024B */
 
 /**
  * @defgroup ReturnCodes Definitions of Return Codes
@@ -169,7 +169,7 @@ static constexpr int RX_BUFFER_SIZE = 1024; /* RX Buffer = 1024B */
 #define WHOLE_MESSAGE                   (true)
 #define JUST_HEADER                     (false)
 
-#define DEBUG_ENABLED                   (true)
+#define DEBUG_ENABLED                   (false)
 
 #define OUTPUT_FILE_FORMAT              ".log"
 

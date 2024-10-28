@@ -98,65 +98,106 @@ int RemoveFilesMatchingPattern(const std::string& dir_path, const std::string& p
     }
 }
 
-void StoreUIDVALIDITY(int uid_validity,std::string output_dir)
+void StoreUIDVALIDITY(int uid_validity, const std::string& mailbox, const std::string& output_dir)
 {
-    std::string filename =  std::string(UIDVALIDITY_FILE); /* TODO: Clean The Rubbish With Suffixes */
-    std::string path = output_dir + filename;
-    std::ofstream file(path);
-    
-    if (!file.is_open())
+    std::string filename = UIDVALIDITY_FILE;
+    std::string path = output_dir + "/" + filename;
+    std::ifstream file_in(path);
+    std::vector<std::string> lines;
+    bool mailbox_found = false;
+
+    /* Load The Content of .uidvalidity File If Exists And Store The Content To Vector */
+    if (file_in.is_open()) 
+    {
+        std::string line;
+        while (std::getline(file_in, line)) 
+        {
+            /* Check If File Contains Line For Current Used Mailbox */
+            if (line.rfind(mailbox + "=", 0) == 0)
+            {
+                lines.push_back(mailbox + "=" + std::to_string(uid_validity));
+                mailbox_found = true;
+            } 
+            else 
+            {
+                lines.push_back(line);
+            }
+        }
+        file_in.close();
+    }
+
+    /* If Mailbox Was Not Found In The File, Create New Record */
+    if (!mailbox_found) 
+    {
+        lines.push_back(mailbox + "=" + std::to_string(uid_validity));
+    }
+
+    /* Open File For Write And Write All The Lines */
+    std::ofstream file_out(path);
+    if (!file_out.is_open()) 
     {
         std::cerr << "ERR: Unable To Open File: " << path << std::endl;
         return;
     }
-    
-    file << uid_validity;
-    file.close();
-}
-/**
- * retval Number from UIDVALIDITY File.
- * retval Non-Positive Values if Error Occurs.
- */
-int ReadUIDVALIDITYFile(const std::string& filepath)
-{
-    std::ifstream file(filepath);   /* Path to .uidvalidity File */
-    std::string content;            /* .uidvalidity File Content */
 
-    if (false == FileExists(filepath)) 
+    for (const auto& line : lines) 
     {
-        return UIDVALIDITY_FILE_NOT_FOUND; /* No Need To Check UIDVALIDITY No More Just Download All Messages. */
+        file_out << line << "\n";
+    }
+    file_out.close();
+}
+
+int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox)
+{
+    std::ifstream file(filepath);   /* Path To .uidvalidity File */
+    if (!FileExists(filepath)) 
+    {
+        return UIDVALIDITY_FILE_NOT_FOUND; /* No Need To Check UIDVALIDITY Further If File Is Missing. */
     }
 
-    if (false == file.is_open()) 
+    if (!file.is_open()) 
     {
         std::cerr << "ERR: Unable To Open The .uidvalidity File." << std::endl;
         return UIDVALIDITY_FILE_ERROR;
     }
-    /* Load Content */
-    std::getline(file, content);
-    try 
-    {
-        size_t pos;
-        int uidvalidity_num = std::stoi(content, &pos);
 
-        /* Check If File Does Not Contain Any Other Characters */
-        if (pos != content.length()) 
+    std::string line;
+    while (std::getline(file, line)) 
+    {
+        size_t equal_pos = line.find('=');
+        if (equal_pos == std::string::npos) 
         {
-            std::cerr << "ERR: File contains extra non-numeric characters.\n";
-            return UIDVALIDITY_FILE_ERROR; 
+            return 0;
         }
-        return uidvalidity_num;
+
+        std::string line_mailbox = line.substr(0, equal_pos);
+        std::string uidvalidity_str = line.substr(equal_pos + 1);
+
+        if (line_mailbox == mailbox) 
+        {
+            try 
+            {
+                size_t pos;
+                int uidvalidity_num = std::stoi(uidvalidity_str, &pos);
+
+                if (pos != uidvalidity_str.length()) 
+                {
+                    return UIDVALIDITY_FILE_NOT_FOUND;
+                }
+
+                return uidvalidity_num;
+            }
+            catch (const std::invalid_argument& e) 
+            {
+                return UIDVALIDITY_FILE_NOT_FOUND;
+            }
+            catch (const std::out_of_range& e) 
+            {
+                return UIDVALIDITY_FILE_NOT_FOUND; 
+            }
+        }
     }
-    catch (const std::invalid_argument& e)  /* Non-Valid Format */ 
-    {
-        std::cerr << "ERR: The file does not contain a valid number.\n";
-        return UIDVALIDITY_FILE_ERROR;
-    }
-    catch (const std::out_of_range& e)      /* Out of The Range of Type INT */
-    {
-        std::cerr << "ERR: The number in the file is out of range.\n";
-        return UIDVALIDITY_FILE_ERROR; 
-    }
+    return UIDVALIDITY_FILE_NOT_FOUND;
 }
 
 std::string GenerateFilename(int uid, std::string mailbox)

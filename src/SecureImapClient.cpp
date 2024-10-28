@@ -460,7 +460,7 @@ int SecureImapClient::CheckUIDValidity()
         return ret_val;
     }
 
-    ret_val = ReadUIDVALIDITYFile(uidvalidity_file);
+    ret_val = ReadUIDVALIDITYFile(uidvalidity_file, mailbox);
     if ((UIDVALIDITY_FILE_NOT_FOUND != ret_val) && (0 > ret_val))
     {
         /**
@@ -482,7 +482,7 @@ int SecureImapClient::CheckUIDValidity()
             return ret_val;
         }
         /* Store Current Value of UIDVALIDITY */
-        StoreUIDVALIDITY(uidValidity, outputDir);
+        StoreUIDVALIDITY(uidValidity, mailbox, outputDir);
 
         /* Emails Are Removed, From Now Client Can Operate as Usual */
     }
