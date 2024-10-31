@@ -2,15 +2,13 @@
 
 all: manual.pdf
 
-manual.pdf: manual.ps
-	ps2pdf manual.ps
-
-manual.ps: manual.dvi
+manual.pdf: manual.dvi
 	dvips -sPAPERSIZE=a4 manual.dvi
+	ps2pdf manual.ps
 
 manual.dvi: manual.tex resources.bib
 	latex manual.tex
-	bibtex resources
+	bibtex manual
 	latex manual.tex
 	latex manual.tex
 

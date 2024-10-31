@@ -46,12 +46,89 @@
 
 \newpage
 \label{firstpage}
-\section{Assignment}
+\section{Introduction}
 The project assignment in the ISA (Network Applications and Network Administration) subject was 
 to create IMAP4rev1 (according to RFC3501), which will be able to communicate only over TCP/IP as well 
 as using SLL/TLS - IMAPS. The following program downloads emails from the defined server in the argument 
 of the program call and saves them in the output directory. If the path to the output repository 
 specified by the argument does not exist, the program creates it on this path.
+
+\subsection{IMAP in Email Services and How It's Used}
+
+\subsubsection{Internet Message Access Protocol}
+The Internet Message Access Protocol (IMAP) is a protocol for receiving email that allows users to access 
+their mailboxes from any device with an internet connection. IMAP was designed to provide flexibility in 
+accessing email messages, regardless of the device or application used. This is achieved by acting as an 
+intermediary between the email server and client, rather than directly downloading emails onto the device. 
+However, IMAP also allows emails to be stored locally, a feature leveraged by this program to download 
+and store emails on the user’s device \cite{rfc3501, what_is_imap}.
+
+While IMAP enhances flexibility, it does come with security considerations. By default, IMAP transmits 
+login credentials in plain text, leaving usernames and passwords vulnerable if intercepted. This issue 
+can be mitigated by configuring IMAP to operate over Transport Layer Security (TLS), which can be enabled 
+in our program using the \texttt{-T} parameter, encrypting the communication between the client and server. 
+Using TLS is a recommended practice to improve IMAP security \cite{what_is_imap, imap_pop_difference, email_protocols}.
+
+\subsubsection{How IMAP Works?}
+IMAP establishes a connection between the email client and server. In most email applications, IMAP allows users to view email headers quickly and download full messages only when selected, which conserves data. Outgoing emails, on the other hand, are sent via the Simple Mail Transfer Protocol (SMTP), which handles message delivery to the recipient \cite{techtarget-imap, email-protocols}.
+
+
+\section{Using the \texttt{imapcl} Program}
+The \texttt{imapcl} program is designed to download email messages from a server via IMAP protocol, 
+with optional support for encrypted connections via SSL/TLS. To run the program, use the following 
+command syntax:
+
+\begin{verbatim}
+    imapcl server [-p port] [-T [-c certfile] [-C certaddr]] [-n] [-h] \
+    -a auth_file [-b MAILBOX] -o out_dir
+    \end{verbatim}
+
+The order of parameters is flexible. Below is a description of each parameter:
+
+\subsection{Required Parameters}
+\begin{itemize}
+    \item \texttt{server}: IP address or domain name of the IMAP server.
+    \item \texttt{-a auth\_file}: Path to the file containing user authentication credentials.
+    \item \texttt{-o out\_dir}: Output directory where downloaded messages will be saved.
+\end{itemize}
+
+\subsection{Optional Parameters}
+\begin{itemize}
+    \item \texttt{-p port}: Specifies the server port. The default value depends on whether the \texttt{-T} parameter is used (use port 993 for encrypted connections).
+    \item \texttt{-T}: Enables an encrypted connection using the IMAPS protocol. If not specified, an unencrypted connection (port 143) is used.
+    \item \texttt{-c certfile}: Path to a certificate file used to verify the validity of the server’s SSL/TLS certificate.
+    \item \texttt{-C certaddr}: Path to a directory containing certificates to verify the SSL/TLS certificate presented by the server. The default value is \texttt{/etc/ssl/certs}.
+    \item \texttt{-n}: Only new messages – the program will work only with messages that have not yet been downloaded.
+    \item \texttt{-h}: Download only message headers without the content.
+    \item \texttt{-b MAILBOX}: Specifies the mailbox name on the server. The default is \texttt{INBOX}.
+\end{itemize}
+
+
+\subsection{Examples of Downloaded Email Filenames}
+If the arguments \texttt{-h} and \texttt{-n} are not used, the output filenames of downloaded emails will look like this:
+\begin{verbatim}
+MSG_INBOX_1717.txt
+\end{verbatim}
+where \texttt{INBOX} is the mailbox and \texttt{1717} is the UID of this email.
+
+If the arguments \texttt{-h} and \texttt{-n} are used, the output filenames of downloaded emails will look like this:
+\begin{verbatim}
+MSG_INBOX_1717_new_header.txt
+\end{verbatim}
+where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{new\_header} indicates that the email contains just the header of emails that the IMAP server categorizes as new.
+
+If only the argument \texttt{-h} is used, the output filenames of downloaded emails will look like this:
+\begin{verbatim}
+MSG_INBOX_1717_header.txt
+\end{verbatim}
+where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{header} indicates that the file contains only the email's header.
+
+If only the argument \texttt{-n} is used, the output filenames of downloaded emails will look like this:
+\begin{verbatim}
+MSG_INBOX_1717_new.txt
+\end{verbatim}
+where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{new} indicates that the file contains an email that the IMAP server categorizes as new.
+
 
 \section{Implementation Details}
 The principles of object-oriented programming have been applied to the program code. The program is 
@@ -62,7 +139,7 @@ which mediates communication, classically only over TCP/IP, or an instance of th
 class, which also uses SSL/TLS in addition to TCP/IP. Both classes \verb!NonSecureImapClient! and 
 \verb!SecureImapClient! inherit basic properties from \verb!BaseImapClient!, which provides features 
 that are common to both derived classes, such as generating a TAG, finding the value of the current TAG or translating 
-a hostname to an IPv4 address. 
+a hostname to an IPv4 address.\cite{openssl_tutorial}
 
 \subsection{Implementation of Client}
 The NonSecureImapClient and SecureClient classes are characterized by their very 
@@ -424,6 +501,7 @@ values according to the table below.
     \vspace{0.5cm} % Space after table
 \end{center}
 
+\newpage
 
 \bibliographystyle{unsrt}
 \bibliography{resources}      

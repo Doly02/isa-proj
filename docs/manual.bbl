@@ -1,0 +1,33 @@
+\begin{thebibliography}{1}
+
+\bibitem{rfc3501}
+{Internet Engineering Task Force}.
+\newblock Internet message access protocol - version 4rev1.
+\newblock [online], 2024.
+\newblock [cited 2024-10-28].
+
+\bibitem{what_is_imap}
+Cloudflare.
+\newblock What is imap?
+\newblock [online], 2024.
+\newblock [cited 2024-10-28].
+
+\bibitem{imap_pop_difference}
+Microsoft Support.
+\newblock What is the difference between pop and imap?
+\newblock [online], 2024.
+\newblock [cited 2024-10-28].
+
+\bibitem{email_protocols}
+EmailLabs.
+\newblock Email protocols: Learn the difference between imap, pop3, and smtp.
+\newblock [online], 2024.
+\newblock [cited 2024-10-28].
+
+\bibitem{openssl_tutorial}
+IBM Developer.
+\newblock Secure programming with the openssl api.
+\newblock [online], 2024.
+\newblock [cited 2024-10-28].
+
+\end{thebibliography}
