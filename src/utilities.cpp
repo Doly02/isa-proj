@@ -200,9 +200,28 @@ int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox)
     return UIDVALIDITY_FILE_NOT_FOUND;
 }
 
-std::string GenerateFilename(int uid, std::string mailbox)
+std::string GenerateFilename(int uid, std::string mailbox, bool h_only, bool n_only)
 {
-    return ("MSG_" + mailbox + "_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
+    std::string suffix = EMPTY_STR;
+
+    if (true == n_only && true == h_only)          
+    {
+        suffix = "_new_headers_";
+    }
+    else if (true == h_only && false == n_only)
+    {
+        suffix = "_headers_";
+    }
+    else if (false == h_only && true == n_only)
+    {
+        suffix = "_new_";
+    }
+    else
+    {
+        suffix = EMPTY_STR;
+    }
+    
+    return ("MSG_" + mailbox + "_" + std::to_string(uid) + suffix + OUTPUT_FILE_FORMAT);
 }
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)

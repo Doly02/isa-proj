@@ -25,11 +25,6 @@
 #include <sys/socket.h>
 #include "definitions.hpp"
 
-#if (DEBUG_ENABLED == 1)
-    #include <fstream>
-    #include <sys/stat.h>
-#endif /* (DEBUG_ENABLED == 1) */
-
 /************************************************/
 /*            Definition of Functions           */
 /************************************************/
@@ -106,15 +101,18 @@ int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox)
 /**
  * @brief       Generates A Filename For A Specific Email.
  * 
- * @details     This Function Generates A Filename Based On The Given UID And Mailbox Name, 
- *              Appending The Standard Output File Format Extension.
+ * @details     This Function Generates A Filename Based On The Given UID, Mailbox Name
+ *              And Program's Arguments '-h' And '-n' Appending The Standard Output File 
+ *              Format Extension.
  * 
  * @param[in]   uid The Unique Identifier Of The Email.
  * @param[in]   mailbox The Name Of The Mailbox.
+ * @param[in]   h_only If Header Only Argument Is Enabled. 
+ * @param[in]   n_only If New Emails Only Argument Is Enabled
  * 
  * @retval      The Generated Filename In The Format MSG_mailbox_uid.log.
  */
-std::string GenerateFilename(int uid, std::string mailbox);
+std::string GenerateFilename(int uid, std::string mailbox, bool h_only, bool n_only);
 
 /**
  * @brief       Generates The Full Path To A File.

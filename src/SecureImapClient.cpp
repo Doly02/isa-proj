@@ -514,33 +514,33 @@ int SecureImapClient::FetchEmails()
 
     for (int id : this->vec_uids)
     {
-        if (1401 != id && 1402 != id && 1556 != id && 1554 != id)
-        {
-            /* Assembly Path To File */
-            path = GenerateFilename(id, mailbox);
-            path = GeneratePathToFile(outputDir, path);
+        /* 1401, 1402, 1556, 1554 */
 
-            /**
-             * If File Exists, Email Does Not Have To Be Downloaded Again.
-             * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
-             */
-            if (false == FileExists(path))
+        /* Assembly Path To File */
+        path = GenerateFilename(id, mailbox, headersOnly, newOnly);
+        path = GeneratePathToFile(outputDir, path);
+
+        /**
+         * If File Exists, Email Does Not Have To Be Downloaded Again.
+         * If .uidvalidity File Does Not Match, Emails Will Be Removed Before This Function.
+         */
+        if (false == FileExists(path))
+        {
+            email = EMPTY_STR;
+            email = FetchEmailByUID(id, WHOLE_MESSAGE);
+            if (EMPTY_STR == email)
             {
-                email = EMPTY_STR;
-                email = FetchEmailByUID(id, WHOLE_MESSAGE);
-                if (EMPTY_STR == email)
-                {
-                    return FETCH_EMAIL_FAILED;   
-                }
-                email = ParseEmail(id, email, false);
-                if (EMPTY_STR == email)
-                {
-                    return FETCH_EMAIL_FAILED;   
-                }
-                StoreEmail(email, path);
-                num_of_uids++;
+                return FETCH_EMAIL_FAILED;   
             }
+            email = ParseEmail(id, email, false);
+            if (EMPTY_STR == email)
+            {
+                return FETCH_EMAIL_FAILED;   
+            }
+            StoreEmail(email, path);
+            num_of_uids++;
         }
+    
     }
     PrintNumberOfMessages(num_of_uids, newOnly, headersOnly);
     return SUCCESS;
