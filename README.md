@@ -25,6 +25,7 @@ The goal of this project in the subject Network Applications and Network Adminis
     - [Handling Non-Existent Output Directory](#handling-non-existent-output-directory)
     - [Storing The Contents of Multiple Mailboxes In One Folder](#storing-the-contents-of-multiple-mailboxes-in-one-folder)
     - [Gentle Downloading](#gentle-downloading)
+- [Examples of a Downloaded Email Filenames](#examples-of-a-downloaded-email-filenames)
 - [Resources](#resources)
 
 ## Requirements
@@ -158,11 +159,30 @@ in a local folder where emails have been downloaded once before, some email(s) i
 have been removed (perhaps by mistake) or the mailbox on the IMAP server has been modified 
 and the `UIDVALIDITY` value has changed. The client is always in sync with the IMAP server.
 
-Example of a downloaded email filename:
+## Examples Of a Downloaded Email Filenames
+If arguments `-h` and `-n` are not used, the output filenames of downloaded emails will look like this:
 ```
 MSG_INBOX_1717.txt
 ```
 Where `INBOX` is mailbox and `1717` is UID of this email.
+
+If the arguments `-h` and `-n` are used the output filenames of downloaded emails will look like this:
+```
+MSG_INBOX_1717_new_header.txt
+```
+Where `INBOX` is mailbox, `1717` is UID of this email and `new_header` signalize that email contain just header of an emails that IMAP server categorize as new.
+
+If the arguments just `-h` is used the output filenames of downloaded emails will look like this:
+```
+MSG_INBOX_1717_header.txt
+```
+Where `INBOX` is mailbox, `1717` is UID of this email and `header` signalize that file contains only email's header.
+
+If the arguments just `-n` is used the output filenames of downloaded emails will look like this:
+```
+MSG_INBOX_1717_new.txt
+```
+Where `INBOX` is mailbox, `1717` is UID of this email and `new` signalize that file contains email that IMAP server categorize as new.
 
 ## Known Issues 
 A user's mailbox can often be bulky and contain a number of large emails whose size can exceed 30MB, in which case it was observed during testing that downloading the entire mailbox can take a considerable amount of time and should be taken into account. 
