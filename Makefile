@@ -12,7 +12,7 @@ DEBUG_TARGET = imapcl_debug
 TEST_TARGET = imapcl_test
 
 # Compiler
-CC = g++
+CC = clang++
 # Compiler Flags
 CFLAGS = -std=c++17 -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -pedantic -Iinclude
 DEBUG_CFLAGS = -fsanitize=address -g -std=c++17 -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -pedantic
