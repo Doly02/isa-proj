@@ -206,11 +206,11 @@ std::string GenerateFilename(int uid, std::string mailbox, bool h_only, bool n_o
 
     if (true == n_only && true == h_only)          
     {
-        suffix = "_new_headers_";
+        suffix = "_new_header_";
     }
     else if (true == h_only && false == n_only)
     {
-        suffix = "_headers_";
+        suffix = "_header_";
     }
     else if (false == h_only && true == n_only)
     {
