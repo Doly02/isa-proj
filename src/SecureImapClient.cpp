@@ -516,7 +516,7 @@ int SecureImapClient::FetchEmails()
     {
         /* 1401, 1402, 1556, 1554 */
 
-        if (1401 == id || 1402 == id || 1556 == id || 1554 == id)
+        if (1401 != id && 1402 != id && 1556 != id && 1554 != id)
         {
             /* Assembly Path To File */
             path = GenerateFilename(id, mailbox, headersOnly, newOnly);

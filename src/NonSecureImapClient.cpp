@@ -409,7 +409,7 @@ int NonSecureImapClient::FetchEmails()
     for (int id : this->vec_uids)
     {
         /* Assembly Path To File */
-        if (1401 == id || 1402 == id || 1556 == id || 1554 == id)
+        if (1401 != id && 1402 != id && 1556 != id && 1554 != id)
         {
             path = GenerateFilename(id, mailbox, headersOnly, newOnly);
             path = GeneratePathToFile(outputDir, path);
