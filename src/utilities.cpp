@@ -257,6 +257,7 @@ std::string ParseEmailHeader(std::string header)
 std::string ParseEmailBody(std::string body, std::string tag)
 {
     std::string delete_part = EMPTY_STR;
+    // printf("DEBUG: body: \n%s\n", body.c_str());
     try
     {
         std::regex reg_expression("(" + tag + "\\s+.*(?=OK)[.|\\s\\S]*)");
@@ -264,10 +265,13 @@ std::string ParseEmailBody(std::string body, std::string tag)
         if (regex_search(body, match, reg_expression))
         {
             delete_part = match.str(0);
+            printf("DEBUG: delete_part: \n%s\n", delete_part.c_str());
         }
     
         body = body.substr(0, body.size() - delete_part.size());
+        printf("DEBUG: body: (Before Erase)\n%s\n", body.c_str());
         body.erase(0, body.find("\r\n") + 1);
+        printf("DEBUG: body: (After Erase)\n%s\n", body.c_str());
         body = body.substr(0, body.size()-5);
         return body; 
     }
