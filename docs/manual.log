@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  31 OCT 2024 21:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  4 NOV 2024 17:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -561,19 +561,15 @@ File: ClientConfig.eps Graphic file (type eps)
  <ClientConfig.eps> [8]
 File: ImapClient.eps Graphic file (type eps)
  <ImapClient.eps>
-Overfull \hbox (42.04112pt too wide) in paragraph at lines 332--333
- [][] 
- []
-
 [9]
-Overfull \hbox (10.66832pt too wide) in paragraph at lines 345--354
+Overfull \hbox (10.66832pt too wide) in paragraph at lines 347--356
 \T1/ptm/m/n/10.95 server. The lo-cal IMAP server is avail-able in the repos-i-t
 ory in the tests folder un-der the name \T1/pcr/m/n/10.95 imap_server.py\T1/ptm
 /m/n/10.95 .
  []
 
 
-Overfull \hbox (3.43326pt too wide) in paragraph at lines 345--354
+Overfull \hbox (3.43326pt too wide) in paragraph at lines 347--356
 \T1/ptm/m/n/10.95 The server is im-ple-mented in Python us-ing the \T1/pcr/m/n/
 10.95 os\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 socket\T1/ptm/m/n/10.95 , \T1/pcr
 /m/n/10.95 threading\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 subprocess\T1/ptm/m/n
@@ -581,17 +577,23 @@ Overfull \hbox (3.43326pt too wide) in paragraph at lines 345--354
 
  []
 
-
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 416--416
+File: imap_server.eps Graphic file (type eps)
+<imap_server.eps> [10]
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 424--424
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
-[10]
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 440--440
+
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 452--452
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
-[11] [12] [13] (./manual.bbl) [14] (./manual.aux)
+[11]
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 470--470
+[]|\T1/ptm/b/n/10.95 Server|  
+ []
+
+[12] [13] (./manual.bbl) [14] (./manual.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -601,15 +603,15 @@ L3 programming layer <2024-01-22>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `manual.out' has not changed.
-(rerunfilecheck)             Checksum: E3824C1D243FB2925A28AF30E7AED90B;4653.
+(rerunfilecheck)             Checksum: 577982B883B0877212CF56962CE3541C;4951.
  ) 
 Here is how much of TeX's memory you used:
- 12795 strings out of 474223
- 205325 string characters out of 5748758
- 1944972 words of memory out of 5000000
- 34852 multiletter control sequences out of 15000+600000
+ 12803 strings out of 474223
+ 205494 string characters out of 5748758
+ 1945972 words of memory out of 5000000
+ 34859 multiletter control sequences out of 15000+600000
  590314 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,8n,79p,1023b,573s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on manual.dvi (15 pages, 73392 bytes).
+Output written on manual.dvi (15 pages, 76176 bytes).

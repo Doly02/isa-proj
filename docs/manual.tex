@@ -246,6 +246,8 @@ A user's mailbox can often be bulky and contain a number of large emails whose s
 in which case it was observed during testing that downloading the entire mailbox can take a 
 considerable amount of time and should be taken into account. 
 
+\newpage
+
 \subsection{Adjustable Definitions}
 The relevant adjustable definitions are defined in the \textbf{\textit{definitions.hpp}} file in the \textbf{\textit{include}} folder. 
 Some of them can be modified according to the user's needs, here is the content of the 
@@ -327,7 +329,7 @@ the whole process of communication with the IMAP server and storing the results.
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.4}{
+    \scalebox{0.3}{
         \includegraphics{ImapClient.eps}
     }
     \caption{ImapClient's Classes and Methods}
@@ -371,7 +373,7 @@ the test during its run logs to the terminal information about what is currently
 
 \begin{figure}[H]
     \centering
-    \scalebox{0.4}{
+    \scalebox{0.15}{
         \includegraphics{imap_server.eps}
     }
     \caption{Output of imap\_server.py}
@@ -419,6 +421,16 @@ the usability of the program.
         \hline
         Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. \\
         \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
+
+\begin{center}
+    \vspace{0.5cm} % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
+        \hline
         Calling \texttt{./imapcl outlook.office365.com -p 143 -a PATH/auth\_file.txt -b INBOX -o PATH/output/} and path \texttt{PATH/output/} does not exists & eva & Downloaded whole emails (including header and body) and created output directory in \texttt{PATH/output/} file, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. in output directory \texttt{PATH/output/}. \\
         \hline
         Calling \texttt{./imapcl outlook.office365.com -T -a PATH/auth\_file.txt -b INBOX -o PATH/output/} with changed value of \texttt{.uidvalidity} file & eva & Downloaded whole emails (including header and body) and updated value in \texttt{.uidvalidity} file thru SSL/TLS on port 993, note: number emails on server was 1739 & Downloaded 1739 from server with headers and bodies. Updated valued of \texttt{.uidvalidity} file. Used SSL/TLS on default port 993.\\
@@ -431,6 +443,12 @@ the usability of the program.
         \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -h -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only headers, note: number emails on server was 2349. & Downloaded 2349 email headers from server. \\
         \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (headers + bodies), note: number emails on server was 56. & Downloaded 56 new emails from server with headers and bodies. \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b BOX1 -o PATH/output/} & merlin & Two emails should be downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} should be stored into \texttt{.uidvalidity.txt} & Two emails were downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} were saved into \texttt{.uidvalidity.txt} \\
+        \hline
+        Calling \texttt{./imapcl eva.fit.vutbr.cz -T -p 993 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & For SSL cetificates should be used default location - \texttt{/etc/ssl/certs}. & Used default location for SSL certificates, \texttt{/etc/ssl/certs}. \\
+        \hline
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
@@ -440,12 +458,6 @@ the usability of the program.
     \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
         \hline
         \textbf{Testcase} & \textbf{Server} & \textbf{Expected Output} & \textbf{Program Output} \\
-        \hline
-        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & Downloaded email only new emails (headers + bodies), note: number emails on server was 56. & Downloaded 56 new emails from server with headers and bodies. \\
-        \hline
-        Calling \texttt{./imapcl eva.fit.vutbr.cz -p 143 -n -a PATH/auth\_file.txt -b BOX1 -o PATH/output/} & merlin & Two emails should be downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} should be stored into \texttt{.uidvalidity.txt} & Two emails were downloaded and \texttt{UIDVALIDITY} of \texttt{BOX1} were saved into \texttt{.uidvalidity.txt} \\
-        \hline
-        Calling \texttt{./imapcl eva.fit.vutbr.cz -T -p 993 -n -a PATH/auth\_file.txt -b INBOX -o PATH/output/} & merlin & For SSL cetificates should be used default location - \texttt{/etc/ssl/certs}. & Used default location for SSL certificates, \texttt{/etc/ssl/certs}. \\
         \hline
         Calling \texttt{./imapcl eva.fit.vutbr.cz -T -p 993 -n -a PATH/auth\_file.txt -b BOX1 -o PATH/output/} with stored all emails from mailbox and right value of \texttt{UIDVALIDITY} & merlin & Zero emails should be downloaded & Zero emails downloaded. \\
         \hline
@@ -458,8 +470,6 @@ the usability of the program.
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
-
-\newpage
 
 \section{Return Codes}
 The program is designed in such a way that in case of an error or failure, the user 
@@ -482,6 +492,14 @@ values according to the table below.
         CREATE\_CONNECTION\_FAILED & int & -4 & Failed to Create Connection With IMAP Server \\
         \hline
         SSL\_CERT\_VERIFICATION\_FAILED & int & -3 & SSL Certificate Verification Failed \\
+        \hline
+    \end{tabularx}
+    \vspace{0.5cm} % Space after table
+\end{center}
+
+\begin{center}
+    \vspace{0.5cm} % % Space before table
+    \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{6.5cm}|>{\raggedright\arraybackslash}p{2cm}|>{\raggedright\arraybackslash}p{1.5cm}|>{\raggedright\arraybackslash}X|}
         \hline
         FETCH\_EMAIL\_FAILED & int & -2 & Fetching Email By UID Failed \\
         \hline
@@ -518,8 +536,6 @@ values according to the table below.
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
-
-\newpage
 
 \bibliographystyle{unsrt}
 \bibliography{resources}      
