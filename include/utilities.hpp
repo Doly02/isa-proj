@@ -25,6 +25,9 @@
 #include <sys/socket.h>
 #include "definitions.hpp"
 
+#include "openssl/bio.h"
+#include "openssl/ssl.h"
+#include "openssl/err.h"
 /************************************************/
 /*            Definition of Functions           */
 /************************************************/
@@ -186,5 +189,20 @@ bool IsIPv4Address(const std::string& str);
 */
 bool isIPv6Address(const std::string& str);
 
+/**
+ * @brief       Clear Rx Buffer on Specific Socket on Standard TCP/IP Connection.
+ * @param[in]   sockfd Socket File Descriptor.
+ * 
+ * @retval      void
+ */
+void ClearSocketBuffer(int sockfd);
+
+/**
+ * @brief       Clear Rx Buffer on Specific Socket on Standard SSL/TLS Connection.
+ * @param[in]   sockfd Socket File Descriptor.
+ * 
+ * @retval      void
+ */
+void ClearSSLBuffer(SSL* ssl);
 
 #endif /* UTILITIES_HPP */

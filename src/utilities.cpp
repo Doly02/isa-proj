@@ -292,3 +292,16 @@ bool isIPv6Address(const std::string& str)
     struct sockaddr_in6 sa;  // Structure of IPv6 Address
     return (0 != inet_pton(AF_INET6, str.c_str(), &(sa.sin6_addr)));
 }
+
+void ClearSocketBuffer(int sockfd)
+{
+    char buffer[1024];
+    while (recv(sockfd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT) > 0);
+}
+
+void ClearSSLBuffer(SSL* ssl)
+{
+    char buffer[1024];
+    while (SSL_read(ssl, buffer, sizeof(buffer) - 1) > 0);
+    // Call SSL_read From SSL/TLS Connections, While All Data Are Not Read
+}

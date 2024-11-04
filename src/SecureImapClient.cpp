@@ -240,16 +240,8 @@ std::string SecureImapClient::ReceiveData(void)
         }
     }
 
-    /* Disabled Timeout */
-    /*
-    time.tv_sec = 0;
-    time.tv_usec = 0;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
-    {
-        std::cerr << "ERR: Resetting Timeout for SSL_read() Function.\n";
-        return BAD_RESPONSE;
-    }
-    */
+    /* Clear The Socket */
+    ClearSSLBuffer(ssl);
 
     /* Handle Errors During Transmission */
     if (0 > bytes_rx)

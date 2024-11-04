@@ -20,9 +20,6 @@
 /************************************************/
 /*                  Libraries                   */
 /************************************************/
-#include "openssl/bio.h"
-#include "openssl/ssl.h"
-#include "openssl/err.h"
 
 #include "utilities.hpp"
 #include "BaseImapClient.hpp"

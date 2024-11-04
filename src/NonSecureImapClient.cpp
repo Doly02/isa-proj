@@ -149,6 +149,8 @@ std::string NonSecureImapClient::ReceiveData()
             return BAD_RESPONSE;
         }
     }
+    /* Clear The Socket */
+    ClearSocketBuffer(sockfd);
 
     /* Handle Error If Ocurred During Transmission */
     if (0 > bytes_rx) 
