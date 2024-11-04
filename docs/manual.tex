@@ -361,6 +361,23 @@ The local IMAP server was used for basic testing of the application functionalit
 and at a later stage of development it was used to simulate errors and unusual conditions 
 that can occur during communication between client and server.
 
+\subsubsection{Implementation Details of Local IMAP Server}
+To run the test correctly it is necessary to configure the parameters client\_path (containing the name of the binary file with the program), 
+output\_dir (where the output files will be stored) and client\_args (arguments with which the tested program will be called), 
+the local IMAP server uses the address 127.0.0.1 and runs by default on port 8143.
+
+Here can we be seen the output of the test, which ended with success, 
+the test during its run logs to the terminal information about what is currently happening.
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.4}{
+        \includegraphics{imap_server.eps}
+    }
+    \caption{Output of imap\_server.py}
+    \label{figure:imap-server}
+\end{figure}
+
 \begin{center}
     \vspace{0.5cm} % Space before table
     \begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}X|}
@@ -375,12 +392,13 @@ that can occur during communication between client and server.
         \hline
         Server does not respond at all. & Client should successfully end and print error message on stderr. & Client successfully ends and prints error message on stderr.  \\
         \hline
-        Stress test, sending three emails, size of each of them 33MB. & Emails successfully downloaded. & Emails were successfully downloaded. Note: Speed was not great. \\
+        Stress test, sending three emails, size of each of them 33MB. & Emails successfully downloaded. & Emails were successfully downloaded. Note: Speed was not optimal. \\
+        \hline
+        Sent an email whose size slightly exceeds the receiving buffer (the end of the email is split into two parts) & No freezing of the program and email successfully downloaded. & No freezing of the program and email successfully downloaded. \\
         \hline
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
-
 
 \subsection{Testing of Foreign IMAP Servers}
 As a complementary method, testing on foreign IMAP servers provided by the school, such as eva 
