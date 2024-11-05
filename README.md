@@ -2,6 +2,7 @@
 - Author: Tomáš Dolák 
 - Login: [xdolak09](https://www.vut.cz/lide/tomas-dolak-247220)
 - Email: <xdolak09@stud.fit.vutbr.cz>
+- Created on 31 October 2024
 
 The goal of this project in the subject Network Applications and Network Administration was to create a IMAPv4 Client that is able to communicate just thru non-secure connection - TCP/IP or secure connection with SSL/TLS to the IMAP server.
 
@@ -79,12 +80,7 @@ ipk-proj-1/
 │   │   
 │   └── test_emails/        # Test email that will send local IMAP server.
 │
-├── doc/                    # Documentation files and resources
-│   │── pics/               # Directory of pictures used in README.md
-│   │
-│   │── manual.pdf
-│   │
-│   └── CHANGELOG.md        # Includes features that were implemented in addition (for more details see manual.pdf)
+├── manual.pdf
 │
 ├── Makefile                # Makefile for compiling the project
 │

@@ -70,7 +70,7 @@ in our program using the \texttt{-T} parameter, encrypting the communication bet
 Using TLS is a recommended practice to improve IMAP security \cite{what_is_imap, imap_pop_difference, email_protocols}.
 
 \subsubsection{How IMAP Works?}
-IMAP establishes a connection between the email client and server. In most email applications, IMAP allows users to view email headers quickly and download full messages only when selected, which conserves data. Outgoing emails, on the other hand, are sent via the Simple Mail Transfer Protocol (SMTP), which handles message delivery to the recipient \cite{techtarget-imap, email-protocols}.
+IMAP establishes a connection between the email client and server. In most email applications, IMAP allows users to view email headers quickly and download full messages only when selected, which conserves data. Outgoing emails, on the other hand, are sent via the Simple Mail Transfer Protocol (SMTP), which handles message delivery to the recipient \cite{techtarget_imap, email_protocols}.
 
 
 \section{Using the \texttt{imapcl} Program}
@@ -343,7 +343,7 @@ way was chosen to test on foreign IMAP servers provided by the school such as ev
 
 \newpage
 
-\subsection{Testing of Local IMAP Server}
+\subsection{Testing on Local IMAP Server}
 To ensure the correct operation of the program, \texttt{imapcl} was tested using a local 
 implementation of the IMAP server. The local IMAP server is available in the repository 
 in the tests folder under the name \texttt{imap\_server.py}. The server is implemented in Python 
@@ -402,7 +402,7 @@ the test during its run logs to the terminal information about what is currently
     \vspace{0.5cm} % Space after table
 \end{center}
 
-\subsection{Testing of Foreign IMAP Servers}
+\subsection{Testing on Foreign IMAP Servers}
 As a complementary method, testing on foreign IMAP servers provided by the school, such as eva 
 or merlin, was chosen to ensure compatibility outside the local environment and to demonstrate 
 the usability of the program.
@@ -536,6 +536,8 @@ values according to the table below.
     \end{tabularx}
     \vspace{0.5cm} % Space after table
 \end{center}
+
+\newpage
 
 \bibliographystyle{unsrt}
 \bibliography{resources}      
