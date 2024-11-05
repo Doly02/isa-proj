@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      BaseImapClient.cpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           24.09.2024
  *  Description:    Implements The Base Class For IMAPv4 Client.
  *

@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      utilities.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           27.09.2024
  *  Description:    Includes Utilities That Are Not Specifically Connected To Any Class.
  *

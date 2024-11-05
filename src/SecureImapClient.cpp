@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      SecureImapClient.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           02.10.2024
  *  Description:    Implements Secure IMAP4rev1 Client That Communicates Thru TCP/IP and SSL/TLS.
  *
@@ -337,7 +338,7 @@ int SecureImapClient::ParseUIDs(std::string response)
         return PARSE_BY_REGEX_FAILED;
     }
     response = response.substr(0, response.size() - deleted_part.size());
-    deleted_part = "* SEARCH "; //FIXME:
+    deleted_part = "* SEARCH ";
     
     found = response.find(deleted_part);
     if (std::string::npos != found)
@@ -373,7 +374,7 @@ int SecureImapClient::FetchUIDs()
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
-        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfied */
+        fetch_uids_cmd += " UNSEEN";
 
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
@@ -563,7 +564,6 @@ std::string SecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
-        // std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
         return recv_data;
     }
 
@@ -638,7 +638,7 @@ int SecureImapClient::DisconnectImapServer(void)
         curr_state = DEFAULT;
         return SUCCESS;
     }
-    return SUCCESS; /* TODO: Already Closed */
+    return SUCCESS;
 }
 
 int SecureImapClient::Run(const std::string& serverAddress, int server_port, const std::string& username, const std::string& password)
@@ -677,8 +677,7 @@ int SecureImapClient::Run(const std::string& serverAddress, int server_port, con
     return SUCCESS;
 }
 
-
-
 /**
- * TODO: Je pojisteno ze se vsechny zdroje uvolni?
+ * NOTES:
+ * Je pojisteno ze se vsechny zdroje uvolni?
  */

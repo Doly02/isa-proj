@@ -2,8 +2,10 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      ClientConfig.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           22.09.2024
- *  Description:    Implements The Client Configuration Settings Based On The Parameters With Which The Program Was Launched.
+ *  Description:    Implements The Client Configuration Settings Based On The Parameters With Which 
+ *                  The Program Was Launched.
  *
  * ****************************/
 
@@ -12,7 +14,8 @@
  *  @file           ClientConfig.hpp
  *  @author         Tomas Dolak
  *  @date           22.09.2024
- *  @brief          Implements The Client Configuration Settings Based On The Parameters With Which The Program Was Launched.
+ *  @brief          Implements The Client Configuration Settings Based On The Parameters With Which 
+ *                  The Program Was Launched.
  * ****************************/
 
 #ifndef CLIENTCONFIG_HPP
@@ -125,8 +128,7 @@ class ImapClientConfig
          * @details     This Method First Parses The Command-Line Arguments Using The 
          * `ParseArguments()` Method. If The Arguments Are Valid, It Then
          * Proceeds To Extract The Authentication Data From The Specified 
-         * File Using `ExtractAuthData()`. If Either Step Fails, An Error Code
-         * Is Returned.
+         * File.
          * 
          * @param[in]   argc Number Of Command-Line Arguments.
          * @param[in]   argv Array Of Command-Line Arguments.
@@ -160,9 +162,8 @@ class ImapClientConfig
         * 
         * User Has to Provide Full Path to The File With Credentials By Parameter '-p'.
         * 
-        * @throw        std::runtime_error If The Auth. File Cannot  
-        * Be Opened or If Valid Credentials (Username and Password) Are Not Found in 
-        * Are Not Found in The Expected Format. TODO: Update Comment!
+        * @retval       SUCCESS If The Credentials Are Successfully Extracted.
+        * @retval       PARSE_CREDENTIALS_FAILED If The Credentials Cannot Be Extracted.
         */
         int ExtractAuthData(void);
 };

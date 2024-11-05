@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      NonSecureImapClient.cpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           28.09.2024
  *  Description:    Implements Non-Secure IMAPv4 Client That Communicates Just Thru TCP/IP With Port 143.
  *
@@ -127,7 +128,6 @@ std::string NonSecureImapClient::ReceiveData()
     time.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)  //<! Setup of Socket Timeout
     {   
-        /*TODO: Should I Close Socket? */
         std::cerr << "ERR: Setting Timeout For recv() Function." << std::endl;
         return BAD_RESPONSE;
     }
@@ -145,7 +145,7 @@ std::string NonSecureImapClient::ReceiveData()
         }
         else if (TRANSMIT_DATA_FAILED == ret_val)
         {
-            std::cerr << "ERR: Server Side Error Received." << std::endl; //TODO:
+            std::cerr << "ERR: Server Side Error Received." << std::endl;
             return BAD_RESPONSE;
         }
     }
@@ -276,7 +276,7 @@ int NonSecureImapClient::FetchUIDs()
     if (false == newOnly)
         fetch_uids_cmd += " ALL";
     else
-        fetch_uids_cmd += " UNSEEN"; /*TODO: Check If Requirements Are Satisfied */
+        fetch_uids_cmd += " UNSEEN";
 
     
     if (SUCCESS != SendData(fetch_uids_cmd)) 
@@ -464,7 +464,6 @@ std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
-        // std::cerr << "ERR: Failed to Receive Data for UID: " << uid << "\n";
         return recv_data;
     }
 
@@ -480,7 +479,7 @@ std::string NonSecureImapClient::ParseEmail(int uid, std::string email, bool jus
 
     if (false == just_headers)
     {
-        email_body = FetchEmailByUID(uid, JUST_HEADER); // TODO: Check Return Value
+        email_body = FetchEmailByUID(uid, JUST_HEADER);
         tag = GetTag();
         email_body = ParseEmailBody(email_body, tag);
     }
@@ -539,7 +538,7 @@ int NonSecureImapClient::DisconnectImapServer(void)
         curr_state = DEFAULT;
         return SUCCESS;
     }
-    return SUCCESS; /* TODO: Already Closed */
+    return SUCCESS;
 }
 
 int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, const std::string& username, const std::string& password)
@@ -579,16 +578,10 @@ int NonSecureImapClient::Run(const std::string& serverAddress, int server_port, 
 }
 
 /**
- * TODO:
+ * Notes:
  * - Pokud dojde k nejake blbosti a klient chce skoncit nemel by se odhlasit ze serveru? (slusne se odhlasit)
  * - Co se stane pokud se zachova stejne UIDVALIDITY a stahnou se znova emaily?
  * - Co se stane kdyz si uzivatel stahne emaily z vice mailboxu?
  * - Jak se ma program chovat s -o ../hey/ a -o ../hey
  * 
- * - Ctyri ERRORY pokud se nepripojis k serveru!!!
- * ERR: Unable to Resolve Hostname to IP Address: No address associated with hostname
- * ERR: Unable to Resolve Hostname To IP Address.
- * ERR: Failed to Login to IMAP Server.
- * ERR: Failed to Set Mailbox on IMAP Server.
-
  */

@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      definitions.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           22.09.2024
  *  Description:    Includes Definitions For IMAP Client.
  *

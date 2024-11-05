@@ -2,8 +2,10 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      ClientConfig.cpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           22.09.2024
- *  Description:    Implements The Client Configuration Settings Based On The Parameters With Which The Program Was Launched.
+ *  Description:    Implements The Client Configuration Settings Based On The Parameters With Which 
+ *                  The Program Was Launched.
  *
  * ****************************/
 
@@ -12,7 +14,8 @@
  *  @file           ClientConfig.cpp
  *  @author         Tomas Dolak
  *  @date           22.09.2024
- *  @brief          Implements The Client Configuration Settings Based On The Parameters With Which The Program Was Launched.
+ *  @brief          Implements The Client Configuration Settings Based On The Parameters With Which 
+ *                  The Program Was Launched.
  * ****************************/
 
 /************************************************/
@@ -179,7 +182,6 @@ int ImapClientConfig::ExtractAuthData(void)
 
     if (false == in.is_open()) 
     {
-        /* TODO: Maybe Return Some Err. Code? */
         std::cerr << "ERR: Unable To Open The Authentication File." << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }
@@ -196,7 +198,7 @@ int ImapClientConfig::ExtractAuthData(void)
         authData.password = match.str(2);  
     } 
     else 
-    {   /* TODO: Maybe Return Some Err. Code? */
+    {   
         std::cerr << "ERR: Unable To Find Valid Credentials in The File." << std::endl;
         return PARSE_CREDENTIALS_FAILED;
     }

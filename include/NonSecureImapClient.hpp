@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      NonSecureImapClient.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           28.09.2024
  *  Description:    Implements Non-Secure IMAPv4 Client That Communicates Just Thru TCP/IP With Port 143.
  *

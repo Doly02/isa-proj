@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      SecureImapClient.hpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           02.10.2024
  *  Description:    Implements Secure IMAPv4 Client That Communicates Just Thru SSL/TLS With Port 993.
  *

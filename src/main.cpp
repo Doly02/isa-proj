@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      main.cpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           22.09.2024
  *  Description:    Implements The Final Program.
  *
@@ -94,7 +95,7 @@ try
 }
 catch (const std::exception &e)
 {
-    std::cerr << e.what() << std::endl;
+    std::cerr << "ERR: " << e.what() << std::endl;
     return 1;
 }
 

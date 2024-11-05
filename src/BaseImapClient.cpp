@@ -2,6 +2,7 @@
  *  Project:        ISA Project - IMAP Client With TLS Support
  *  File Name:      BaseImapClient.cpp
  *  Author:         Tomas Dolak
+ *  Login:          xdolak09
  *  Date:           24.09.2024
  *  Description:    Implements The Base Class For IMAPv4 Client.
  *
@@ -109,13 +110,13 @@ std::string BaseImapClient::ResolveHostnameToIP(const std::string& hostname, con
 void BaseImapClient::PrintNumberOfMessages(int num, bool new_only, bool headers_only)
 {
     if (false == new_only && false == headers_only)
-        printf("Stored %d Messages\n", num);
+        fprintf(stdout, "Stored %d Messages\n", num);
     else if (true == new_only && false == headers_only)
-        printf("Stored %d New Messages\n", num);
+        fprintf(stdout, "Stored %d New Messages\n", num);
     else if (false == new_only && true == headers_only)
-        printf("Stored %d Message Headers\n", num);
+        fprintf(stdout, "Stored %d Message Headers\n", num);
     else
-        printf("Stored %d New Message Headers\n", num);
+        fprintf(stdout, "Stored %d New Message Headers\n", num);
 }
 
 
@@ -128,7 +129,7 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
             /* login completed, now in authenticated state */
             if (std::string::npos != buff.find(current_tag + " OK "))
                 return SUCCESS; 
-            /* Greeting from IMAP Server FIXME */
+            /* Greeting from IMAP Server */
             else if (std::string::npos != buff.find(current_tag + "* OK "))
                 return TRANSMIT_DATA_FAILED; 
             /* login failure: user name or password rejected */
@@ -195,7 +196,6 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
     return UNDEFINED_STATE;
 }
 
-/* TODO: BYE Command! */
 /**
  * Zpravy jsou poznaceny UID (unikatni pro kazdou zpravu) -> Tak poznas ze zpravu jsi jiz stahoval.
  *
@@ -204,5 +204,4 @@ int BaseImapClient::FindEndOfResponse(std::string buff)
  * 1) RFC:              A142 OK [READ-WRITE] SELECT completed
  * 2) Real Server:      A0000000002 OK [READ-WRITE] Select completed
  *
- * TODO: Check If Files Are Correcly Stored.
  */
