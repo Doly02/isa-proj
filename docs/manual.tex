@@ -81,7 +81,7 @@ command syntax:
 \begin{verbatim}
     imapcl server [-p port] [-T [-c certfile] [-C certaddr]] [-n] [-h] \
     -a auth_file [-b MAILBOX] -o out_dir
-    \end{verbatim}
+\end{verbatim}
 
 The order of parameters is flexible. Below is a description of each parameter:
 
@@ -103,6 +103,14 @@ The order of parameters is flexible. Below is a description of each parameter:
     \item \texttt{-b MAILBOX}: Specifies the mailbox name on the server. The default is \texttt{INBOX}.
 \end{itemize}
 
+Example how to use the program:
+
+\begin{verbatim}
+./imapcl imap.outlook.cz -p 143 -a ~/Desktop/auth_file.txt -b INBOX \
+-o ~/Desktop/email/user_inbox/
+\end{verbatim}
+
+If program is called wrongly or with wrong arguments, the program will print a help message to the user.
 
 \subsection{Examples of Downloaded Email Filenames}
 If the arguments \texttt{-h} and \texttt{-n} are not used, the output filenames of downloaded emails will look like this:
@@ -197,6 +205,8 @@ INBOX=1662988148
 SPECIFIC_MAILBOX1=1662988155
 SPECIFIC_MAILBOX2=1362922155
 \end{verbatim}
+
+\newpage
 
 In this example:
 \begin{itemize}
