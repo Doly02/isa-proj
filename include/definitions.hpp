@@ -172,7 +172,7 @@ static constexpr int RX_BUFFER_SIZE = 2048; /* RX Buffer = 1024B */
 
 #define DEBUG_ENABLED                   (false)
 
-#define OUTPUT_FILE_FORMAT              ".log"
+#define OUTPUT_FILE_FORMAT              ".txt"
 
 /***************************************************************/
 /*                  Specific For Non-Secure Mode               */

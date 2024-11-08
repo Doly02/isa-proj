@@ -128,7 +128,6 @@ std::string NonSecureImapClient::ReceiveData()
     time.tv_usec = 0;
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)  //<! Setup of Socket Timeout
     {   
-        std::cerr << "ERR: Setting Timeout For recv() Function." << std::endl;
         return BAD_RESPONSE;
     }
 
@@ -145,7 +144,6 @@ std::string NonSecureImapClient::ReceiveData()
         }
         else if (TRANSMIT_DATA_FAILED == ret_val)
         {
-            std::cerr << "ERR: Server Side Error Received." << std::endl;
             return BAD_RESPONSE;
         }
     }
@@ -155,14 +153,6 @@ std::string NonSecureImapClient::ReceiveData()
     /* Handle Error If Ocurred During Transmission */
     if (0 > bytes_rx) 
     {
-        if (EAGAIN == errno || EWOULDBLOCK == errno) 
-        {    
-            std::cerr << "ERR: Timeout Overrun While Receiving Data - recv() Timeout." << std::endl;
-        } 
-        else 
-        {        
-            std::cerr << "ERR: Receiving Data: " << strerror(errno) << std::endl;
-        }
         return EMPTY_STR;
     }
     return rx_data;
@@ -464,6 +454,7 @@ std::string NonSecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
+        std::cerr << "ERR: Failed to Receive FETCH Response for UID: " << uid << "\n";
         return recv_data;
     }
 

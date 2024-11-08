@@ -211,7 +211,6 @@ std::string SecureImapClient::ReceiveData(void)
 
     if (nullptr == ssl)
     {
-        std::cerr << "ERR: SSL Object Is Not Initialized.\n";
         return BAD_RESPONSE;
     }
 
@@ -219,7 +218,6 @@ std::string SecureImapClient::ReceiveData(void)
     time.tv_usec = 0;               /* None Microsecs */
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
     {
-        std::cerr << "ERR: Setting Timeout for SSL_read() function.\n";
         return BAD_RESPONSE;
     }
 
@@ -236,7 +234,6 @@ std::string SecureImapClient::ReceiveData(void)
         }
         else if (TRANSMIT_DATA_FAILED == ret_val)
         {
-            std::cerr << "ERR: Server Side Error Received." << std::endl;
             return BAD_RESPONSE;
         }
     }
@@ -247,15 +244,6 @@ std::string SecureImapClient::ReceiveData(void)
     /* Handle Errors During Transmission */
     if (0 > bytes_rx)
     {
-        int ssl_error = SSL_get_error(ssl, bytes_rx);
-        if (SSL_ERROR_WANT_READ == ssl_error || SSL_ERROR_WANT_WRITE == ssl_error)
-        {
-            std::cerr << "ERR: Timeout While Receiving Data With SSL_read().\n";
-        }
-        else
-        {
-            std::cerr << "ERR: Failed to Receive Data Over SSL - " << strerror(errno) << std::endl;
-        }
         return EMPTY_STR;
     }
 
@@ -564,6 +552,7 @@ std::string SecureImapClient::FetchEmailByUID(int uid, bool mode)
     recv_data = ReceiveData();
     if (EMPTY_STR == recv_data || BAD_RESPONSE == recv_data) 
     {
+        std::cerr << "ERR: Failed to Receive FETCH Response for UID: " << uid << "\n";
         return recv_data;
     }
 
