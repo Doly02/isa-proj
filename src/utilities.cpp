@@ -303,5 +303,9 @@ void ClearSocketBuffer(int sockfd)
 void ClearBIOBuffer(BIO* bio)
 {
     char buffer[1024];
-    while (BIO_read(bio, buffer, sizeof(buffer) - 1) > 0);
+    BIO_set_nbio(bio, 1);  // Non-Blocking Mode
+
+    while (BIO_pending(bio) > 0) {
+        BIO_read(bio, buffer, sizeof(buffer) - 1);
+    }
 }
