@@ -19,7 +19,8 @@
 /*                  Libraries                   */
 /************************************************/
 #include "../include/SecureImapClient.hpp"
-
+#include <sys/select.h> 
+#include <unistd.h> 
 /************************************************/
 /*             Class Implementation             */
 /************************************************/
@@ -35,6 +36,7 @@ SecureImapClient::SecureImapClient(const std::string& MailBox,
       newOnly(NewOnly),
       ssl(nullptr),             /* SSL Pointer      */
       ctx(nullptr),             /* SSL_CTX Pointer  */ 
+      bio(nullptr),             /* BIO Pointer      */
       certFile(CertFile),
       certDir(CertDirectory),
 	  uidValidity(0)
@@ -45,211 +47,129 @@ SecureImapClient::SecureImapClient(const std::string& MailBox,
     OpenSSL_add_all_algorithms();
 
 }
-
 SecureImapClient::~SecureImapClient()
 {
-    if (nullptr != ssl)
-    {
-        SSL_shutdown(ssl);
-        SSL_free(ssl);
+    if (bio != nullptr) {
+        BIO_free_all(bio);
     }
 
-    if (nullptr != ctx)
-    {
+    if (ctx != nullptr) {
         SSL_CTX_free(ctx);
     }
 }
-
 int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
 {
     int ret_val = -1;
 
-    /* Create SSL Context Only Once */
-    ctx = SSL_CTX_new(TLS_client_method()); /* SSL Context For TLS Client */
-    if (!ctx)
-    {
+    ctx = SSL_CTX_new(TLS_client_method()); 
+    if (!ctx) {
         std::cerr << "ERR: Unable to Create SSL Context.\n";
         return CREATE_CONNECTION_FAILED;
     }
 
-    /* Setup of File With Certificate */
-    if (false == certFile.empty()) 
-    {
-        if (!SSL_CTX_load_verify_locations(ctx, certFile.c_str(), nullptr)) 
-        {
-            std::cerr << "ERR: Failed to Load Certificate From File: " << certFile << "\n";
-            SSL_CTX_free(ctx);
-            return SSL_CERT_VERIFICATION_FAILED;
-        }
+    if (!certFile.empty() && !SSL_CTX_load_verify_locations(ctx, certFile.c_str(), nullptr)) {
+        std::cerr << "ERR: Failed to Load Certificate From File: " << certFile << "\n";
+        SSL_CTX_free(ctx);
+        return SSL_CERT_VERIFICATION_FAILED;
     }
 
-    /* Setup of Directory With Certificates */
-    if (false == certDir.empty()) 
-    {
-        if (!SSL_CTX_load_verify_locations(ctx, nullptr, certDir.c_str())) 
-        {
-            std::cerr << "ERR: Failed to Load Certificates From Directory: " << certDir << "\n";
-            SSL_CTX_free(ctx);
-            return SSL_CERT_VERIFICATION_FAILED;
-        }
+    if (!certDir.empty() && !SSL_CTX_load_verify_locations(ctx, nullptr, certDir.c_str())) {
+        std::cerr << "ERR: Failed to Load Certificates From Directory: " << certDir << "\n";
+        SSL_CTX_free(ctx);
+        return SSL_CERT_VERIFICATION_FAILED;
     }
 
-    /* Resolve IPv4 Address And Socket Creation */
-    std::string server_ip = serverAddress;
-    bool is_ipv4_addr = IsIPv4Address(serverAddress);
-
-    if (false == is_ipv4_addr)
-    {
-        server_ip = ResolveHostnameToIP(serverAddress, std::to_string(port));
-        if (server_ip.empty())
-        {
-            return CREATE_CONNECTION_FAILED;
-        }
-    }
-
-    is_ipv4_addr = IsIPv4Address(server_ip);
-    if (true == is_ipv4_addr)
-    {
-        sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (0 > sockfd)
-        {
-            std::cerr << "ERR: Unable To Create IPv4 Socket.\n";
-            SSL_CTX_free(ctx);
-            return CREATE_CONNECTION_FAILED;
-        }
-
-        struct sockaddr_in server_addr;
-        memset(&server_addr, 0, sizeof(server_addr));
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons((uint16_t)port); 
-        if (0 >= inet_pton(AF_INET, server_ip.c_str(), &server_addr.sin_addr))
-        {
-            std::cerr << "ERR: Invalid IPv4 Address Format.\n";
-            close(sockfd);
-            sockfd = -1;
-            SSL_CTX_free(ctx);
-            return CREATE_CONNECTION_FAILED;
-        }
-
-        /* Connection to IMAP Server */
-        if (0 > connect(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)))
-        {
-            std::cerr << "ERR: Unable To Connect To The IMAP Server on IPv4 Protocol.\n";
-            close(sockfd);
-            sockfd = -1;
-            SSL_CTX_free(ctx);
-            return CREATE_CONNECTION_FAILED;
-        }
-    }
-    else
-    {
-        std::cerr << "ERR: Server Address Is Not Valid IPv4.\n";
+    bio = BIO_new_ssl_connect(ctx);
+    if (!bio) {
+        std::cerr << "ERR: Unable to Create BIO.\n";
         SSL_CTX_free(ctx);
         return CREATE_CONNECTION_FAILED;
     }
 
-    /* Creation of SSL/TLS Connection */
-    ssl = SSL_new(ctx);                     /* Uses the SSL_CTX created once */
-    SSL_set_fd(ssl, sockfd);                /* Sets the socket */
-
-    /* SSL Handshake */
-    if (0 >= SSL_connect(ssl))
-    {
-        std::cerr << "ERR: SSL Handshake Failed.\n";
-        SSL_free(ssl);
-        ssl = nullptr;
+    BIO_get_ssl(bio, &ssl);
+    if (!ssl) {
+        std::cerr << "ERR: SSL Pointer Not Initialized.\n";
+        BIO_free_all(bio);
         SSL_CTX_free(ctx);
-        ctx = nullptr;
-        close(sockfd);
-        sockfd = -1;
         return CREATE_CONNECTION_FAILED;
     }
-    /* Set LOGIN State */
+
+    SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
+
+    std::string bio_address = serverAddress + ":" + std::to_string(port);
+    BIO_set_conn_hostname(bio, bio_address.c_str());
+
+    if (BIO_do_connect(bio) <= 0) {
+        std::cerr << "ERR: SSL BIO Connection Failed.\n";
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        return CREATE_CONNECTION_FAILED;
+    }
+
+    if (BIO_do_handshake(bio) <= 0) {
+        std::cerr << "ERR: SSL BIO Handshake Failed.\n";
+        BIO_free_all(bio);
+        SSL_CTX_free(ctx);
+        return CREATE_CONNECTION_FAILED;
+    }
+
     ret_val = LoginClient(username, password);
-    if (SUCCESS != ret_val)
-    {
+    if (ret_val != SUCCESS) {
         return ret_val;
     }
     return SUCCESS;
 }
 
-
 int SecureImapClient::SendData(const std::string& data)
 {
-    ssize_t bytes_tx = 0;
     std::string message = data + "\r\n";
 
-    if (nullptr == ssl)
-    {
-        std::cerr << "ERR: SSL Object Is Not Initialized.\n";
+    if (!bio) {
         return TRANSMIT_DATA_FAILED;
     }
 
-    /* Sends Data Thru SLL Connection */
-    bytes_tx = SSL_write(ssl, message.c_str(), message.length());
-    if (0 > bytes_tx)
-    {
-        std::cerr << "ERR: Failed to Send Data Over SSL Connection.\n";
+    int bytes_tx = BIO_write(bio, message.c_str(), message.length());
+    if (bytes_tx <= 0) {
+        if (!BIO_should_retry(bio)) {
+            return TRANSMIT_DATA_FAILED;
+        }
+    }
+
+    if (bytes_tx != static_cast<int>(message.length())) {
         return TRANSMIT_DATA_FAILED;
     }
 
-    if (static_cast<size_t>(bytes_tx) != message.length())
-    {
-        std::cerr << "ERR: Not All Data Was Transmitted Over SSL Connection.\n";
-        return TRANSMIT_DATA_FAILED;
-    }
     return SUCCESS;
 }
 
-std::string SecureImapClient::ReceiveData(void)
+std::string SecureImapClient::ReceiveData()
 {
-    char rx_buffer[RX_BUFFER_SIZE]  = { 0 };        /* Buffer For Data Reception    */
-    ssize_t bytes_rx                = 0;            /* Number of Received Bytes     */
-    std::string rx_data             = EMPTY_STR;    /* Buffer For Server Response   */
-    int ret_val                     = -1;
-    struct timeval time;
+    char rx_buffer[RX_BUFFER_SIZE] = { 0 };
+    std::string rx_data;
 
-    if (nullptr == ssl)
-    {
+    if (!bio) {
         return BAD_RESPONSE;
     }
 
-    time.tv_sec = TIMEOUT_SECURE;   /* Timeout in Secs */
-    time.tv_usec = 0;               /* None Microsecs */
-    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time, sizeof(time)) < 0)
-    {
-        return BAD_RESPONSE;
-    }
-
-    while (0 < (bytes_rx = SSL_read(ssl, rx_buffer, RX_BUFFER_SIZE - 1)))
-    {
+    int bytes_rx;
+    while ((bytes_rx = BIO_read(bio, rx_buffer, RX_BUFFER_SIZE - 1)) > 0) {
         rx_buffer[bytes_rx] = '\0';
         rx_data += rx_buffer;
 
-        /* Check For The End of The Response */
-        ret_val = BaseImapClient::FindEndOfResponse(std::string(rx_data)); 
-        if (SUCCESS == ret_val)
-        {
+        int ret_val = BaseImapClient::FindEndOfResponse(rx_data);
+        if (ret_val == SUCCESS) {
             break;
-        }
-        else if (TRANSMIT_DATA_FAILED == ret_val)
-        {
+        } else if (ret_val == TRANSMIT_DATA_FAILED) {
             return BAD_RESPONSE;
         }
     }
 
-    /* Clear The Socket */
-    ClearSSLBuffer(ssl);
-
-    /* Handle Errors During Transmission */
-    if (0 > bytes_rx)
-    {
+    if (bytes_rx < 0 && !BIO_should_retry(bio)) {
         return EMPTY_STR;
     }
 
     return rx_data;
 }
-
 
 int SecureImapClient::LoginClient(std::string username, std::string password)
 {

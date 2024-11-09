@@ -125,6 +125,7 @@ int ImapClientConfig::ParseArguments(int argc, char* argv[])
 
     if (6 > argc || 16 < argc) 
     {
+        PrintHelp();
         return PARSE_ARGUMENTS_FAILED;  
     }
     server = argv[1];

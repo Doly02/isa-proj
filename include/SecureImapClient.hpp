@@ -42,6 +42,7 @@ class SecureImapClient : public BaseImapClient
 
         SSL*        ssl;            //!< SSL Structure For The Connection
         SSL_CTX*    ctx;            //!< SSL Context Structure For Managing SSL
+        BIO*        bio;            //!< BIO Structure For Managing SSL Connection
 
         std::string certFile;
         std::string certDir;
