@@ -152,25 +152,55 @@ std::string SecureImapClient::ReceiveData()
     }
 
     int bytes_rx;
-    while ((bytes_rx = BIO_read(bio, rx_buffer, RX_BUFFER_SIZE - 1)) > 0) {
-        rx_buffer[bytes_rx] = '\0';
-        rx_data += rx_buffer;
+    int bio_fd = BIO_get_fd(bio, nullptr);  // BIO Object Descriptor
+    struct timeval timeout;
 
-        int ret_val = BaseImapClient::FindEndOfResponse(rx_data);
-        if (ret_val == SUCCESS) {
-            break;
-        } else if (ret_val == TRANSMIT_DATA_FAILED) {
-            return BAD_RESPONSE;
+    while (true) {
+        timeout.tv_sec = TIMEOUT_SECURE;  
+        timeout.tv_usec = 0;
+
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(bio_fd, &read_fds);
+
+        int select_result = select(bio_fd + 1, &read_fds, nullptr, nullptr, &timeout);
+
+        if (select_result > 0 && FD_ISSET(bio_fd, &read_fds)) 
+        {
+            bytes_rx = BIO_read(bio, rx_buffer, RX_BUFFER_SIZE - 1);
+            if (bytes_rx > 0) {
+                rx_buffer[bytes_rx] = '\0';
+                rx_data += rx_buffer;
+
+                int ret_val = BaseImapClient::FindEndOfResponse(rx_data);
+                if (ret_val == SUCCESS) {
+                    break;
+                } else if (ret_val == TRANSMIT_DATA_FAILED) {
+                    return BAD_RESPONSE;
+                }
+            } else if (bytes_rx <= 0) 
+            {
+                if (!BIO_should_retry(bio)) 
+                {
+                    return EMPTY_STR;
+                }
+            }
+        } else if (select_result == 0) 
+        {
+            // Timeout Error
+            return EMPTY_STR;
+        } 
+        else 
+        {
+            // Error In Select
+            return EMPTY_STR;
         }
     }
 
     ClearBIOBuffer(bio);
-    if (bytes_rx < 0 && !BIO_should_retry(bio)) {
-        return EMPTY_STR;
-    }
-
     return rx_data;
 }
+
 
 int SecureImapClient::LoginClient(std::string username, std::string password)
 {

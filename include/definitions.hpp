@@ -207,7 +207,7 @@ static constexpr int RX_BUFFER_SIZE = 2048; /* RX Buffer = 1024B */
  * @brief   Define Timeout For Receiving Data From IMAP Server. Time in [s].
  * @details Used Only for Secure Client Mode.
  */
-#define TIMEOUT_SECURE              (30)
+#define TIMEOUT_SECURE              (10)
 
 #define DEFAULT_SSL_CERT_LOC        "/etc/ssl/certs"
 #define DEFAULT_MAILBOX_DIR         "INBOX"
