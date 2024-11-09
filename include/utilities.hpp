@@ -200,10 +200,10 @@ void ClearSocketBuffer(int sockfd);
 
 /**
  * @brief       Clear Rx Buffer on Specific Socket on Standard SSL/TLS Connection.
- * @param[in]   sockfd Socket File Descriptor.
+ * @param[in]   bio Pointer to bio.
  * 
  * @retval      void
  */
-void ClearSSLBuffer(SSL* ssl);
+void ClearBIOBuffer(BIO* bio);
 
 #endif /* UTILITIES_HPP */

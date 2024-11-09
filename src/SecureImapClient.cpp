@@ -164,6 +164,7 @@ std::string SecureImapClient::ReceiveData()
         }
     }
 
+    ClearBIOBuffer(bio);
     if (bytes_rx < 0 && !BIO_should_retry(bio)) {
         return EMPTY_STR;
     }

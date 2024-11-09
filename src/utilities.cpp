@@ -300,9 +300,8 @@ void ClearSocketBuffer(int sockfd)
     while (recv(sockfd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT) > 0);
 }
 
-void ClearSSLBuffer(SSL* ssl)
+void ClearBIOBuffer(BIO* bio)
 {
     char buffer[1024];
-    while (SSL_read(ssl, buffer, sizeof(buffer) - 1) > 0);
-    // Call SSL_read From SSL/TLS Connections, While All Data Are Not Read
+    while (BIO_read(bio, buffer, sizeof(buffer) - 1) > 0);
 }
