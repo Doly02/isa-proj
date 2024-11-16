@@ -464,7 +464,7 @@ int SecureImapClient::FetchEmails()
             {
                 return FETCH_EMAIL_FAILED;   
             }
-            email = ParseEmail(id, email, false);
+            email = ParseEmail(id, email, headersOnly);
             if (EMPTY_STR == email)
             {
                 return FETCH_EMAIL_FAILED;   
