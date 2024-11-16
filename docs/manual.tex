@@ -121,21 +121,21 @@ where \texttt{INBOX} is the mailbox and \texttt{1717} is the UID of this email.
 
 If the arguments \texttt{-h} and \texttt{-n} are used, the output filenames of downloaded emails will look like this:
 \begin{verbatim}
-MSG_INBOX_1717_new_header.txt
+MSG_new_header_INBOX_1717.txt
 \end{verbatim}
-where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{new\_header} indicates that the email contains just the header of emails that the IMAP server categorizes as new.
+where \texttt{new\_header} indicates that the email contains just the header of emails that the IMAP server categorizes as new, \texttt{INBOX} is the mailbox and \texttt{1717} is the UID of this email.
 
 If only the argument \texttt{-h} is used, the output filenames of downloaded emails will look like this:
 \begin{verbatim}
-MSG_INBOX_1717_header.txt
+MSG_header_INBOX_1717.txt
 \end{verbatim}
-where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{header} indicates that the file contains only the email's header.
+where \texttt{MSG\_header} indicates that the file contains only the email's header, \texttt{INBOX} is the mailbox, and \texttt{1717} is the UID of this email.
 
 If only the argument \texttt{-n} is used, the output filenames of downloaded emails will look like this:
 \begin{verbatim}
-MSG_INBOX_1717_new.txt
+MSG_new_INBOX_1717.txt
 \end{verbatim}
-where \texttt{INBOX} is the mailbox, \texttt{1717} is the UID of this email, and \texttt{new} indicates that the file contains an email that the IMAP server categorizes as new.
+where \texttt{MSG\_new} indicates that the file contains an email that the IMAP server categorizes as new, \texttt{INBOX} is the mailbox and \texttt{1717} is the UID of this email.
 
 
 \section{Implementation Details}
@@ -144,10 +144,12 @@ divided into logical classes such as the \verb!ClientConfig! class - which takes
 of the resulting IMAP client based on the input arguments of the program, which it also processes. 
 On the result of the configuration, either an instance of the \verb!NonSecureImapClient! class is created, 
 which mediates communication, classically only over TCP/IP, or an instance of the \verb!SecureImapClient! 
-class, which also uses SSL/TLS in addition to TCP/IP. Both classes \verb!NonSecureImapClient! and 
-\verb!SecureImapClient! inherit basic properties from \verb!BaseImapClient!, which provides features 
-that are common to both derived classes, such as generating a TAG, finding the value of the current TAG or translating 
-a hostname to an IPv4 address.\cite{openssl_tutorial}
+class, which also uses SSL/TLS in addition to TCP/IP. The \verb!SecureImapClient! class utilizes OpenSSL's 
+\textbf{BIO} (Basic Input/Output) abstraction for handling SSL/TLS communication. The BIO object is configured 
+to establish a secure connection with the IMAP server, handle handshakes, and ensure encrypted data transmission. 
+Both classes \verb!NonSecureImapClient! and \verb!SecureImapClient! inherit basic properties from \verb!BaseImapClient!, 
+which provides features that are common to both derived classes, such as generating a TAG, finding the value of the 
+current TAG or translating a hostname to an IPv4 address.\cite{openssl_tutorial}
 
 \subsection{Implementation of Client}
 The NonSecureImapClient and SecureClient classes are characterized by their very 
@@ -198,6 +200,7 @@ name of the IMAP server or user account, so it is recommended to download only e
 multiple mailboxes of one account to one output directory to maintain clarity and easy orientation 
 in the application output.
 
+\newpage
 An example of the `.uidvalidity` file content:
 
 \begin{verbatim}
@@ -205,8 +208,6 @@ INBOX=1662988148
 SPECIFIC_MAILBOX1=1662988155
 SPECIFIC_MAILBOX2=1362922155
 \end{verbatim}
-
-\newpage
 
 In this example:
 \begin{itemize}

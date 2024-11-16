@@ -7,7 +7,7 @@
 \contentsline {subsection}{\numberline {2.1}Required Parameters}{2}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Optional Parameters}{3}{subsection.2.2}%
 \contentsline {subsection}{\numberline {2.3}Examples of Downloaded Email Filenames}{3}{subsection.2.3}%
-\contentsline {section}{\numberline {3}Implementation Details}{3}{section.3}%
+\contentsline {section}{\numberline {3}Implementation Details}{4}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Implementation of Client}{4}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Program's Features}{4}{subsection.3.2}%
 \contentsline {subsubsection}{\numberline {3.2.1}Usage of UIDVALIDITY Value}{4}{subsubsection.3.2.1}%
@@ -22,7 +22,7 @@
 \contentsline {subsubsection}{\numberline {3.6.1}ClientConfig}{8}{subsubsection.3.6.1}%
 \contentsline {subsubsection}{\numberline {3.6.2}ImapClients}{9}{subsubsection.3.6.2}%
 \contentsline {section}{\numberline {4}Testing}{9}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Testing of Local IMAP Server}{10}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.1}Testing on Local IMAP Server}{10}{subsection.4.1}%
 \contentsline {subsubsection}{\numberline {4.1.1}Implementation Details of Local IMAP Server}{10}{subsubsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.2}Testing of Foreign IMAP Servers}{11}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.2}Testing on Foreign IMAP Servers}{11}{subsection.4.2}%
 \contentsline {section}{\numberline {5}Return Codes}{13}{section.5}%

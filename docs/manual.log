@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  4 NOV 2024 17:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=latex 2024.10.12)  16 NOV 2024 20:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -541,16 +541,9 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 \openout4 = `manual.toc'.
 
  [1]
-
-LaTeX Warning: Citation `techtarget-imap' on page 2 undefined on input line 73.
-
-
-
-LaTeX Warning: Citation `email-protocols' on page 2 undefined on input line 73.
-
-
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 9
 0.
+
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [2] [3] [4] [5]
@@ -562,14 +555,14 @@ File: ClientConfig.eps Graphic file (type eps)
 File: ImapClient.eps Graphic file (type eps)
  <ImapClient.eps>
 [9]
-Overfull \hbox (10.66832pt too wide) in paragraph at lines 347--356
+Overfull \hbox (10.66832pt too wide) in paragraph at lines 358--367
 \T1/ptm/m/n/10.95 server. The lo-cal IMAP server is avail-able in the repos-i-t
 ory in the tests folder un-der the name \T1/pcr/m/n/10.95 imap_server.py\T1/ptm
 /m/n/10.95 .
  []
 
 
-Overfull \hbox (3.43326pt too wide) in paragraph at lines 347--356
+Overfull \hbox (3.43326pt too wide) in paragraph at lines 358--367
 \T1/ptm/m/n/10.95 The server is im-ple-mented in Python us-ing the \T1/pcr/m/n/
 10.95 os\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 socket\T1/ptm/m/n/10.95 , \T1/pcr
 /m/n/10.95 threading\T1/ptm/m/n/10.95 , \T1/pcr/m/n/10.95 subprocess\T1/ptm/m/n
@@ -579,39 +572,35 @@ Overfull \hbox (3.43326pt too wide) in paragraph at lines 347--356
 
 File: imap_server.eps Graphic file (type eps)
 <imap_server.eps> [10]
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 424--424
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 435--435
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
 
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 452--452
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 463--463
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
 [11]
-Overfull \hbox (2.3383pt too wide) in paragraph at lines 470--470
+Overfull \hbox (2.3383pt too wide) in paragraph at lines 481--481
 []|\T1/ptm/b/n/10.95 Server|  
  []
 
-[12] [13] (./manual.bbl) [14] (./manual.aux)
+[12] [13] [14] (./manual.bbl) [15] (./manual.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `manual.out' has not changed.
-(rerunfilecheck)             Checksum: 577982B883B0877212CF56962CE3541C;4951.
+(rerunfilecheck)             Checksum: A4970E54BD1719B35D131876BF6C4E68;4951.
  ) 
 Here is how much of TeX's memory you used:
- 12803 strings out of 474223
- 205494 string characters out of 5748758
+ 12804 strings out of 474223
+ 205511 string characters out of 5748758
  1945972 words of memory out of 5000000
- 34859 multiletter control sequences out of 15000+600000
+ 34860 multiletter control sequences out of 15000+600000
  590314 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,8n,79p,1023b,573s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on manual.dvi (15 pages, 76176 bytes).
+Output written on manual.dvi (16 pages, 77920 bytes).
