@@ -51,10 +51,12 @@ SecureImapClient::~SecureImapClient()
 {
     if (bio != nullptr) {
         BIO_free_all(bio);
+        bio = nullptr;
     }
 
     if (ctx != nullptr) {
         SSL_CTX_free(ctx);
+        ctx = nullptr;
     }
 }
 int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const std::string& username, const std::string& password, int port)
@@ -70,12 +72,14 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
     if (!certFile.empty() && !SSL_CTX_load_verify_locations(ctx, certFile.c_str(), nullptr)) {
         std::cerr << "ERR: Failed to Load Certificate From File: " << certFile << "\n";
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return SSL_CERT_VERIFICATION_FAILED;
     }
 
     if (!certDir.empty() && !SSL_CTX_load_verify_locations(ctx, nullptr, certDir.c_str())) {
         std::cerr << "ERR: Failed to Load Certificates From Directory: " << certDir << "\n";
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return SSL_CERT_VERIFICATION_FAILED;
     }
 
@@ -83,6 +87,7 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
     if (!bio) {
         std::cerr << "ERR: Unable to Create BIO.\n";
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return CREATE_CONNECTION_FAILED;
     }
 
@@ -90,7 +95,9 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
     if (!ssl) {
         std::cerr << "ERR: SSL Pointer Not Initialized.\n";
         BIO_free_all(bio);
+        bio = nullptr;
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return CREATE_CONNECTION_FAILED;
     }
 
@@ -102,14 +109,18 @@ int SecureImapClient::ConnectImapServer(const std::string& serverAddress, const 
     if (BIO_do_connect(bio) <= 0) {
         std::cerr << "ERR: SSL BIO Connection Failed.\n";
         BIO_free_all(bio);
+        bio = nullptr;
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return CREATE_CONNECTION_FAILED;
     }
 
     if (BIO_do_handshake(bio) <= 0) {
         std::cerr << "ERR: SSL BIO Handshake Failed.\n";
         BIO_free_all(bio);
+        bio = nullptr;
         SSL_CTX_free(ctx);
+        ctx = nullptr;
         return CREATE_CONNECTION_FAILED;
     }
 
