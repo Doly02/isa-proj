@@ -103,6 +103,10 @@ void StoreUIDVALIDITY(int uid_validity, const std::string& mailbox, const std::s
 int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox);
 
 /**
+ * @brief       Retrieves The Base Filename For The Output File.
+ */
+std::string GetBasename(bool h_only, bool n_only);
+/**
  * @brief       Generates A Filename For A Specific Email.
  * 
  * @details     This Function Generates A Filename Based On The Given UID, Mailbox Name

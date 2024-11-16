@@ -201,28 +201,31 @@ int ReadUIDVALIDITYFile(const std::string& filepath, const std::string& mailbox)
     return UIDVALIDITY_FILE_NOT_FOUND;
 }
 
-std::string GenerateFilename(int uid, std::string mailbox, bool h_only, bool n_only)
+std::string GetBasename(bool h_only, bool n_only)
 {
-    std::string suffix = EMPTY_STR;
-
     if (true == n_only && true == h_only)          
     {
-        suffix = "_new_header";
+        return "MSG_new_header_";
     }
     else if (true == h_only && false == n_only)
     {
-        suffix = "_header";
+        return "MSG_header_";
     }
     else if (false == h_only && true == n_only)
     {
-        suffix = "_new";
+        return "MSG_new_";
     }
     else
     {
-        suffix = EMPTY_STR;
+        return "MSG_";
     }
-    
-    return ("MSG_" + mailbox + "_" + std::to_string(uid) + suffix + OUTPUT_FILE_FORMAT);
+}
+
+std::string GenerateFilename(int uid, std::string mailbox, bool h_only, bool n_only)
+{
+    std::string base = EMPTY_STR;
+    base = GetBasename(h_only, n_only);    
+    return (base + mailbox + "_" + std::to_string(uid) + OUTPUT_FILE_FORMAT);
 }
 
 std::string GeneratePathToFile(std::string output_dir, std::string f_name)
@@ -238,21 +241,38 @@ void StoreEmail(std::string content, std::string file_path)
 
 std::string ParseEmailHeader(std::string header)
 {
-    std::string delete_part = EMPTY_STR;
-    try {
-        std::regex reg_expression("(\\r\\n\\)[.|\\s\\S]*)");
-        std::smatch match;
-        if(regex_search(header, match, reg_expression) && (1 < match.size())) {
-            delete_part = match.str(1);
+  try {
+        // Delete First Line
+        size_t first_line_end = header.find("\r\n");
+        if (first_line_end != std::string::npos) 
+        {
+            header = header.substr(first_line_end + 2); // +2 -> "\r\n"
         } 
-    } 
-    catch(std::regex_error& e) {
-        return BAD_RESPONSE;
+        else 
+        {
+            first_line_end = header.find("\n"); // For Case If End of Line Is Just "\n"
+            if (first_line_end != std::string::npos) 
+            {
+
+                header = header.substr(first_line_end + 1); // +1 -> "\n"
+            }
+        }
+
+        /* Find End Of Header ("\r\n\r\n")*/
+        size_t header_end = header.find("\r\n\r\n");
+        if (header_end != std::string::npos) {
+            // Zachováme pouze část hlavičky
+
+            header = header.substr(0, header_end + 4);  // +4 -> "\r\n\r\n"
+            return header; 
+        }
+
+        /* "\r\n\r\n" Not Found */
+        return header;
+
+    } catch (...) {
+        return BAD_RESPONSE; // V případě chyby vrátíme BAD_RESPONSE
     }
-    header = header.substr(0, header.size() - delete_part.size());
-    header.erase(0, header.find("\r\n") + 1);
-    header.erase(0, header.find("\n") + 1);
-    return header;
 }
 
 std::string ParseEmailBody(std::string body, std::string tag)

@@ -413,7 +413,8 @@ int SecureImapClient::CheckUIDValidity()
         /* Program Will Remove Email Files From Folder And Then Downloaded Them Again. */
         
         /* Remove Email Files From Output Directory */
-        std::string prefix = "MSG_" + mailbox + "_";
+        std::string base = GetBasename(headersOnly, newOnly);
+        std::string prefix = base + mailbox + "_";
         ret_val = RemoveFilesMatchingPattern(outputDir, prefix, OUTPUT_FILE_FORMAT);
         if (SUCCESS != ret_val)
         {
