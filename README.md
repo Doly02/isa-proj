@@ -26,6 +26,7 @@ The goal of this project in the subject Network Applications and Network Adminis
     - [Handling Non-Existent Output Directory](#handling-non-existent-output-directory)
     - [Storing The Contents of Multiple Mailboxes In One Folder](#storing-the-contents-of-multiple-mailboxes-in-one-folder)
     - [Gentle Downloading](#gentle-downloading)
+    - [Authentication File](#authentication-file)
 - [Examples of a Downloaded Email Filenames](#examples-of-a-downloaded-email-filenames)
 - [Resources](#resources)
 
@@ -147,13 +148,29 @@ The client always needs to have a specific `output directory` to which it will d
 ### Storing The Contents of Multiple Mailboxes In One Folder
 The client is able to download the contents of multiple mailboxes into one output directory. Because the program often relies on the value of UIDVALIDITY, the client stores the values of already known mailboxes from which emails are downloaded to the given output directory, thus synchronization of multiple mailboxes is guaranteed.
 
-### Gentle Downloading 
+### Gentle Downloading
 The program also introduces a gentle download, i.e. emails are downloaded only if the 
 emails are downloaded to a given output directory for the first time, or the structure of 
 the local copy of the mailbox or the structure on the IMAP server has changed. For example, 
 in a local folder where emails have been downloaded once before, some email(s) in the folder 
 have been removed (perhaps by mistake) or the mailbox on the IMAP server has been modified 
 and the `UIDVALIDITY` value has changed. The client is always in sync with the IMAP server.
+
+### Authentication File
+The program allows the user more variability with the background authentication file containing 
+login credentials, the content of the authentication file (parameter `-a`) can look like follows:
+
+```
+username = login
+password = pwd
+```
+or like this:
+```
+username=login
+password=pwd
+
+```
+The user is allowed to work with white characters in different ways, which should make the use of the program more comfortable.
 
 ## Examples Of a Downloaded Email Filenames
 If arguments `-h` and `-n` are not used, the output filenames of downloaded emails will look like this:
