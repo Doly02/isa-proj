@@ -57,7 +57,7 @@ Please refer to the Makefile for additional targets and commands.
 
 ## Project organization 
 ```
-ipk-proj-1/
+isa-proj/
 │
 ├── include/                # Header files for class declarations.
 │   ├── BaseImapClient.hpp       # Base class for IMAP client functionality.
